@@ -32,13 +32,16 @@ function htmlEscape(s: string) {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const secret = process.env.PLAYER_SESSION_SECRET;
+  const secret = process.env['PLAYER_SESSION_SECRET'];
+
   if (!secret) {
     res.status(500).send('Missing env PLAYER_SESSION_SECRET');
     return;
   }
 
-  const token = typeof req.query.token === 'string' ? req.query.token : '';
+  const tokenRaw = req.query['token'];
+  const token = typeof tokenRaw === 'string' ? tokenRaw : '';
+  
   if (!token) {
     res.status(401).send('Missing token');
     return;

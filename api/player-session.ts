@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const secret = process.env.PLAYER_SESSION_SECRET;
+  const secret = process.env['PLAYER_SESSION_SECRET'];
   if (!secret) {
     res.status(500).send('Missing env PLAYER_SESSION_SECRET');
     return;
@@ -63,7 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const expiresInSec = Number(process.env.PLAYER_SESSION_TTL_SEC || 300);
+   const expiresInSec = Number(process.env['PLAYER_SESSION_TTL_SEC'] ?? 300);
     const now = Math.floor(Date.now() / 1000);
 
     const token = jwt.sign(
