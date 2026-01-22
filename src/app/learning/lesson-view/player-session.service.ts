@@ -23,6 +23,7 @@ export class PlayerSessionService {
   async createSession(req: CreatePlayerSessionRequest): Promise<CreatePlayerSessionResponse> {
     const res = await fetch('/api/player-session', {
       method: 'POST',
+      credentials: 'include', // ✅ مهم جدًا عشان الـ Set-Cookie يتسجل
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${req.idToken}`
