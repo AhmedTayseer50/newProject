@@ -1,0 +1,32 @@
+{
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "dist/dr-enam",
+  "framework": "angular",
+
+  "redirects": [
+    { "source": "/", "destination": "/ar/", "permanent": false }
+  ],
+
+  "rewrites": [
+    { "source": "/ar", "destination": "/ar/index.html" },
+    { "source": "/ar/(.*)", "destination": "/ar/index.html" },
+
+    { "source": "/en", "destination": "/en/index.html" },
+    { "source": "/en/(.*)", "destination": "/en/index.html" }
+  ],
+
+  "headers": [
+    {
+      "source": "/(ar|en)/(.*)\\.(js|css|png|jpg|jpeg|svg|webp|woff|woff2|ttf|eot)$",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(ar|en)/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ]
+}

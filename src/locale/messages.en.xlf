@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2"
+  xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="ar" target-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+
+      <trans-unit id="1152015693471194400" datatype="html">
+        <source>نبضة حياة</source>
+        <target>Nabdah Hayah</target>
+      </trans-unit>
+
+      <trans-unit id="7935153659626812438" datatype="html">
+        <source>منصة للصحة النفسية والتعليم</source>
+        <target>Mental Health and Education Platform</target>
+      </trans-unit>
+
+      <trans-unit id="6909046605963142271" datatype="html">
+        <source>القائمة</source>
+        <target>Menu</target>
+      </trans-unit>
+
+      <trans-unit id="5896476729491647130" datatype="html">
+        <source>الرئيسية</source>
+        <target>Home</target>
+      </trans-unit>
+
+      <trans-unit id="7738948830253305185" datatype="html">
+        <source>الكورسات</source>
+        <target>Courses</target>
+      </trans-unit>
+
+      <trans-unit id="6921251900815919748" datatype="html">
+        <source>الدبلومات</source>
+        <target>Diplomas</target>
+      </trans-unit>
+
+      <trans-unit id="7126736703579246278" datatype="html">
+        <source> الاستشارات </source>
+        <target>Consultations</target>
+      </trans-unit>
+
+      <trans-unit id="1290431441074778079" datatype="html">
+        <source>عن الدكتورة</source>
+        <target>About the Doctor</target>
+      </trans-unit>
+
+      <trans-unit id="1885903461072966202" datatype="html">
+        <source>تواصل</source>
+        <target>Contact</target>
+      </trans-unit>
+
+      <trans-unit id="7595438448549829066" datatype="html">
+        <source>تغيير الوضع</source>
+        <target>Toggle Theme</target>
+      </trans-unit>
+
+      <trans-unit id="460269749123164826" datatype="html">
+        <source> دخول </source>
+        <target>Login</target>
+      </trans-unit>
+
+      <trans-unit id="9148745601540834162" datatype="html">
+        <source> حساب جديد </source>
+        <target>Register</target>
+      </trans-unit>
+
+      <trans-unit id="1970019115624026220" datatype="html">
+        <source> مرحبًا،          <x id="INTERPOLATION" equiv-text="{{ u.email }}"/>
+        </source>
+        <target>Hello, <x id="INTERPOLATION" equiv-text="{{ u.email }}"/>
+        </target>
+      </trans-unit>
+
+      <trans-unit id="580349602669558247" datatype="html">
+        <source>حساب معطّل</source>
+        <target>Account Disabled</target>
+      </trans-unit>
+
+      <trans-unit id="22464362655476342" datatype="html">
+        <source> كورساتي </source>
+        <target>My Courses</target>
+      </trans-unit>
+
+      <trans-unit id="6821871031768267042" datatype="html">
+        <source> الملف الشخصي </source>
+        <target>Profile</target>
+      </trans-unit>
+
+      <trans-unit id="2414892305215743892" datatype="html">
+        <source> خروج </source>
+        <target>Logout</target>
+      </trans-unit>
+
+      <trans-unit id="7507085789803157481" datatype="html">
+        <source>الاستشارات</source>
+        <target>Consultations</target>
+      </trans-unit>
+
+      <!-- New translations added -->
+
+      <trans-unit id="9064979754952574225" datatype="html">
+        <source>إنشاء حساب</source>
+        <target>Create Account</target>
+      </trans-unit>
+
+      <trans-unit id="5505730230573298366" datatype="html">
+        <source>البريد الإلكتروني</source>
+        <target>Email</target>
+      </trans-unit>
+
+      <trans-unit id="4630260391192426648" datatype="html">
+        <source>كلمة المرور</source>
+        <target>Password</target>
+      </trans-unit>
+
+      <trans-unit id="429088543149366046" datatype="html">
+        <source>تسجيل</source>
+        <target>Register</target>
+      </trans-unit>
+
+      <trans-unit id="6223432864390216980" datatype="html">
+        <source>لديك حساب؟ دخول</source>
+        <target>Have an account? Login</target>
+      </trans-unit>
+
+      <trans-unit id="home_hero_pill" datatype="html">
+        <source>
+          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
+          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
+          منصة نفسية تعليمية مع دكتورة استشاري صحة نفسية
+        </source>
+        <target>
+          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
+          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
+          Educational psychological platform with a consultant psychiatrist
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_hero_title" datatype="html">
+        <source>رحلتك نحو الشفاء تبدأ من هنا</source>
+        <target>Your journey to healing starts here</target>
+      </trans-unit>
+
+      <!-- FIXED: STRONG placeholders must be <x .../> -->
+      <trans-unit id="home_hero_subtitle" datatype="html">
+        <source>
+          منصة          <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>
+نبضة حياة          <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+          تقدم كورسات نفسية مسجلة وجلسات خاصة تُمكّنك من فهم ذاتك، معالجة جذور الألم، وبناء حياة أكثر سلاماً ووعيًا.
+        </source>
+        <target>
+          <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>
+Nabdah Hayah<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
+          platform offers recorded psychological courses and private sessions that enable you to understand yourself, treat the roots of pain, and build a more peaceful and conscious life.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_hero_cta_consult" datatype="html">
+        <source> احجز جلسة استشارة </source>
+        <target> Book a consultation session </target>
+      </trans-unit>
+
+      <trans-unit id="home_hero_cta_courses" datatype="html">
+        <source> اكتشف الكورسات </source>
+        <target> Discover the courses </target>
+      </trans-unit>
+
+      <!-- FIXED: SPAN placeholders must be <x .../> -->
+      <trans-unit id="home_hero_meta_1" datatype="html">
+        <source>
+          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
+          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
+          محتوى علمي مبني على مدارس علم النفس الحديثة
+        </source>
+        <target>
+          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
+          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
+          Scientific content based on modern schools of psychology
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_hero_meta_2" datatype="html">
+        <source>
+          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
+          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
+          متابعة نفسية للحالات عبر برامج خاصة
+        </source>
+        <target>
+          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
+          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
+          Psychological follow-up for cases through special programs
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_hero_meta_3" datatype="html">
+        <source>
+          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
+          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
+          خصوصية وسرية تامة في كل خطوة
+        </source>
+        <target>
+          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
+          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
+          Complete privacy and confidentiality at every step
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_featured_eyebrow" datatype="html">
+        <source>أفضل البرامج</source>
+        <target>Best Programs</target>
+      </trans-unit>
+
+      <trans-unit id="home_featured_title" datatype="html">
+        <source>أكثر الكورسات طلبًا</source>
+        <target>Most Requested Courses</target>
+      </trans-unit>
+
+      <trans-unit id="home_featured_subtitle" datatype="html">
+        <source> مجموعة مختارة من أهم البرامج العلاجية والنفسية في منصة نبضة حياة. </source>
+        <target> A selected group of the most important therapeutic and psychological programs on the Nabdah Hayah platform. </target>
+      </trans-unit>
+
+      <trans-unit id="home_course_tag_default" datatype="html">
+        <source>
+          <x id="INTERPOLATION" equiv-text="{{ c.categoryId || &quot;عام&quot; }}"/>
+        </source>
+        <target>
+          <x id="INTERPOLATION" equiv-text="{{ c.categoryId || &quot;عام&quot; }}"/>
+        </target>
+      </trans-unit>
+
+
+      <trans-unit id="home_course_open" datatype="html">
+        <source> فتح الكورس </source>
+        <target> Open Course </target>
+      </trans-unit>
+
+      <trans-unit id="home_course_details" datatype="html">
+        <source> عرض التفاصيل </source>
+        <target> View Details </target>
+      </trans-unit>
+
+      <trans-unit id="home_course_join" datatype="html">
+        <source> انضم الآن </source>
+        <target> Join Now </target>
+      </trans-unit>
+
+      <trans-unit id="title_home" datatype="html">
+        <source>الرئيسية</source>
+        <target>Home</target>
+      </trans-unit>
+
+      <trans-unit id="title_about" datatype="html">
+        <source>عن الدكتورة</source>
+        <target>About the Doctor</target>
+      </trans-unit>
+
+      <trans-unit id="title_courses" datatype="html">
+        <source>الكورسات</source>
+        <target>Courses</target>
+      </trans-unit>
+
+      <trans-unit id="title_course_details" datatype="html">
+        <source>تفاصيل الكورس</source>
+        <target>Course Details</target>
+      </trans-unit>
+
+      <trans-unit id="title_consultations" datatype="html">
+        <source>الاستشارات</source>
+        <target>Consultations</target>
+      </trans-unit>
+
+      <trans-unit id="title_contact" datatype="html">
+        <source>تواصل</source>
+        <target>Contact</target>
+      </trans-unit>
+
+      <trans-unit id="title_book_session" datatype="html">
+        <source>حجز جلسة</source>
+        <target>Book Session</target>
+      </trans-unit>
+
+      <trans-unit id="title_lesson_view" datatype="html">
+        <source>الدرس</source>
+        <target>Lesson</target>
+      </trans-unit>
+
+      <trans-unit id="title_my_courses" datatype="html">
+        <source>كورساتي</source>
+        <target>My Courses</target>
+      </trans-unit>
+
+      <trans-unit id="title_profile" datatype="html">
+        <source>الملف الشخصي</source>
+        <target>Profile</target>
+      </trans-unit>
+
+      <trans-unit id="title_settings" datatype="html">
+        <source>الإعدادات</source>
+        <target>Settings</target>
+      </trans-unit>
+
+      <trans-unit id="title_diplomas" datatype="html">
+        <source>الدبلومات</source>
+        <target>Diplomas</target>
+      </trans-unit>
+
+      <trans-unit id="title_diploma_details" datatype="html">
+        <source>تفاصيل الدبلومة</source>
+        <target>Diploma Details</target>
+      </trans-unit>
+
+      <trans-unit id="title_staff_cases" datatype="html">
+        <source>الحالات</source>
+        <target>Cases</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_dashboard" datatype="html">
+        <source>لوحة التحكم</source>
+        <target>Dashboard</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_course_editor" datatype="html">
+        <source>إدارة الكورسات</source>
+        <target>Course Management</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_course_editor_edit" datatype="html">
+        <source>تعديل الكورس</source>
+        <target>Edit Course</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_users" datatype="html">
+        <source>المستخدمين</source>
+        <target>Users</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_cases" datatype="html">
+        <source>الحالات</source>
+        <target>Cases</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_access" datatype="html">
+        <source>الصلاحيات</source>
+        <target>Permissions</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_sales_analytics" datatype="html">
+        <source>تحليلات المبيعات</source>
+        <target>Sales Analytics</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_diploma_editor" datatype="html">
+        <source>إدارة الدبلومات</source>
+        <target>Diploma Management</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_diploma_editor_edit" datatype="html">
+        <source>تعديل الدبلومة</source>
+        <target>Edit Diploma</target>
+      </trans-unit>
+
+      <trans-unit id="title_admin_session_requests" datatype="html">
+        <source>طلبات الجلسات</source>
+        <target>Session Requests</target>
+      </trans-unit>
+
+      <trans-unit id="title_login" datatype="html">
+        <source>دخول</source>
+        <target>Login</target>
+      </trans-unit>
+
+      <trans-unit id="title_register" datatype="html">
+        <source>حساب جديد</source>
+        <target>New Account</target>
+      </trans-unit>
+
+      <trans-unit id="title_forgot_password" datatype="html">
+        <source>نسيت كلمة المرور</source>
+        <target>Forgot Password</target>
+      </trans-unit>
+
+      <trans-unit id="app_name" datatype="html">
+        <source>نبضة حياة</source>
+        <target>Nabdah Hayah</target>
+      </trans-unit>
+
+      <trans-unit id="4529372112865406379" datatype="html">
+        <source>Cases</source>
+        <target>Cases</target>
+      </trans-unit>
+
+      <trans-unit id="6570363013146073520" datatype="html">
+        <source>Dashboard</source>
+        <target>Dashboard</target>
+      </trans-unit>
+
+      <trans-unit id="7582772216721712982" datatype="html">
+        <source>روابط سريعة</source>
+        <target>Quick Links</target>
+      </trans-unit>
+
+      <trans-unit id="8260477600354468826" datatype="html">
+        <source>الأسئلة الشائعة</source>
+        <target>FAQ</target>
+      </trans-unit>
+
+      <trans-unit id="6740505671649764860" datatype="html">
+        <source>تابعنا</source>
+        <target>Follow Us</target>
+      </trans-unit>
+
+      <trans-unit id="8790918354594417962" datatype="html">
+        <source>Facebook</source>
+        <target>Facebook</target>
+      </trans-unit>
+
+      <trans-unit id="3080109816219994129" datatype="html">
+        <source>Instagram</source>
+        <target>Instagram</target>
+      </trans-unit>
+
+      <trans-unit id="8401085193044135025" datatype="html">
+        <source>YouTube</source>
+        <target>YouTube</target>
+      </trans-unit>
+
+      <trans-unit id="8307602980487099346" datatype="html">
+        <source>TikTok</source>
+        <target>TikTok</target>
+      </trans-unit>
+
+      <!-- HOME: CONSULTATION SECTION -->
+      <trans-unit id="home_consult_eyebrow" datatype="html">
+        <source>الاستشارات النفسية</source>
+        <target>Psychological Consultations</target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_title" datatype="html">
+        <source>جلسات فردية بخصوصية تامة</source>
+        <target>Private 1-on-1 sessions with full confidentiality</target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_subtitle" datatype="html">
+        <source>
+    استشارات نفسية مع دكتورة استشاري صحة نفسية، لمساعدتك على فهم ما تمر به،
+    ووضع خطة علاجية تناسبك.
+        </source>
+        <target>
+    Psychological consultations with a consultant psychiatrist to help you understand what you’re going through and set a treatment plan that suits you.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_label" datatype="html">
+        <source>جلسات أونلاين</source>
+        <target>Online Sessions</target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_card_title" datatype="html">
+        <source>جلسة استشارة نفسية فردية</source>
+        <target>Individual psychological consultation session</target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_desc" datatype="html">
+        <source>
+    مساحة آمنة للحديث عن كل ما يثقل قلبك وعقلك، مع توجيه مهني يساعدك على
+    رؤية أعمق لذاتك، واتخاذ قرارات أكثر وعيًا.
+        </source>
+        <target>
+    A safe space to talk about whatever weighs on your heart and mind, with professional guidance that helps you gain deeper insight into yourself and make more conscious decisions.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_meta_1" datatype="html">
+        <source>مدة الجلسة: 50 دقيقة</source>
+        <target>Session duration: 50 minutes</target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_meta_2" datatype="html">
+        <source>أونلاين عبر منصات آمنة</source>
+        <target>Online via secure platforms</target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_meta_3" datatype="html">
+        <source>خصوصية وسرية تامة</source>
+        <target>Complete privacy and confidentiality</target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_cta" datatype="html">
+        <source>احجز موعدًا الآن</source>
+        <target>Book an appointment now</target>
+      </trans-unit>
+
+      <trans-unit id="home_consult_img_alt" datatype="html">
+        <source>جلسة استشارة نفسية</source>
+        <target>Psychological consultation session</target>
+      </trans-unit>
+
+
+      <!-- HOME: WHY SECTION -->
+      <trans-unit id="home_why_eyebrow" datatype="html">
+        <source>لماذا نبضة حياة؟</source>
+        <target>Why Nabdah Hayah?</target>
+      </trans-unit>
+
+      <trans-unit id="home_why_title" datatype="html">
+        <source>منصة نفسية متكاملة</source>
+        <target>A complete psychological platform</target>
+      </trans-unit>
+
+      <trans-unit id="home_why_subtitle" datatype="html">
+        <source>
+    ليست مجرد كورسات؛ بل منظومة نفسية متكاملة تجمع بين العلم، الإنسان،
+    والمتابعة العملية لحالتك النفسية.
+        </source>
+        <target>
+    Not just courses; a comprehensive psychological system that brings together science, the human side, and practical follow-up for your mental well-being.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_why_card_1_title" datatype="html">
+        <source>محتوى علمي موثوق</source>
+        <target>Trusted scientific content</target>
+      </trans-unit>
+
+      <trans-unit id="home_why_card_1_text" datatype="html">
+        <source>
+    كورسات مبنية على أسس علم النفس الإكلينيكي ومدارس العلاج الحديثة، بلغة
+    بسيطة وواعية.
+        </source>
+        <target>
+    Courses built on clinical psychology foundations and modern therapy approaches, delivered in a clear and mindful way.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_why_card_2_title" datatype="html">
+        <source>متابعة نفسية للحالات</source>
+        <target>Psychological follow-up</target>
+      </trans-unit>
+
+      <trans-unit id="home_why_card_2_text" datatype="html">
+        <source>
+    برامج موجهة لمرافقة حالتك النفسية، وليس مجرد معلومات نظرية.
+        </source>
+        <target>
+    Guided programs that accompany your psychological journey—not just theoretical information.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_why_card_3_title" datatype="html">
+        <source>تركيز على التعافي والوعي</source>
+        <target>Focus on healing and awareness</target>
+      </trans-unit>
+
+      <trans-unit id="home_why_card_3_text" datatype="html">
+        <source>
+    الهدف هو مساعدتك على العيش بسلام داخلي أكبر، لا مجرد التخلص من العرض.
+        </source>
+        <target>
+    The goal is to help you live with deeper inner peace—not just to remove symptoms.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_why_card_4_title" datatype="html">
+        <source>خصوصية وسرية تامة</source>
+        <target>Complete privacy and confidentiality</target>
+      </trans-unit>
+
+      <trans-unit id="home_why_card_4_text" datatype="html">
+        <source>
+    كل ما تشاركه يظل في مساحة آمنة ومحترمة، تحفظ خصوصيتك وكرامتك.
+        </source>
+        <target>
+    Everything you share stays in a safe, respectful space that protects your privacy and dignity.
+        </target>
+      </trans-unit>
+
+
+      <!-- HOME: TESTIMONIALS -->
+      <trans-unit id="home_testimonials_eyebrow" datatype="html">
+        <source>آراء المتدربين</source>
+        <target>Trainees’ Reviews</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonials_title" datatype="html">
+        <source>تجارب حقيقية من نبضات حية</source>
+        <target>Real experiences from our community</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonials_subtitle" datatype="html">
+        <source>
+    جزء من قصص المتدربين الذين اختاروا البدء في رحلة الشفاء مع نبضة حياة.
+        </source>
+        <target>
+    A glimpse of stories from trainees who chose to begin their healing journey with Nabdah Hayah.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_1_avatar" datatype="html">
+        <source>ن</source>
+        <target>N</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_1_name" datatype="html">
+        <source>نورة</source>
+        <target>Nora</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_1_tag" datatype="html">
+        <source>متدربة في صدمات الطفولة</source>
+        <target>Trainee in Childhood Trauma</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_1_text" datatype="html">
+        <source>
+    لأول مرة أحس إن في حد فاهم الجذر الحقيقي لألمي. الكورس فتح لي أبواب ما
+    كنت أتوقعها، وتعاملي مع نفسي ومع أهلي اختلف تمامًا.
+        </source>
+        <target>
+    For the first time, I felt someone truly understood the real root of my pain. The course opened doors I never expected, and my relationship with myself and my family changed completely.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_1_label" datatype="html">
+        <source>تغيير عميق من الداخل</source>
+        <target>A deep inner transformation</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_2_avatar" datatype="html">
+        <source>ر</source>
+        <target>R</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_2_name" datatype="html">
+        <source>ريم</source>
+        <target>Reem</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_2_tag" datatype="html">
+        <source>جلسات استشارة شخصية</source>
+        <target>Personal consultation sessions</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_2_text" datatype="html">
+        <source>
+    الجلسات كانت مساحة آمنة جدًا. قدرت أتكلم بدون خوف من الحكم، وطلعت
+    بأفكار وخطوات عملية ساعدتني في قرارات مهمة.
+        </source>
+        <target>
+    The sessions were a very safe space. I could speak without fear of judgment, and I left with ideas and practical steps that helped me with important decisions.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_2_label" datatype="html">
+        <source>مساحة آمنة ومٌحتوية</source>
+        <target>A safe and supportive space</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_3_avatar" datatype="html">
+        <source>س</source>
+        <target>S</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_3_name" datatype="html">
+        <source>سارة</source>
+        <target>Sara</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_3_tag" datatype="html">
+        <source>كورس أعماق النفس البشرية</source>
+        <target>Human Psyche Depths course</target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_3_text" datatype="html">
+        <source>
+    البرنامج ساعدني أفهم ليه أكرر نفس العلاقات ونفس الأخطاء. حسيت إني
+    أتعرفت على نفسي من جديد.
+        </source>
+        <target>
+    The program helped me understand why I repeat the same relationships and the same mistakes. I felt like I got to know myself all over again.
+        </target>
+      </trans-unit>
+
+      <trans-unit id="home_testimonial_3_label" datatype="html">
+        <source>وعي مختلف بالحياة</source>
+        <target>A new awareness of life</target>
+      </trans-unit>
+
+
+    </body>
+  </file>
+</xliff>
