@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt from 'jsonwebtoken';
+
+// ✅ CommonJS require (works on Vercel serverless CJS output)
+const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
 
 type SessionClaims = {
   uid: string;
@@ -13,12 +15,18 @@ type SessionClaims = {
 function htmlEscape(s: string) {
   return s.replace(/[&<>"']/g, (c) => {
     switch (c) {
-      case '&': return '&amp;';
-      case '<': return '&lt;';
-      case '>': return '&gt;';
-      case '"': return '&quot;';
-      case "'": return '&#39;';
-      default: return c;
+      case '&':
+        return '&amp;';
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      case '"':
+        return '&quot;';
+      case "'":
+        return '&#39;';
+      default:
+        return c;
     }
   });
 }
@@ -55,13 +63,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // Security-ish headers: keep it simple for now
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'no-referrer');
-
-  // NOTE: For YouTube embeds, CSP needs to allow https://www.youtube.com and https://www.youtube-nocookie.com
 
   const safeVideoId = htmlEscape(videoId);
 
@@ -74,14 +79,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     <style>
       html, body { height: 100%; margin: 0; background: #000; }
       #player { width: 100%; height: 100%; }
-      /* منع كليك يمين (ردع بسيط) */
       body { -webkit-user-select: none; user-select: none; }
     </style>
   </head>
   <body oncontextmenu="return false;">
     <div id="player"></div>
     <script>
-      // YouTube IFrame API
       var tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -89,23 +92,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       var player;
       function postState(state) {
-        try {
-          parent.postMessage({ type: 'PLAYER_STATE', state: state }, '*');
-        } catch (e) {}
+        try { parent.postMessage({ type: 'PLAYER_STATE', state: state }, '*'); } catch (e) {}
       }
 
       function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
           videoId: '${safeVideoId}',
-          playerVars: {
-            rel: 0,
-            modestbranding: 1,
-            controls: 1
-          },
+          playerVars: { rel: 0, modestbranding: 1, controls: 1 },
           events: {
             'onReady': function() { postState('ready'); },
             'onStateChange': function(event) {
-              // 1 PLAYING, 2 PAUSED, 0 ENDED
               if (event.data === 1) postState('playing');
               else if (event.data === 2) postState('paused');
               else if (event.data === 0) postState('ended');
@@ -114,7 +110,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
 
-      // Commands from parent (pause/play)
       window.addEventListener('message', function(ev) {
         if (!ev || !ev.data || typeof ev.data !== 'object') return;
         if (ev.data.type !== 'PARENT_COMMAND') return;
