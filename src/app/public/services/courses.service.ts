@@ -20,12 +20,7 @@ export class CoursesService {
   async getCourseById(id: string): Promise<Course | null> {
 
     const snap = await get(ref(this.db, `courses/${id}`));
-   console.log('[exists?]', snap.exists());
 
-   console.log('[val]', snap.val());
-   console.log('[key]', snap.key);
-
-   console.log('[pretty]', JSON.stringify(snap.val(), null, 2));
 
     return snap.exists() ? ({ id, ...(snap.val() as Omit<Course, 'id'>) }) : null;
     
