@@ -15,6 +15,13 @@ function parseCookies(cookieHeader) {
   return out;
 }
 
+function normalizeProvider(value) {
+  const v = String(value || '').trim().toLowerCase();
+  if (v === 'gdrive' || v === 'drive' || v === 'google_drive' || v === 'google-drive' || v === 'google drive') return 'gdrive';
+  if (v === 'youtube' || v === 'yt') return 'youtube';
+  return v;
+}
+
 module.exports = async function handler(req, res) {
   try {
     const secret = process.env.PLAYER_SESSION_SECRET;
@@ -38,8 +45,11 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    if (!payload || payload.videoProvider !== 'gdrive') {
-      res.status(400).send('This player is configured for Google Drive only');
+    const provider = normalizeProvider(payload?.videoProvider);
+
+    // ✅ For now we support gdrive only (you can extend later)
+    if (provider !== 'gdrive') {
+      res.status(400).send(`Unsupported provider: ${String(payload?.videoProvider)}`);
       return;
     }
 

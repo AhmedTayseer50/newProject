@@ -8,6 +8,22 @@ function setCookie(res, name, value) {
   res.setHeader('Set-Cookie', cookie);
 }
 
+function normalizeProvider(value) {
+  const v = String(value || '').trim().toLowerCase();
+
+  // Accept multiple aliases and normalize to "gdrive"
+  if (v === 'gdrive' || v === 'drive' || v === 'google_drive' || v === 'google-drive' || v === 'google drive') {
+    return 'gdrive';
+  }
+
+  // Keep youtube if you ever use it
+  if (v === 'youtube' || v === 'yt') {
+    return 'youtube';
+  }
+
+  return v; // fallback
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
@@ -26,7 +42,7 @@ module.exports = async function handler(req, res) {
 
   const courseId = String(body.courseId || '');
   const lessonId = String(body.lessonId || '');
-  const videoProvider = body.videoProvider; // 'gdrive' | 'youtube'
+  const videoProvider = normalizeProvider(body.videoProvider);
   const videoRef = String(body.videoRef || '');
 
   if (!courseId || !lessonId || !videoProvider || !videoRef) {
@@ -45,9 +61,9 @@ module.exports = async function handler(req, res) {
     const decoded = await admin.auth().verifyIdToken(idToken);
     const uid = decoded.uid;
 
-    // must be enrolled
     const enrollPath = `enrollments/${uid}/${courseId}`;
     const snap = await admin.database().ref(enrollPath).get();
+
     if (!snap.exists()) {
       res.status(403).send('Not enrolled in this course');
       return;
@@ -61,7 +77,7 @@ module.exports = async function handler(req, res) {
         uid,
         courseId,
         lessonId,
-        videoProvider,
+        videoProvider, // ✅ now normalized
         videoRef,
         iat: now,
         exp: now + expiresInSec,

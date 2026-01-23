@@ -16,6 +16,13 @@ function parseCookies(cookieHeader) {
   return out;
 }
 
+function normalizeProvider(value) {
+  const v = String(value || '').trim().toLowerCase();
+  if (v === 'gdrive' || v === 'drive' || v === 'google_drive' || v === 'google-drive' || v === 'google drive') return 'gdrive';
+  if (v === 'youtube' || v === 'yt') return 'youtube';
+  return v;
+}
+
 module.exports = async function handler(req, res) {
   try {
     const secret = process.env.PLAYER_SESSION_SECRET;
@@ -39,12 +46,13 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    if (!payload || payload.videoProvider !== 'gdrive') {
+    const provider = normalizeProvider(payload?.videoProvider);
+    if (provider !== 'gdrive') {
       res.status(400).send('Not a Google Drive session');
       return;
     }
 
-    const fileId = String(payload.videoRef || '');
+    const fileId = String(payload?.videoRef || '');
     if (!fileId) {
       res.status(400).send('Missing fileId in session');
       return;
@@ -71,15 +79,14 @@ module.exports = async function handler(req, res) {
 
     const driveRes = await drive.files.get(
       { fileId, alt: 'media' },
-      {
-        responseType: 'stream',
-        headers: range ? { Range: range } : undefined,
-      }
+      { responseType: 'stream', headers: range ? { Range: range } : undefined }
     );
 
     const h = driveRes.headers || {};
 
-    if (h['content-type']) res.setHeader('Content-Type', String(h['content-type']));
+    // ✅ sometimes Drive returns octet-stream; force mp4 helps browsers
+    res.setHeader('Content-Type', String(h['content-type'] || 'video/mp4'));
+
     if (h['content-length']) res.setHeader('Content-Length', String(h['content-length']));
     if (h['content-range']) res.setHeader('Content-Range', String(h['content-range']));
 
