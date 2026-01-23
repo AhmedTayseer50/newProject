@@ -9,8 +9,7 @@ import {
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Database } from '@angular/fire/database';
 import { ref, get } from 'firebase/database';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Subscription, firstValueFrom } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { PlayerSessionService } from './player-session.service';
 
@@ -37,7 +36,12 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
   /** رابط داخلي مؤقت للاعب الفيديو (Vercel API) */
   playerUrl?: string;
-  safeUrl?: SafeResourceUrl;
+
+  /**
+   * ✅ مع <video [src]> نستخدم string عادي.
+   * لا نستخدم DomSanitizer ولا SafeResourceUrl.
+   */
+  safeUrl?: string;
 
   loading = true;
   error?: string;
@@ -55,42 +59,19 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   private schedulerTimeoutId: any = null;
   private countdownIntervalId: any = null;
 
-  private readonly onWindowMessage = (ev: MessageEvent) => {
-    // نتعامل فقط مع رسائل الـ iframe
-    if (!ev?.data || typeof ev.data !== 'object') return;
-    const data: any = ev.data;
-
-    console.log('[lesson-view][postMessage] received:', data);
-
-    if (data.type === 'PLAYER_STATE') {
-      console.log('[lesson-view][postMessage] PLAYER_STATE:', data.state);
-
-      if (data.state === 'playing') {
-        this.isPlaying = true;
-        this.startRandomPresenceScheduler();
-      } else if (data.state === 'paused' || data.state === 'ended') {
-        this.isPlaying = false;
-        this.stopRandomPresenceScheduler();
-        this.clearPresencePrompt();
-      }
-    }
-  };
-
-  @ViewChild('playerFrame') playerFrame?: ElementRef<HTMLIFrameElement>;
+  /** ✅ بدل iframe: ربط عنصر الفيديو نفسه */
+  @ViewChild('videoPlayer') videoPlayer?: ElementRef<HTMLVideoElement>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private db: Database,
-    private sanitizer: DomSanitizer,
     private auth: Auth,
     private playerSession: PlayerSessionService,
   ) {}
 
   ngOnInit() {
     console.log('[lesson-view] ngOnInit ✅');
-
-    window.addEventListener('message', this.onWindowMessage);
 
     // الاشتراك في تغيّر الباراميترز
     this.paramSub = this.route.paramMap.subscribe(async (pm: ParamMap) => {
@@ -109,6 +90,13 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
       this.loading = true;
       this.error = undefined;
+
+      // ✅ reset video state
+      this.playerUrl = undefined;
+      this.safeUrl = undefined;
+      this.isPlaying = false;
+      this.stopRandomPresenceScheduler();
+      this.clearPresencePrompt();
 
       console.log('[lesson-view] state reset -> loading=true, error cleared');
       console.log('[lesson-view] courseChanged?', courseChanged);
@@ -133,6 +121,12 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
         await this.loadCurrentLesson();
         console.log('[lesson-view] loadCurrentLesson finished ✅');
+
+        // ✅ بعد تعيين safeUrl، اربط أحداث الفيديو
+        setTimeout(() => {
+          this.attachVideoEvents();
+          this.debugVideoEl();
+        }, 0);
       } catch (e: any) {
         console.error('[lesson-view] ERROR in paramMap subscription:', e);
         this.error = e?.message ?? 'حدث خطأ';
@@ -147,7 +141,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     console.log('[lesson-view] ngOnDestroy 🧹');
 
     this.paramSub?.unsubscribe();
-    window.removeEventListener('message', this.onWindowMessage);
     this.stopRandomPresenceScheduler();
     this.clearPresencePrompt();
   }
@@ -247,39 +240,30 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       videoRef: this.videoRef,
     });
 
-    const res = await firstValueFrom(
-      this.playerSession.createSession({
+    const res = await this.playerSession
+      .createSession({
         courseId: this.courseId,
         lessonId: this.lessonId,
         videoProvider: this.videoProvider,
         videoRef: this.videoRef,
         idToken,
-      }),
-    );
+      })
+      .toPromise();
 
     console.log('[lesson-view] playerSession response ✅:', res);
 
-    this.playerUrl = res.playerUrl;
+    this.playerUrl = res?.playerUrl;
 
-    // تحديث الـ iframe
-    this.safeUrl = this.playerUrl
-      ? this.sanitizer.bypassSecurityTrustResourceUrl(this.playerUrl)
-      : undefined;
+    /**
+     * ✅ مع <video> لازم يكون src string مباشر
+     * (لا bypassSecurityTrustResourceUrl)
+     */
+    this.safeUrl = this.playerUrl ?? undefined;
 
-    console.log('[lesson-view] iframe url set ✅:', {
+    console.log('[lesson-view] video url set ✅:', {
       playerUrl: this.playerUrl,
       safeUrlDefined: !!this.safeUrl,
     });
-
-    // Debug: هل iframe موجود بالفعل؟
-    setTimeout(() => {
-      const el = this.playerFrame?.nativeElement;
-      console.log('[lesson-view] iframe DOM check:', {
-        iframeExists: !!el,
-        iframeSrcAttr: el?.getAttribute('src'),
-        iframeSrcProp: el?.src,
-      });
-    }, 300);
 
     console.log('[lesson-view] now showing lesson:', {
       courseId: this.courseId,
@@ -288,6 +272,74 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       videoProvider: this.videoProvider,
       videoRef: this.videoRef,
       playerUrl: this.playerUrl,
+    });
+  }
+
+  // ===== Video Events + Debug =====
+  private attachVideoEvents() {
+    const v = this.videoPlayer?.nativeElement;
+    if (!v) {
+      console.warn('[lesson-view] attachVideoEvents: video not found yet');
+      return;
+    }
+
+    // منع تكرار الربط
+    v.onplay = null;
+    v.onpause = null;
+    v.onended = null;
+    v.onerror = null;
+
+    v.onplay = () => {
+      this.isPlaying = true;
+      console.log('[lesson-view][video] play ✅', {
+        currentTime: v.currentTime,
+        readyState: v.readyState,
+        networkState: v.networkState,
+        src: v.currentSrc,
+      });
+      this.startRandomPresenceScheduler();
+    };
+
+    v.onpause = () => {
+      this.isPlaying = false;
+      console.log('[lesson-view][video] pause ⏸️', {
+        currentTime: v.currentTime,
+        readyState: v.readyState,
+        networkState: v.networkState,
+      });
+      this.stopRandomPresenceScheduler();
+      this.clearPresencePrompt();
+    };
+
+    v.onended = () => {
+      this.isPlaying = false;
+      console.log('[lesson-view][video] ended ✅');
+      this.stopRandomPresenceScheduler();
+      this.clearPresencePrompt();
+    };
+
+    v.onerror = () => {
+      const err = v.error;
+      console.error('[lesson-view][video] ERROR ❌', {
+        code: err?.code,
+        message: (err as any)?.message,
+        src: v.currentSrc,
+        readyState: v.readyState,
+        networkState: v.networkState,
+      });
+    };
+
+    console.log('[lesson-view] attachVideoEvents ✅');
+  }
+
+  private debugVideoEl() {
+    const v = this.videoPlayer?.nativeElement;
+    console.log('[lesson-view] video DOM check:', {
+      exists: !!v,
+      srcAttr: v?.getAttribute('src'),
+      currentSrc: v?.currentSrc,
+      readyState: v?.readyState,
+      networkState: v?.networkState,
     });
   }
 
@@ -335,7 +387,9 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
     this.presenceRequired = true;
     this.countdown = 30;
-    this.sendPlayerCommand('pause');
+
+    // ✅ pause الفيديو مباشرة
+    this.videoPlayer?.nativeElement?.pause();
 
     this.countdownIntervalId = setInterval(() => {
       this.countdown--;
@@ -350,7 +404,11 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   confirmPresence() {
     console.log('[lesson-view] confirmPresence() -> overlay OFF and play');
     this.clearPresencePrompt();
-    this.sendPlayerCommand('play');
+
+    // ✅ play الفيديو مباشرة
+    const v = this.videoPlayer?.nativeElement;
+    v?.play().catch((e) => console.warn('[lesson-view] play() rejected:', e));
+
     this.startRandomPresenceScheduler();
   }
 
@@ -363,9 +421,12 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       clearInterval(this.countdownIntervalId);
       this.countdownIntervalId = null;
     }
+
     this.presenceRequired = true;
     this.countdown = 0;
-    this.sendPlayerCommand('pause');
+
+    // ✅ keep paused
+    this.videoPlayer?.nativeElement?.pause();
   }
 
   private clearPresencePrompt() {
@@ -379,18 +440,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       clearInterval(this.countdownIntervalId);
       this.countdownIntervalId = null;
     }
-  }
-
-  private sendPlayerCommand(command: 'play' | 'pause') {
-    const win = this.playerFrame?.nativeElement?.contentWindow;
-
-    console.log('[lesson-view] sendPlayerCommand:', {
-      command,
-      hasFrame: !!this.playerFrame?.nativeElement,
-      hasContentWindow: !!win,
-    });
-
-    win?.postMessage({ type: 'PARENT_COMMAND', command }, '*');
   }
 
   private randomBetween(min: number, max: number) {
@@ -428,13 +477,5 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
     const nextPos = this.currentPos + 1;
     this.router.navigate(['/lesson', this.courseId, this.lessons[nextPos].id]);
-  }
-
-  onIframeLoad() {
-    console.log('[lesson-view] ✅ iframe LOAD event fired');
-    const el = this.playerFrame?.nativeElement;
-
-    console.log('[lesson-view] iframe src attr:', el?.getAttribute('src'));
-    console.log('[lesson-view] iframe src prop:', el?.src);
   }
 }
