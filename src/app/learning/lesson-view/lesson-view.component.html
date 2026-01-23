@@ -46,7 +46,7 @@
       <!-- Video -->
       <div class="video-card" *ngIf="safeUrl">
         <div class="ratio ratio-16x9 position-relative">
-          <iframe
+          <!-- <iframe
             #playerFrame
             [src]="safeUrl"
             style="border: 0"
@@ -55,6 +55,16 @@
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowfullscreen
             referrerpolicy="no-referrer"
+          ></iframe> -->
+
+          <iframe
+            #playerFrame
+            [src]="safeUrl"
+            style="border: 2px solid red"
+            title="Lesson video"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allowfullscreen
+            (load)="onIframeLoad()"
           ></iframe>
 
           <!-- Presence overlay (يظهر فقط أثناء تشغيل الفيديو) -->
@@ -68,7 +78,11 @@
                 </ng-container>
                 <ng-container *ngIf="countdown === 0">للإستمرار</ng-container>.
               </p>
-              <button class="btn btn-light" (click)="confirmPresence()" type="button">
+              <button
+                class="btn btn-light"
+                (click)="confirmPresence()"
+                type="button"
+              >
                 متابعة
               </button>
             </div>

@@ -1,5 +1,11 @@
 // src/app/learning/lesson-view/lesson-view.component.ts
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Database } from '@angular/fire/database';
 import { ref, get } from 'firebase/database';
@@ -19,7 +25,7 @@ type ViewLesson = {
 @Component({
   selector: 'app-lesson-view',
   templateUrl: './lesson-view.component.html',
-  styleUrls: ['./lesson-view.component.css']
+  styleUrls: ['./lesson-view.component.css'],
 })
 export class LessonViewComponent implements OnInit, OnDestroy {
   courseId!: string;
@@ -78,7 +84,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     private db: Database,
     private sanitizer: DomSanitizer,
     private auth: Auth,
-    private playerSession: PlayerSessionService
+    private playerSession: PlayerSessionService,
   ) {}
 
   ngOnInit() {
@@ -91,7 +97,10 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       const newCourseId = pm.get('courseId')!;
       const newLessonId = pm.get('lessonId')!;
 
-      console.log('[lesson-view] route paramMap changed:', { newCourseId, newLessonId });
+      console.log('[lesson-view] route paramMap changed:', {
+        newCourseId,
+        newLessonId,
+      });
 
       const courseChanged = newCourseId !== this.courseId;
 
@@ -108,12 +117,18 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         if (courseChanged || this.lessons.length === 0) {
           console.log('[lesson-view] loading all lessons...');
           await this.loadAllLessons();
-          console.log('[lesson-view] lessons loaded ✅ count=', this.lessons.length);
+          console.log(
+            '[lesson-view] lessons loaded ✅ count=',
+            this.lessons.length,
+          );
         } else {
-          console.log('[lesson-view] lessons cache reused ✅ count=', this.lessons.length);
+          console.log(
+            '[lesson-view] lessons cache reused ✅ count=',
+            this.lessons.length,
+          );
         }
 
-        this.currentPos = this.lessons.findIndex(l => l.id === this.lessonId);
+        this.currentPos = this.lessons.findIndex((l) => l.id === this.lessonId);
         console.log('[lesson-view] currentPos:', this.currentPos);
 
         await this.loadCurrentLesson();
@@ -138,14 +153,22 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   }
 
   private async loadAllLessons() {
-    console.log('[lesson-view] loadAllLessons() start:', `lessons/${this.courseId}`);
+    console.log(
+      '[lesson-view] loadAllLessons() start:',
+      `lessons/${this.courseId}`,
+    );
 
     const allSnap = await get(ref(this.db, `lessons/${this.courseId}`));
 
     if (allSnap.exists()) {
       const obj = allSnap.val() as Record<
         string,
-        { title?: string; lessonIndex?: number; videoProvider?: string; videoRef?: string }
+        {
+          title?: string;
+          lessonIndex?: number;
+          videoProvider?: string;
+          videoRef?: string;
+        }
       >;
 
       this.lessons = Object.entries(obj)
@@ -153,12 +176,17 @@ export class LessonViewComponent implements OnInit, OnDestroy {
           id,
           title: (v?.title ?? '').toString(),
           lessonIndex: Number(v?.lessonIndex ?? 0),
-          videoProvider: (v?.videoProvider ?? 'youtube') as 'youtube' | 'gdrive',
+          videoProvider: (v?.videoProvider ?? 'youtube') as
+            | 'youtube'
+            | 'gdrive',
           videoRef: (v?.videoRef ?? '').toString(),
         }))
         .sort((a, b) => (a.lessonIndex ?? 0) - (b.lessonIndex ?? 0));
 
-      console.log('[lesson-view] loadAllLessons() ✅ first item:', this.lessons[0]);
+      console.log(
+        '[lesson-view] loadAllLessons() ✅ first item:',
+        this.lessons[0],
+      );
     } else {
       this.lessons = [];
       console.warn('[lesson-view] loadAllLessons() -> no lessons found');
@@ -166,9 +194,14 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   }
 
   private async loadCurrentLesson() {
-    console.log('[lesson-view] loadCurrentLesson() start:', `lessons/${this.courseId}/${this.lessonId}`);
+    console.log(
+      '[lesson-view] loadCurrentLesson() start:',
+      `lessons/${this.courseId}/${this.lessonId}`,
+    );
 
-    const snap = await get(ref(this.db, `lessons/${this.courseId}/${this.lessonId}`));
+    const snap = await get(
+      ref(this.db, `lessons/${this.courseId}/${this.lessonId}`),
+    );
     if (!snap.exists()) {
       console.error('[lesson-view] lesson not found ❌');
       throw new Error('الدرس غير موجود');
@@ -178,13 +211,15 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     console.log('[lesson-view] lesson raw data:', data);
 
     this.title = data.title ?? '';
-    this.videoProvider = (data.videoProvider ?? 'youtube') as 'youtube' | 'gdrive';
+    this.videoProvider = (data.videoProvider ?? 'youtube') as
+      | 'youtube'
+      | 'gdrive';
     this.videoRef = data.videoRef;
 
     console.log('[lesson-view] parsed lesson:', {
       title: this.title,
       videoProvider: this.videoProvider,
-      videoRef: this.videoRef
+      videoRef: this.videoRef,
     });
 
     if (!this.videoProvider || !this.videoRef) {
@@ -209,7 +244,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       courseId: this.courseId,
       lessonId: this.lessonId,
       videoProvider: this.videoProvider,
-      videoRef: this.videoRef
+      videoRef: this.videoRef,
     });
 
     const res = await firstValueFrom(
@@ -219,7 +254,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         videoProvider: this.videoProvider,
         videoRef: this.videoRef,
         idToken,
-      })
+      }),
     );
 
     console.log('[lesson-view] playerSession response ✅:', res);
@@ -233,7 +268,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
     console.log('[lesson-view] iframe url set ✅:', {
       playerUrl: this.playerUrl,
-      safeUrlDefined: !!this.safeUrl
+      safeUrlDefined: !!this.safeUrl,
     });
 
     // Debug: هل iframe موجود بالفعل؟
@@ -242,7 +277,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       console.log('[lesson-view] iframe DOM check:', {
         iframeExists: !!el,
         iframeSrcAttr: el?.getAttribute('src'),
-        iframeSrcProp: el?.src
+        iframeSrcProp: el?.src,
       });
     }, 300);
 
@@ -252,7 +287,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       title: this.title,
       videoProvider: this.videoProvider,
       videoRef: this.videoRef,
-      playerUrl: this.playerUrl
+      playerUrl: this.playerUrl,
     });
   }
 
@@ -261,7 +296,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     console.log('[lesson-view] startRandomPresenceScheduler() called', {
       schedulerTimeoutId: !!this.schedulerTimeoutId,
       presenceRequired: this.presenceRequired,
-      isPlaying: this.isPlaying
+      isPlaying: this.isPlaying,
     });
 
     if (this.schedulerTimeoutId || this.presenceRequired) return;
@@ -274,7 +309,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
       console.log('[lesson-view] presence scheduler fired', {
         isPlaying: this.isPlaying,
-        presenceRequired: this.presenceRequired
+        presenceRequired: this.presenceRequired,
       });
 
       if (this.isPlaying && !this.presenceRequired) {
@@ -287,7 +322,9 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
   private stopRandomPresenceScheduler() {
     if (this.schedulerTimeoutId) {
-      console.log('[lesson-view] stopRandomPresenceScheduler() clearing timeout');
+      console.log(
+        '[lesson-view] stopRandomPresenceScheduler() clearing timeout',
+      );
       clearTimeout(this.schedulerTimeoutId);
       this.schedulerTimeoutId = null;
     }
@@ -318,7 +355,9 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   }
 
   private lockVideoUntilConfirm() {
-    console.warn('[lesson-view] lockVideoUntilConfirm() -> countdown ended, keep paused');
+    console.warn(
+      '[lesson-view] lockVideoUntilConfirm() -> countdown ended, keep paused',
+    );
 
     if (this.countdownIntervalId) {
       clearInterval(this.countdownIntervalId);
@@ -348,7 +387,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     console.log('[lesson-view] sendPlayerCommand:', {
       command,
       hasFrame: !!this.playerFrame?.nativeElement,
-      hasContentWindow: !!win
+      hasContentWindow: !!win,
     });
 
     win?.postMessage({ type: 'PARENT_COMMAND', command }, '*');
@@ -389,5 +428,13 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
     const nextPos = this.currentPos + 1;
     this.router.navigate(['/lesson', this.courseId, this.lessons[nextPos].id]);
+  }
+
+  onIframeLoad() {
+    console.log('[lesson-view] ✅ iframe LOAD event fired');
+    const el = this.playerFrame?.nativeElement;
+
+    console.log('[lesson-view] iframe src attr:', el?.getAttribute('src'));
+    console.log('[lesson-view] iframe src prop:', el?.src);
   }
 }
