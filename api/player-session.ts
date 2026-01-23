@@ -34,7 +34,7 @@ async function handler(req: any, res: any) {
     return;
   }
 
-  if (videoProvider !== 'youtube') {
+  if (videoProvider !== 'youtube' && videoProvider !== 'gdrive') {
     res.status(400).send('Unsupported video provider');
     return;
   }
@@ -62,8 +62,16 @@ async function handler(req: any, res: any) {
     const now = Math.floor(Date.now() / 1000);
 
     const token = jwt.sign(
-      { uid, courseId, lessonId, videoProvider, videoRef, iat: now, exp: now + expiresInSec },
-      secret
+      {
+        uid,
+        courseId,
+        lessonId,
+        videoProvider,
+        videoRef,
+        iat: now,
+        exp: now + expiresInSec,
+      },
+      secret,
     );
 
     // ✅ حط التوكن في Cookie بدل querystring

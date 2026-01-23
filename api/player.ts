@@ -1,71 +1,42 @@
 const jwt = require('jsonwebtoken');
 
-function parseCookies(cookieHeader: string | undefined) {
-  const out: Record<string, string> = {};
+function parseCookies(cookieHeader) {
+  const out = {};
   if (!cookieHeader) return out;
-
-  cookieHeader.split(';').forEach((part: string) => {
+  cookieHeader.split(';').forEach((part) => {
     const [k, ...rest] = part.trim().split('=');
     if (!k) return;
     out[k] = decodeURIComponent(rest.join('=') || '');
   });
-
   return out;
 }
 
-async function handler(req: any, res: any) {
+async function handler(req, res) {
   try {
     const secret = process.env['PLAYER_SESSION_SECRET'];
-    if (!secret) {
-      res.status(500).send('Missing env PLAYER_SESSION_SECRET');
-      return;
-    }
+    if (!secret) return res.status(500).send('Missing env PLAYER_SESSION_SECRET');
 
     const cookies = parseCookies(req.headers.cookie);
     const token = cookies['ps'];
+    if (!token) return res.status(401).send('Missing session cookie');
 
-    if (!token) {
-      res.status(401).send('Missing session cookie');
-      return;
-    }
-
-    let payload: any;
+    let payload;
     try {
       payload = jwt.verify(token, secret);
-    } catch (e: any) {
-      res.status(401).send(e?.message || 'Invalid/Expired session');
-      return;
+    } catch (e) {
+      return res.status(401).send('Invalid/Expired session');
     }
 
-    const videoProvider = payload?.videoProvider;
-    const videoRef = payload?.videoRef;
+    const provider = payload?.videoProvider;
 
-    if (videoProvider !== 'youtube' || !videoRef) {
-      res.status(400).send('Invalid payload');
-      return;
-    }
-
-    // ✅ YouTube embed URL
-    const youtubeUrl = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoRef)}?rel=0&modestbranding=1`;
-
-    // ✅ Headers حماية (مش DRM، لكن تمنع caching + تقلل التسريب)
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    res.setHeader('Content-Security-Policy',
-      "default-src 'none'; " +
-      "style-src 'unsafe-inline'; " +
-      "script-src 'unsafe-inline'; " +
-      "img-src 'self' data:; " +
-      "frame-src https://www.youtube-nocookie.com https://www.youtube.com; " +
-      "frame-ancestors 'self';"
-    );
+    res.setHeader('Cache-Control', 'no-store');
 
-    // ✅ HTML Player
+    if (provider !== 'gdrive') {
+      // لو لسه عندك دروس يوتيوب قديمة، ممكن تسيب رسالة أو تتعامل معاها لاحقًا
+      return res.status(400).send('This player is configured for Google Drive only');
+    }
+
     const html = `<!doctype html>
 <html lang="ar">
 <head>
@@ -76,35 +47,27 @@ async function handler(req: any, res: any) {
   <style>
     html,body{height:100%;margin:0;background:#000}
     .wrap{height:100%;display:flex;align-items:center;justify-content:center}
-    iframe{width:100%;height:100%;border:0}
+    video{width:100%;height:100%;background:#000}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <iframe
-      src="${youtubeUrl}"
-      title="Video Player"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen
-      referrerpolicy="strict-origin-when-cross-origin"
-    ></iframe>
+    <video
+      controls
+      playsinline
+      webkit-playsinline
+      controlslist="nodownload"
+      oncontextmenu="return false"
+      src="/api/drive-stream"
+    ></video>
   </div>
-
-  <script>
-    // حواجز بسيطة (مش حماية حقيقية ضد screen recording)
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && ['s','u','p'].includes((e.key||'').toLowerCase())) e.preventDefault();
-      if (e.key === 'PrintScreen') e.preventDefault();
-    });
-  </script>
 </body>
 </html>`;
 
-    res.status(200).send(html);
-  } catch (err: any) {
+    return res.status(200).send(html);
+  } catch (err) {
     console.error('[player] ERROR:', err);
-    res.status(500).send(err?.message || 'FUNCTION_INVOCATION_FAILED');
+    return res.status(500).send('FUNCTION_INVOCATION_FAILED');
   }
 }
 
