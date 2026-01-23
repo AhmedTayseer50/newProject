@@ -25,33 +25,21 @@ function normalizeProvider(value) {
 module.exports = async function handler(req, res) {
   try {
     const secret = process.env.PLAYER_SESSION_SECRET;
-    if (!secret) {
-      res.status(500).send('Missing env PLAYER_SESSION_SECRET');
-      return;
-    }
+    if (!secret) return res.status(500).send('Missing env PLAYER_SESSION_SECRET');
 
     const cookies = parseCookies(req.headers.cookie);
     const token = cookies.ps;
-    if (!token) {
-      res.status(401).send('Missing session cookie');
-      return;
-    }
+    if (!token) return res.status(401).send('Missing session cookie');
 
     let payload;
     try {
       payload = jwt.verify(token, secret);
     } catch {
-      res.status(401).send('Invalid/Expired session');
-      return;
+      return res.status(401).send('Invalid/Expired session');
     }
 
     const provider = normalizeProvider(payload?.videoProvider);
-
-    // ✅ For now we support gdrive only (you can extend later)
-    if (provider !== 'gdrive') {
-      res.status(400).send(`Unsupported provider: ${String(payload?.videoProvider)}`);
-      return;
-    }
+    if (provider !== 'gdrive') return res.status(400).send(`Unsupported provider: ${String(payload?.videoProvider)}`);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
@@ -72,14 +60,63 @@ module.exports = async function handler(req, res) {
 <body>
   <div class="wrap">
     <video
+      id="v"
       controls
       playsinline
       webkit-playsinline
+      preload="metadata"
+      crossorigin="anonymous"
       controlslist="nodownload"
-      oncontextmenu="return false"
       src="/api/drive-stream"
     ></video>
   </div>
+
+  <script>
+    (function () {
+      const v = document.getElementById('v');
+
+      function post(type, extra) {
+        try {
+          window.parent && window.parent.postMessage(Object.assign({ type }, extra || {}), '*');
+        } catch (_) {}
+      }
+
+      function snap(label) {
+        const err = v && v.error ? { code: v.error.code, message: v.error.message } : null;
+        post('PLAYER_DEBUG', {
+          label,
+          currentSrc: v ? v.currentSrc : null,
+          networkState: v ? v.networkState : null,
+          readyState: v ? v.readyState : null,
+          paused: v ? v.paused : null,
+          ended: v ? v.ended : null,
+          error: err
+        });
+      }
+
+      snap('init');
+
+      ['loadstart','loadedmetadata','loadeddata','canplay','canplaythrough','play','playing','pause','waiting','stalled','ended','error','emptied','abort'].forEach(evt => {
+        v.addEventListener(evt, function () {
+          if (evt === 'playing') post('PLAYER_STATE', { state: 'playing' });
+          if (evt === 'pause') post('PLAYER_STATE', { state: 'paused' });
+          if (evt === 'ended') post('PLAYER_STATE', { state: 'ended' });
+          snap(evt);
+        });
+      });
+
+      window.addEventListener('message', function (e) {
+        const d = e && e.data;
+        if (!d || typeof d !== 'object') return;
+        if (d.type !== 'PARENT_COMMAND') return;
+
+        if (d.command === 'play') {
+          v.play().catch(err => post('PLAYER_DEBUG', { label:'play() rejected', err: String(err) }));
+        }
+        if (d.command === 'pause') v.pause();
+      });
+    })();
+  </script>
 </body>
 </html>`;
 
