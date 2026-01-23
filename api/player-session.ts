@@ -1,20 +1,26 @@
-const jwt = require('jsonwebtoken');
-const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import jwt from 'jsonwebtoken';
+import { getFirebaseAdmin } from './_lib/firebaseAdmin';
 
-function setCookie(res: any, name: string, value: string) {
-  // Cookie HttpOnly + Secure + SameSite=Lax
-  // مهم: Secure لازم عشان HTTPS على Vercel
+function setCookie(res: VercelResponse, name: string, value: string) {
   const cookie = `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300`;
   res.setHeader('Set-Cookie', cookie);
 }
 
-async function handler(req: any, res: any) {
+type PlayerSessionBody = {
+  courseId?: string;
+  lessonId?: string;
+  videoProvider?: 'youtube' | 'gdrive';
+  videoRef?: string;
+};
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
     return;
   }
 
-  const authHeader = req.headers.authorization || '';
+  const authHeader = String(req.headers.authorization || '');
   const match = authHeader.match(/^Bearer\s+(.+)$/i);
   if (!match) {
     res.status(401).send('Missing Authorization Bearer token');
@@ -22,7 +28,7 @@ async function handler(req: any, res: any) {
   }
 
   const idToken = match[1];
-  const body = req.body || {};
+  const body = (req.body || {}) as PlayerSessionBody;
 
   const courseId = String(body.courseId || '');
   const lessonId = String(body.lessonId || '');
@@ -71,21 +77,19 @@ async function handler(req: any, res: any) {
         iat: now,
         exp: now + expiresInSec,
       },
-      secret,
+      secret
     );
 
-    // ✅ حط التوكن في Cookie بدل querystring
+    // ✅ token في cookie بدل querystring
     setCookie(res, 'ps', token);
 
-    // ✅ رجّع URL ثابت من غير token
     res.status(200).json({
       playerUrl: `/api/player`,
       expiresAt: new Date((now + expiresInSec) * 1000).toISOString(),
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'FUNCTION_INVOCATION_FAILED';
     console.error('[player-session] ERROR:', err);
-    res.status(500).send(err?.message || 'FUNCTION_INVOCATION_FAILED');
+    res.status(500).send(message);
   }
 }
-
-module.exports = handler;

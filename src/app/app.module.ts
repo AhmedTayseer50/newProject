@@ -1,6 +1,6 @@
-
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -35,14 +35,12 @@ import { SalesAnalyticsComponent } from './admin/sales-analytics/sales-analytics
 // ====== Firebase (Modular API) ======
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-
 import { provideDatabase, getDatabase } from '@angular/fire/database';
 import { provideStorage, getStorage } from '@angular/fire/storage';
-// (اختياري) Analytics لو محتاجه:
-// import { provideAnalytics, getAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 
 import { environment } from '../environments/environment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { NavbarComponent } from './core/navbar/navbar.component';
 import { AdminCasesComponent } from './admin/cases/cases-admin.component';
 import { StaffCasesComponent } from './staff/cases/cases.component';
@@ -56,9 +54,6 @@ import { SessionRequestsComponent } from './admin/session-requests/session-reque
 import { DiplomasListComponent } from './public/diplomas-list/diplomas-list.component';
 import { DiplomaDetailsComponent } from './public/diploma-details/diploma-details.component';
 import { DiplomaEditorComponent } from './admin/diploma-editor/diploma-editor.component';
-
-          
-
 
 @NgModule({
   declarations: [
@@ -88,27 +83,29 @@ import { DiplomaEditorComponent } from './admin/diploma-editor/diploma-editor.co
     AdminCasesComponent,
     StaffCasesComponent,
     AccessManagerComponent,
-     SearchCoursesPipe,
-     ConsultationsComponent,
-     MyCoursesComponent,
-     FooterComponent,
-     ConsultationBookingComponent,
-     SessionRequestsComponent,
-     DiplomasListComponent,
-     DiplomaDetailsComponent,
-     DiplomaEditorComponent, 
+    SearchCoursesPipe,
+    ConsultationsComponent,
+    MyCoursesComponent,
+    FooterComponent,
+    ConsultationBookingComponent,
+    SessionRequestsComponent,
+    DiplomasListComponent,
+    DiplomaDetailsComponent,
+    DiplomaEditorComponent,
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
-    // ✅ ضع الـ Firebase هنا بدل providers
+
+    // Firebase
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
-    
     provideDatabase(() => getDatabase()),
     provideStorage(() => getStorage()),
+
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

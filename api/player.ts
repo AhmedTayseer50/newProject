@@ -1,40 +1,50 @@
-const jwt = require('jsonwebtoken');
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-function parseCookies(cookieHeader) {
-  const out = {};
+function parseCookies(cookieHeader: string | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
   if (!cookieHeader) return out;
+
   cookieHeader.split(';').forEach((part) => {
     const [k, ...rest] = part.trim().split('=');
     if (!k) return;
     out[k] = decodeURIComponent(rest.join('=') || '');
   });
+
   return out;
 }
 
-async function handler(req, res) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const secret = process.env['PLAYER_SESSION_SECRET'];
-    if (!secret) return res.status(500).send('Missing env PLAYER_SESSION_SECRET');
+    if (!secret) {
+      res.status(500).send('Missing env PLAYER_SESSION_SECRET');
+      return;
+    }
 
     const cookies = parseCookies(req.headers.cookie);
     const token = cookies['ps'];
-    if (!token) return res.status(401).send('Missing session cookie');
-
-    let payload;
-    try {
-      payload = jwt.verify(token, secret);
-    } catch (e) {
-      return res.status(401).send('Invalid/Expired session');
+    if (!token) {
+      res.status(401).send('Missing session cookie');
+      return;
     }
 
-    const provider = payload?.videoProvider;
+    let payload: string | JwtPayload;
+    try {
+      payload = jwt.verify(token, secret);
+    } catch {
+      res.status(401).send('Invalid/Expired session');
+      return;
+    }
+
+    const provider = typeof payload === 'object' ? (payload as any).videoProvider : undefined;
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
 
     if (provider !== 'gdrive') {
-      // لو لسه عندك دروس يوتيوب قديمة، ممكن تسيب رسالة أو تتعامل معاها لاحقًا
-      return res.status(400).send('This player is configured for Google Drive only');
+      res.status(400).send('This player is configured for Google Drive only');
+      return;
     }
 
     const html = `<!doctype html>
@@ -64,11 +74,9 @@ async function handler(req, res) {
 </body>
 </html>`;
 
-    return res.status(200).send(html);
-  } catch (err) {
+    res.status(200).send(html);
+  } catch (err: unknown) {
     console.error('[player] ERROR:', err);
-    return res.status(500).send('FUNCTION_INVOCATION_FAILED');
+    res.status(500).send('FUNCTION_INVOCATION_FAILED');
   }
 }
-
-module.exports = handler;
