@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 export type CreatePlayerSessionRequest = {
   courseId: string;
@@ -11,17 +12,28 @@ export type CreatePlayerSessionRequest = {
 };
 
 export type CreatePlayerSessionResponse = {
-  ok: boolean;
-  session?: string;
-  exp?: number;
-  error?: string;
+  playerUrl: string;
+  expiresAt: string;
 };
 
 @Injectable({ providedIn: 'root' })
 export class PlayerSessionService {
   constructor(private http: HttpClient) {}
 
-  createSession(payload: CreatePlayerSessionRequest) {
-    return this.http.post<CreatePlayerSessionResponse>('/api/player-session', payload);
+  createSession(payload: CreatePlayerSessionRequest): Observable<CreatePlayerSessionResponse> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${payload.idToken}`,
+    });
+
+    // ملاحظة: السيرفر بياخد التوكن من Authorization header
+    // لذلك مش لازم نبعته في body
+    const body = {
+      courseId: payload.courseId,
+      lessonId: payload.lessonId,
+      videoProvider: payload.videoProvider,
+      videoRef: payload.videoRef,
+    };
+
+    return this.http.post<CreatePlayerSessionResponse>('/api/player-session', body, { headers });
   }
 }
