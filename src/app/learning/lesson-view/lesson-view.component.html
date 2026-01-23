@@ -57,15 +57,14 @@
             referrerpolicy="no-referrer"
           ></iframe> -->
 
-          <iframe
-            #playerFrame
+          <video
+            #videoPlayer
+            class="w-100"
+            controls
+            playsinline
+            preload="metadata"
             [src]="safeUrl"
-            style="border: 2px solid red"
-            title="Lesson video"
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            allowfullscreen
-            (load)="onIframeLoad()"
-          ></iframe>
+          ></video>
 
           <!-- Presence overlay (يظهر فقط أثناء تشغيل الفيديو) -->
           <div class="presence-overlay" *ngIf="presenceRequired">
