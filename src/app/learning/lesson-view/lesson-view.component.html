@@ -46,6 +46,12 @@
       <!-- Video -->
       <div class="video-card" *ngIf="safeUrl">
         <div class="ratio ratio-16x9 position-relative">
+          <iframe
+            #playerFrame
+            [src]="safeUrl"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+          ></iframe>
           <!-- <iframe
             #playerFrame
             [src]="safeUrl"
@@ -56,7 +62,7 @@
             allowfullscreen
             referrerpolicy="no-referrer"
           ></iframe> -->
-
+          <!-- 
           <video
             #videoPlayer
             class="w-100"
@@ -64,7 +70,7 @@
             playsinline
             preload="metadata"
             [src]="safeUrl"
-          ></video>
+          ></video> -->
 
           <!-- Presence overlay (يظهر فقط أثناء تشغيل الفيديو) -->
           <div class="presence-overlay" *ngIf="presenceRequired">
