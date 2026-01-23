@@ -1,12 +1,10 @@
-/* api/drive-stream.ts */
+// api/drive-stream.js
 
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+const jwt = require('jsonwebtoken');
+const { google } = require('googleapis');
 
-const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
-const { google } = require('googleapis') as typeof import('googleapis');
-
-function parseCookies(cookieHeader: string | undefined): Record<string, string> {
-  const out: Record<string, string> = {};
+function parseCookies(cookieHeader) {
+  const out = {};
   if (!cookieHeader) return out;
 
   cookieHeader.split(';').forEach((part) => {
@@ -18,22 +16,22 @@ function parseCookies(cookieHeader: string | undefined): Record<string, string> 
   return out;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   try {
-    const secret = process.env['PLAYER_SESSION_SECRET'];
+    const secret = process.env.PLAYER_SESSION_SECRET;
     if (!secret) {
       res.status(500).send('Missing env PLAYER_SESSION_SECRET');
       return;
     }
 
     const cookies = parseCookies(req.headers.cookie);
-    const token = cookies['ps'];
+    const token = cookies.ps;
     if (!token) {
       res.status(401).send('Missing session cookie');
       return;
     }
 
-    let payload: any;
+    let payload;
     try {
       payload = jwt.verify(token, secret);
     } catch {
@@ -41,19 +39,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    if (payload?.videoProvider !== 'gdrive') {
+    if (!payload || payload.videoProvider !== 'gdrive') {
       res.status(400).send('Not a Google Drive session');
       return;
     }
 
-    const fileId = String(payload?.videoRef || '');
+    const fileId = String(payload.videoRef || '');
     if (!fileId) {
       res.status(400).send('Missing fileId in session');
       return;
     }
 
-    const clientEmail = process.env['GOOGLE_DRIVE_SA_EMAIL'];
-    let privateKey = process.env['GOOGLE_DRIVE_SA_PRIVATE_KEY'];
+    const clientEmail = process.env.GOOGLE_DRIVE_SA_EMAIL;
+    let privateKey = process.env.GOOGLE_DRIVE_SA_PRIVATE_KEY;
 
     if (!clientEmail || !privateKey) {
       res.status(500).send('Missing Google Drive service account env');
@@ -69,7 +67,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     const drive = google.drive({ version: 'v3', auth });
-
     const range = req.headers.range;
 
     const driveRes = await drive.files.get(
@@ -91,15 +88,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (range) res.statusCode = 206;
 
-    driveRes.data.on('error', (e: unknown) => {
+    driveRes.data.on('error', (e) => {
       console.error('[drive-stream] stream error', e);
       if (!res.headersSent) res.status(500).end('Stream error');
       else res.end();
     });
 
     driveRes.data.pipe(res);
-  } catch (err: unknown) {
+  } catch (err) {
     console.error('[drive-stream] ERROR:', err);
     res.status(500).send('Drive stream failed');
   }
-}
+};

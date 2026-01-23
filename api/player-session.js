@@ -1,23 +1,14 @@
-/* api/player-session.ts */
+// api/player-session.js
 
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getFirebaseAdmin } from './_lib/firebaseAdmin';
+const jwt = require('jsonwebtoken');
+const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
 
-const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
-
-function setCookie(res: VercelResponse, name: string, value: string) {
+function setCookie(res, name, value) {
   const cookie = `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300`;
   res.setHeader('Set-Cookie', cookie);
 }
 
-type PlayerSessionBody = {
-  courseId?: string;
-  lessonId?: string;
-  videoProvider?: 'youtube' | 'gdrive';
-  videoRef?: string; // fileId لو gdrive
-};
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
     return;
@@ -31,11 +22,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const idToken = match[1];
-  const body = (req.body || {}) as PlayerSessionBody;
+  const body = req.body || {};
 
   const courseId = String(body.courseId || '');
   const lessonId = String(body.lessonId || '');
-  const videoProvider = body.videoProvider;
+  const videoProvider = body.videoProvider; // 'gdrive' | 'youtube'
   const videoRef = String(body.videoRef || '');
 
   if (!courseId || !lessonId || !videoProvider || !videoRef) {
@@ -43,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const secret = process.env['PLAYER_SESSION_SECRET'];
+  const secret = process.env.PLAYER_SESSION_SECRET;
   if (!secret) {
     res.status(500).send('Missing env PLAYER_SESSION_SECRET');
     return;
@@ -54,16 +45,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const decoded = await admin.auth().verifyIdToken(idToken);
     const uid = decoded.uid;
 
-    // ✅ تأكد إن المستخدم enrolled في الكورس
+    // must be enrolled
     const enrollPath = `enrollments/${uid}/${courseId}`;
-    const enrollmentSnap = await admin.database().ref(enrollPath).get();
-
-    if (!enrollmentSnap.exists()) {
+    const snap = await admin.database().ref(enrollPath).get();
+    if (!snap.exists()) {
       res.status(403).send('Not enrolled in this course');
       return;
     }
 
-    const expiresInSec = Number(process.env['PLAYER_SESSION_TTL_SEC'] ?? 300);
+    const expiresInSec = Number(process.env.PLAYER_SESSION_TTL_SEC || 300);
     const now = Math.floor(Date.now() / 1000);
 
     const token = jwt.sign(
@@ -85,9 +75,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       playerUrl: '/api/player',
       expiresAt: new Date((now + expiresInSec) * 1000).toISOString(),
     });
-  } catch (err: unknown) {
+  } catch (err) {
     console.error('[player-session] ERROR:', err);
-    const message = err instanceof Error ? err.message : 'FUNCTION_INVOCATION_FAILED';
-    res.status(500).send(message);
+    res.status(500).send(err?.message || 'FUNCTION_INVOCATION_FAILED');
   }
-}
+};

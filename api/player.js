@@ -1,11 +1,9 @@
-/* api/player.ts */
+// api/player.js
 
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+const jwt = require('jsonwebtoken');
 
-const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
-
-function parseCookies(cookieHeader: string | undefined): Record<string, string> {
-  const out: Record<string, string> = {};
+function parseCookies(cookieHeader) {
+  const out = {};
   if (!cookieHeader) return out;
 
   cookieHeader.split(';').forEach((part) => {
@@ -17,22 +15,22 @@ function parseCookies(cookieHeader: string | undefined): Record<string, string> 
   return out;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   try {
-    const secret = process.env['PLAYER_SESSION_SECRET'];
+    const secret = process.env.PLAYER_SESSION_SECRET;
     if (!secret) {
       res.status(500).send('Missing env PLAYER_SESSION_SECRET');
       return;
     }
 
     const cookies = parseCookies(req.headers.cookie);
-    const token = cookies['ps'];
+    const token = cookies.ps;
     if (!token) {
       res.status(401).send('Missing session cookie');
       return;
     }
 
-    let payload: any;
+    let payload;
     try {
       payload = jwt.verify(token, secret);
     } catch {
@@ -40,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    if (payload?.videoProvider !== 'gdrive') {
+    if (!payload || payload.videoProvider !== 'gdrive') {
       res.status(400).send('This player is configured for Google Drive only');
       return;
     }
@@ -76,8 +74,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 </html>`;
 
     res.status(200).send(html);
-  } catch (err: unknown) {
+  } catch (err) {
     console.error('[player] ERROR:', err);
     res.status(500).send('FUNCTION_INVOCATION_FAILED');
   }
-}
+};
