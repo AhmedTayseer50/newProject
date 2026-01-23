@@ -1,6 +1,9 @@
+/* api/drive-stream.ts */
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import { google } from 'googleapis';
+
+const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
+const { google } = require('googleapis') as typeof import('googleapis');
 
 function parseCookies(cookieHeader: string | undefined): Record<string, string> {
   const out: Record<string, string> = {};
@@ -30,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    let payload: string | JwtPayload;
+    let payload: any;
     try {
       payload = jwt.verify(token, secret);
     } catch {
@@ -38,15 +41,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const videoProvider = typeof payload === 'object' ? (payload as any).videoProvider : undefined;
-    const videoRef = typeof payload === 'object' ? (payload as any).videoRef : undefined;
-
-    if (videoProvider !== 'gdrive') {
+    if (payload?.videoProvider !== 'gdrive') {
       res.status(400).send('Not a Google Drive session');
       return;
     }
 
-    const fileId = String(videoRef || '');
+    const fileId = String(payload?.videoRef || '');
     if (!fileId) {
       res.status(400).send('Missing fileId in session');
       return;
@@ -69,6 +69,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     const drive = google.drive({ version: 'v3', auth });
+
     const range = req.headers.range;
 
     const driveRes = await drive.files.get(
@@ -79,15 +80,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     );
 
-    // Streaming headers
     const h = driveRes.headers || {};
+
     if (h['content-type']) res.setHeader('Content-Type', String(h['content-type']));
     if (h['content-length']) res.setHeader('Content-Length', String(h['content-length']));
     if (h['content-range']) res.setHeader('Content-Range', String(h['content-range']));
+
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Cache-Control', 'no-store');
 
-    // لو فيه Range غالبًا هتبقى 206
     if (range) res.statusCode = 206;
 
     driveRes.data.on('error', (e: unknown) => {

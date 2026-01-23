@@ -1,8 +1,10 @@
-import admin from 'firebase-admin';
+/* api/_lib/firebaseAdmin.ts */
 
-let app: admin.app.App | undefined;
+const admin = require('firebase-admin') as typeof import('firebase-admin');
 
-export function getFirebaseAdminApp(): admin.app.App {
+let app: import('firebase-admin').app.App | undefined;
+
+export function getFirebaseAdminApp(): import('firebase-admin').app.App {
   if (app) return app;
 
   const raw = process.env['FIREBASE_SERVICE_ACCOUNT_JSON'];
@@ -18,11 +20,11 @@ export function getFirebaseAdminApp(): admin.app.App {
     try {
       serviceAccountJson = Buffer.from(raw, 'base64').toString('utf8');
     } catch {
-      // لو فشل، هنكمل بالـ raw زي ما هو
+      // تجاهل، هنحاول نكمل بالـ raw
     }
   }
 
-  const serviceAccount = JSON.parse(serviceAccountJson) as admin.ServiceAccount;
+  const serviceAccount = JSON.parse(serviceAccountJson) as import('firebase-admin').ServiceAccount;
 
   app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -32,7 +34,7 @@ export function getFirebaseAdminApp(): admin.app.App {
   return app;
 }
 
-export function getFirebaseAdmin(): typeof admin {
+export function getFirebaseAdmin(): typeof import('firebase-admin') {
   getFirebaseAdminApp();
   return admin;
 }

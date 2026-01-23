@@ -1,6 +1,9 @@
+/* api/player-session.ts */
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt from 'jsonwebtoken';
 import { getFirebaseAdmin } from './_lib/firebaseAdmin';
+
+const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
 
 function setCookie(res: VercelResponse, name: string, value: string) {
   const cookie = `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300`;
@@ -11,7 +14,7 @@ type PlayerSessionBody = {
   courseId?: string;
   lessonId?: string;
   videoProvider?: 'youtube' | 'gdrive';
-  videoRef?: string;
+  videoRef?: string; // fileId لو gdrive
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -40,11 +43,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  if (videoProvider !== 'youtube' && videoProvider !== 'gdrive') {
-    res.status(400).send('Unsupported video provider');
-    return;
-  }
-
   const secret = process.env['PLAYER_SESSION_SECRET'];
   if (!secret) {
     res.status(500).send('Missing env PLAYER_SESSION_SECRET');
@@ -56,6 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const decoded = await admin.auth().verifyIdToken(idToken);
     const uid = decoded.uid;
 
+    // ✅ تأكد إن المستخدم enrolled في الكورس
     const enrollPath = `enrollments/${uid}/${courseId}`;
     const enrollmentSnap = await admin.database().ref(enrollPath).get();
 
@@ -80,16 +79,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       secret
     );
 
-    // ✅ token في cookie بدل querystring
     setCookie(res, 'ps', token);
 
     res.status(200).json({
-      playerUrl: `/api/player`,
+      playerUrl: '/api/player',
       expiresAt: new Date((now + expiresInSec) * 1000).toISOString(),
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'FUNCTION_INVOCATION_FAILED';
     console.error('[player-session] ERROR:', err);
+    const message = err instanceof Error ? err.message : 'FUNCTION_INVOCATION_FAILED';
     res.status(500).send(message);
   }
 }

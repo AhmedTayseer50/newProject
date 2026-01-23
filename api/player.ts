@@ -1,5 +1,8 @@
+/* api/player.ts */
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+
+const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
 
 function parseCookies(cookieHeader: string | undefined): Record<string, string> {
   const out: Record<string, string> = {};
@@ -29,7 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    let payload: string | JwtPayload;
+    let payload: any;
     try {
       payload = jwt.verify(token, secret);
     } catch {
@@ -37,15 +40,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const provider = typeof payload === 'object' ? (payload as any).videoProvider : undefined;
-
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store');
-
-    if (provider !== 'gdrive') {
+    if (payload?.videoProvider !== 'gdrive') {
       res.status(400).send('This player is configured for Google Drive only');
       return;
     }
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store');
 
     const html = `<!doctype html>
 <html lang="ar">
