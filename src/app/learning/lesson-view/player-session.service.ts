@@ -1,46 +1,27 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 export type CreatePlayerSessionRequest = {
   courseId: string;
   lessonId: string;
-  videoProvider: 'youtube';
+  videoProvider: 'youtube' | 'gdrive';
   videoRef: string;
   /** Firebase ID token (Bearer) */
   idToken: string;
 };
 
 export type CreatePlayerSessionResponse = {
-  /** رابط اللاعب الداخلي (Vercel API) */
-  playerUrl: string;
-  /** وقت انتهاء الجلسة (اختياري) */
-  expiresAt?: string;
+  ok: boolean;
+  session?: string;
+  exp?: number;
+  error?: string;
 };
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class PlayerSessionService {
-  async createSession(req: CreatePlayerSessionRequest): Promise<CreatePlayerSessionResponse> {
-    const res = await fetch('/api/player-session', {
-      method: 'POST',
-      credentials: 'include', // ✅ مهم جدًا عشان الـ Set-Cookie يتسجل
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${req.idToken}`
-      },
-      body: JSON.stringify({
-        courseId: req.courseId,
-        lessonId: req.lessonId,
-        videoProvider: req.videoProvider,
-        videoRef: req.videoRef,
-      })
-    });
+  constructor(private http: HttpClient) {}
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      throw new Error(text || 'فشل إنشاء جلسة تشغيل الفيديو');
-    }
-
-    return (await res.json()) as CreatePlayerSessionResponse;
+  createSession(payload: CreatePlayerSessionRequest) {
+    return this.http.post<CreatePlayerSessionResponse>('/api/player-session', payload);
   }
 }

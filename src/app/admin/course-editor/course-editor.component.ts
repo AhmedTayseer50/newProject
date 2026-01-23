@@ -9,7 +9,11 @@ import {
   FormControl,
   FormGroup,
 } from '@angular/forms';
-import { AdminService, AdminCourse, AdminLesson } from '../services/admin.service';
+import {
+  AdminService,
+  AdminCourse,
+  AdminLesson,
+} from '../services/admin.service';
 
 type CourseRow = {
   id: string;
@@ -20,10 +24,10 @@ type CourseRow = {
 };
 
 type LessonRow = {
-  id: string;            // Firebase key
+  id: string;
   title: string;
-  lessonIndex: number;   // 1-based position
-  videoProvider?: 'youtube';
+  lessonIndex: number;
+  videoProvider?: 'youtube' | 'gdrive';
   videoRef?: string;
 };
 
@@ -37,7 +41,7 @@ export class CourseEditorComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
-    private admin: AdminService
+    private admin: AdminService,
   ) {}
 
   courseId?: string;
@@ -87,10 +91,10 @@ export class CourseEditorComponent implements OnInit {
 
   /** نموذج الدرس */
   lessonForm!: FormGroup<{
-    id: FormControl<string | null>;     // Firebase key عند التعديل
+    id: FormControl<string | null>;
     title: FormControl<string>;
-    lessonIndex: FormControl<number>;   // 1-based
-    videoProvider: FormControl<'youtube'>;
+    lessonIndex: FormControl<number>;
+    videoProvider: FormControl<'youtube' | 'gdrive'>;
     videoRef: FormControl<string>;
   }>;
 
@@ -150,16 +154,10 @@ export class CourseEditorComponent implements OnInit {
 
     this.lessonForm = this.fb.group({
       id: this.fb.control<string | null>(null),
-      title: this.fb.nonNullable.control<string>('', [
-        Validators.required,
-        Validators.minLength(2),
-      ]),
-      lessonIndex: this.fb.nonNullable.control<number>(1, [
-        Validators.required,
-        Validators.min(1),
-      ]),
-      videoProvider: this.fb.nonNullable.control<'youtube'>('youtube'),
-      videoRef: this.fb.nonNullable.control<string>(''),
+      title: this.fb.nonNullable.control(''),
+      lessonIndex: this.fb.nonNullable.control(1),
+      videoProvider: this.fb.nonNullable.control<'youtube' | 'gdrive'>('youtube'),
+      videoRef: this.fb.nonNullable.control(''),
     });
 
     // 2) تشغيل
@@ -205,7 +203,7 @@ export class CourseEditorComponent implements OnInit {
 
         // املأ أسماء الدروس للعرض فقط (من course.lectureNames)
         (c.lectureNames ?? []).forEach((name) =>
-          this.addLectureName((name ?? '').trim())
+          this.addLectureName((name ?? '').trim()),
         );
         if (this.lectureNames.length === 0) this.addLectureName('');
 
@@ -228,7 +226,7 @@ export class CourseEditorComponent implements OnInit {
   /** تحميل جميع الكورسات لعرضها في جدول */
   async loadCoursesList() {
     this.courses = (await this.admin.listCourses()).sort((a, b) =>
-      (a.title || '').localeCompare(b.title || '')
+      (a.title || '').localeCompare(b.title || ''),
     );
   }
 
@@ -236,15 +234,19 @@ export class CourseEditorComponent implements OnInit {
   private async refreshLessons() {
     if (!this.courseId) return;
     const list = await this.admin.listLessons(this.courseId);
-    this.lessons = list.map(l => ({
+
+    this.lessons = list.map((l) => ({
       id: l.id,
       title: l.title,
       lessonIndex: l.lessonIndex,
-      videoProvider: (l.videoProvider ?? 'youtube') as any,
+      videoProvider: (l.videoProvider ?? 'youtube') as 'youtube' | 'gdrive',
       videoRef: l.videoRef || '',
     }));
+
     // عدّل القيمة الافتراضية لترتيب الدرس الجديد
-    this.lessonForm.patchValue({ lessonIndex: (this.lessons?.length || 0) + 1 });
+    this.lessonForm.patchValue({
+      lessonIndex: (this.lessons?.length || 0) + 1,
+    });
   }
 
   /** حذف كورس من جدول القائمة (يُستدعى من القالب) */
@@ -289,7 +291,9 @@ export class CourseEditorComponent implements OnInit {
       goalDescription: f.get('goalDescription')!.value.trim(),
 
       expectedStudyTimeTitle: f.get('expectedStudyTimeTitle')!.value.trim(),
-      expectedStudyTimeDescription: f.get('expectedStudyTimeDescription')!.value.trim(),
+      expectedStudyTimeDescription: f
+        .get('expectedStudyTimeDescription')!
+        .value.trim(),
 
       prerequisitesTitle: f.get('prerequisitesTitle')!.value.trim(),
       prerequisitesDescription: f.get('prerequisitesDescription')!.value.trim(),
@@ -340,6 +344,7 @@ export class CourseEditorComponent implements OnInit {
 
   async saveLesson() {
     if (!this.courseId) return;
+
     if (this.lessonForm.invalid) {
       this.lessonForm.markAllAsTouched();
       return;
@@ -350,12 +355,23 @@ export class CourseEditorComponent implements OnInit {
 
     const id = this.lessonForm.get('id')!.value;
     const title = (this.lessonForm.get('title')!.value ?? '').trim();
+
     let lessonIndex = Number(this.lessonForm.get('lessonIndex')!.value) || 1;
     lessonIndex = Math.max(1, lessonIndex);
-    const videoProvider = (this.lessonForm.get('videoProvider')!.value ?? 'youtube') as any;
+
+    const videoProvider =
+      (this.lessonForm.get('videoProvider')!.value ?? 'youtube') as
+        | 'youtube'
+        | 'gdrive';
+
     const videoRef = (this.lessonForm.get('videoRef')!.value ?? '').trim();
 
-    const payload: AdminLesson = { title, lessonIndex, videoProvider, videoRef };
+    const payload: AdminLesson = {
+      title,
+      lessonIndex,
+      videoProvider,
+      videoRef,
+    };
 
     try {
       if (id) {
@@ -377,7 +393,7 @@ export class CourseEditorComponent implements OnInit {
       id: l.id,
       title: l.title || '',
       lessonIndex: l.lessonIndex || 1,
-      videoProvider: (l.videoProvider ?? 'youtube') as any,
+      videoProvider: (l.videoProvider ?? 'youtube') as 'youtube' | 'gdrive',
       videoRef: l.videoRef || '',
     });
   }

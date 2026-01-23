@@ -41,7 +41,7 @@ export interface AdminCourse {
 export interface AdminLesson {
   title: string;
   lessonIndex: number;
-  videoProvider?: 'youtube';
+  videoProvider?: 'youtube' | 'gdrive';
   videoRef?: string;
   createdAt?: number;
 }
@@ -107,20 +107,22 @@ export class AdminService {
       .sort((a, b) => (a.lessonIndex ?? 0) - (b.lessonIndex ?? 0));
   }
 
-  async addLesson(courseId: string, data: AdminLesson): Promise<string> {
-    const listRef = ref(this.db, `lessons/${courseId}`);
-    const newRef = push(listRef);
-    const id = newRef.key!;
-    const payload: AdminLesson = {
-      title: data.title,
-      lessonIndex: data.lessonIndex,
-      videoProvider: (data.videoProvider ?? 'youtube') as any,
-      videoRef: data.videoRef || '',
-      createdAt: Date.now(),
-    };
-    await set(ref(this.db, `lessons/${courseId}/${id}`), payload);
-    return id;
-  }
+async addLesson(courseId: string, data: AdminLesson): Promise<string> {
+  const listRef = ref(this.db, `lessons/${courseId}`);
+  const newRef = push(listRef);
+  const id = newRef.key!;
+
+  const payload: AdminLesson = {
+    title: data.title,
+    lessonIndex: data.lessonIndex,
+    videoProvider: (data.videoProvider ?? 'youtube') as 'youtube' | 'gdrive',
+    videoRef: data.videoRef || '',
+    createdAt: Date.now(),
+  };
+
+  await set(ref(this.db, `lessons/${courseId}/${id}`), payload);
+  return id;
+}
 
   async updateLesson(courseId: string, lessonId: string, data: Partial<AdminLesson>): Promise<void> {
     await update(ref(this.db, `lessons/${courseId}/${lessonId}`), data);

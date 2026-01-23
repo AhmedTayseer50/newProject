@@ -371,16 +371,42 @@
           <label class="form-label">المنصة</label>
           <select formControlName="videoProvider" class="form-select">
             <option value="youtube">YouTube</option>
+            <option value="gdrive">Google Drive</option>
           </select>
         </div>
+
         <div class="col-md-5">
-          <label class="form-label">YouTube videoId</label>
+          <label class="form-label">
+            {{
+              lessonForm.get("videoProvider")?.value === "gdrive"
+                ? "Google Drive fileId"
+                : "YouTube videoId"
+            }}
+          </label>
+
           <input
             formControlName="videoRef"
             class="form-control"
-            placeholder="مثال: dQw4w9WgXcQ"
+            [placeholder]="
+              lessonForm.get('videoProvider')?.value === 'gdrive'
+                ? 'مثال: 1ZAVVJDAmXyG9ah-m4vm7EmTi_kh82wFr'
+                : 'مثال: dQw4w9WgXcQ'
+            "
           />
-          <div class="form-text">ارفع الفيديو Unlisted وخُد الـ videoId من الرابط.</div>
+
+          <div
+            class="form-text"
+            *ngIf="lessonForm.get('videoProvider')?.value === 'youtube'"
+          >
+            ارفع الفيديو Unlisted وخُد الـ videoId من الرابط.
+          </div>
+
+          <div
+            class="form-text"
+            *ngIf="lessonForm.get('videoProvider')?.value === 'gdrive'"
+          >
+            حط Google Drive fileId فقط (الجزء بين /d/ و /view).
+          </div>
         </div>
       </div>
       <div class="card-footer d-flex gap-2">
@@ -405,9 +431,7 @@
       >
         <div>
           <strong>الدرس {{ l.lessonIndex }}:</strong> {{ l.title }}
-          <div class="text-muted small" *ngIf="l.videoRef">
-            فيديو مضبوط
-          </div>
+          <div class="text-muted small" *ngIf="l.videoRef">فيديو مضبوط</div>
         </div>
         <div class="btn-group">
           <button

@@ -3,9 +3,13 @@ export interface Lesson {
   courseId: string;
   title?: string | null;
   lessonIndex?: number | null;
-  /** مصدر الفيديو (حاليًا: youtube) */
-  videoProvider?: 'youtube';
-  /** مرجع الفيديو (مثلاً YouTube videoId) */
-  videoRef?: string;
-  createdAt?: number;
+
+  /** مصدر الفيديو */
+  videoProvider?: 'youtube' | 'gdrive';
+
+  /** مرجع الفيديو (YouTube videoId أو Google Drive fileId) */
+  videoRef?: string | null;
+
+  createdAt?: number | null;
+  updatedAt?: number | null;
 }
