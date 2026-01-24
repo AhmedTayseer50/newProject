@@ -1,8 +1,11 @@
 // api/drive-stream.ts
+// Vercel Serverless Function (Node)
+// Streams Google Drive video with Range support, using a short-lived session cookie "ps"
+
 const jwt = require('jsonwebtoken');
 const { google } = require('googleapis');
 
-function parseCookies(cookieHeader: string) {
+function parseCookies(cookieHeader?: string) {
   const out: Record<string, string> = {};
   if (!cookieHeader) return out;
 
@@ -20,7 +23,7 @@ async function handler(req: any, res: any) {
     const secret = process.env['PLAYER_SESSION_SECRET'];
     if (!secret) return res.status(500).send('Missing env PLAYER_SESSION_SECRET');
 
-    const cookies = parseCookies(req.headers.cookie);
+    const cookies = parseCookies(req.headers?.cookie);
     const token = cookies['ps'];
     if (!token) return res.status(401).send('Missing session cookie');
 
@@ -54,7 +57,7 @@ async function handler(req: any, res: any) {
 
     const drive = google.drive({ version: 'v3', auth });
 
-    const range = req.headers.range;
+    const range = req.headers?.range;
 
     const driveRes = await drive.files.get(
       { fileId, alt: 'media' },
@@ -64,26 +67,31 @@ async function handler(req: any, res: any) {
       }
     );
 
-    // ✅ خُد نفس الـ status اللي راجع من جوجل
+    // خُد نفس status من جوجل (ده مهم جدًا)
     const status = driveRes?.status || (range ? 206 : 200);
     res.statusCode = status;
 
-    // ✅ هيدرز مهمة للـ video streaming
     const h = driveRes?.headers || {};
     const contentType = h['content-type'] || 'video/mp4';
     const contentLength = h['content-length'];
     const contentRange = h['content-range'];
+    const contentDisposition = h['content-disposition'];
 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Robots-Tag', 'noindex');
 
-    // لو جوجل رجّع 206 لازم يكون فيه Content-Range
-    // لو مفيش Content-Range يبقى غالبًا جوجل رجّع 200 أصلاً → خليه 200
+    // مرّر Content-Disposition لو موجود (بيساعد اسم الملف)
+    if (contentDisposition) {
+      res.setHeader('Content-Disposition', contentDisposition);
+    } else {
+      res.setHeader('Content-Disposition', 'inline');
+    }
+
+    // لو 206 لازم Content-Range. لو مفيش → هننزّلها لـ 200 عشان المتصفح ما ينهارش
     if (status === 206) {
       if (!contentRange) {
-        // downgrade safely
         res.statusCode = 200;
       } else {
         res.setHeader('Content-Range', contentRange);
@@ -92,12 +100,16 @@ async function handler(req: any, res: any) {
 
     if (contentLength) res.setHeader('Content-Length', contentLength);
 
+    // stream errors
     driveRes.data.on('error', (e: any) => {
-      console.error('[drive-stream] stream error', e);
-      if (!res.headersSent) res.status(500).end('Stream error');
-      else res.end();
+      console.error('[drive-stream] upstream stream error:', e);
+      try {
+        if (!res.headersSent) res.status(500).end('Stream error');
+        else res.end();
+      } catch (_) {}
     });
 
+    // pipe stream
     driveRes.data.pipe(res);
   } catch (err) {
     console.error('[drive-stream] ERROR:', err);
