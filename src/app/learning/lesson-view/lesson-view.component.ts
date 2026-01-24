@@ -37,6 +37,8 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
   /** رابط داخلي مؤقت للاعب الفيديو (Vercel API) */
   playerUrl?: string;
+
+  /** ✅ لازم SafeResourceUrl للـ iframe */
   safeUrl?: SafeResourceUrl;
 
   loading = true;
@@ -64,8 +66,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     console.log('[lesson-view][postMessage] received:', data);
 
     if (data.type === 'PLAYER_STATE') {
-      console.log('[lesson-view][postMessage] PLAYER_STATE:', data.state);
-
       if (data.state === 'playing') {
         this.isPlaying = true;
         this.startRandomPresenceScheduler();
@@ -74,10 +74,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         this.stopRandomPresenceScheduler();
         this.clearPresencePrompt();
       }
-    }
-
-    if (data.type === 'PLAYER_DEBUG') {
-      console.log('[lesson-view][postMessage] PLAYER_DEBUG:', data);
     }
   };
 
@@ -112,24 +108,19 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       this.loading = true;
       this.error = undefined;
 
-      // important: clear previous iframe url so it reloads cleanly
+      // ✅ مهم: صَفّر الـ urls عشان Angular يعيد binding من جديد
       this.playerUrl = undefined;
       this.safeUrl = undefined;
 
-      // also stop presence timers
       this.isPlaying = false;
       this.stopRandomPresenceScheduler();
       this.clearPresencePrompt();
-
-      console.log('[lesson-view] state reset -> loading=true, error cleared');
 
       try {
         if (courseChanged || this.lessons.length === 0) {
           console.log('[lesson-view] loading all lessons...');
           await this.loadAllLessons();
           console.log('[lesson-view] lessons loaded ✅ count=', this.lessons.length);
-        } else {
-          console.log('[lesson-view] lessons cache reused ✅ count=', this.lessons.length);
         }
 
         this.currentPos = this.lessons.findIndex((l) => l.id === this.lessonId);
@@ -148,8 +139,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('[lesson-view] ngOnDestroy 🧹');
-
     this.paramSub?.unsubscribe();
     window.removeEventListener('message', this.onWindowMessage);
     this.stopRandomPresenceScheduler();
@@ -160,21 +149,14 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     console.log('[lesson-view] loadAllLessons() start:', `lessons/${this.courseId}`);
 
     const allSnap = await get(ref(this.db, `lessons/${this.courseId}`));
-
     if (!allSnap.exists()) {
       this.lessons = [];
-      console.warn('[lesson-view] loadAllLessons() -> no lessons found');
       return;
     }
 
     const obj = allSnap.val() as Record<
       string,
-      {
-        title?: string;
-        lessonIndex?: number;
-        videoProvider?: string;
-        videoRef?: string;
-      }
+      { title?: string; lessonIndex?: number; videoProvider?: string; videoRef?: string }
     >;
 
     this.lessons = Object.entries(obj)
@@ -200,17 +182,10 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     if (!snap.exists()) throw new Error('الدرس غير موجود');
 
     const data = snap.val() as any;
-    console.log('[lesson-view] lesson raw data:', data);
 
     this.title = data.title ?? '';
     this.videoProvider = (data.videoProvider ?? 'youtube') as 'youtube' | 'gdrive';
     this.videoRef = data.videoRef;
-
-    console.log('[lesson-view] parsed lesson:', {
-      title: this.title,
-      videoProvider: this.videoProvider,
-      videoRef: this.videoRef,
-    });
 
     if (!this.videoProvider || !this.videoRef) {
       this.playerUrl = undefined;
@@ -218,20 +193,9 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       throw new Error('هذا الدرس لا يحتوي على فيديو بعد');
     }
 
-    // ===== create temp player session =====
-    console.log('[lesson-view] getting idToken from currentUser...');
+    // ===== create player session =====
     const idToken = await this.auth.currentUser?.getIdToken();
-
     if (!idToken) throw new Error('يرجى تسجيل الدخول لمشاهدة الفيديو');
-
-    console.log('[lesson-view] idToken acquired ✅ length=', idToken.length);
-
-    console.log('[lesson-view] calling /api/player-session ...', {
-      courseId: this.courseId,
-      lessonId: this.lessonId,
-      videoProvider: this.videoProvider,
-      videoRef: this.videoRef,
-    });
 
     const res = await firstValueFrom(
       this.playerSession.createSession({
@@ -243,60 +207,36 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       }),
     );
 
-    console.log('[lesson-view] playerSession response ✅:', res);
+    // ✅ خليها absolute path على نفس الدومين (مهم جدًا)
+    const raw = String(res?.playerUrl ?? '');
+    const url = raw.startsWith('/') ? raw : `/${raw}`;
 
-    // IMPORTANT: ensure leading slash (absolute path on same domain)
-    const url = String(res.playerUrl || '');
-    this.playerUrl = url.startsWith('/') ? url : `/${url}`;
+    this.playerUrl = url;
 
-    // avoid NG0904 by sanitizing resource url
-    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.playerUrl);
+    // ✅ ده اللي يمنع NG0904
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
 
-    console.log('[lesson-view] iframe url set ✅:', {
-      playerUrl: this.playerUrl,
-      safeUrlDefined: !!this.safeUrl,
-    });
+    console.log('[lesson-view] iframe url set ✅', { playerUrl: this.playerUrl });
 
-    // debug DOM after Angular binds src
+    // Debug: اتأكد إن property src اتغير
     setTimeout(() => {
       const el = this.playerFrame?.nativeElement;
       console.log('[lesson-view] iframe DOM check:', {
-        iframeExists: !!el,
-        iframeSrcAttr: el?.getAttribute('src'),
-        iframeSrcProp: el?.src,
+        exists: !!el,
+        srcProp: el?.src,
       });
-    }, 300);
-
-    console.log('[lesson-view] now showing lesson:', {
-      courseId: this.courseId,
-      lessonId: this.lessonId,
-      title: this.title,
-      videoProvider: this.videoProvider,
-      videoRef: this.videoRef,
-      playerUrl: this.playerUrl,
-    });
+    }, 200);
   }
 
-  // ===== Presence Check Logic =====
+  // ===== Presence =====
   private startRandomPresenceScheduler() {
     if (this.schedulerTimeoutId || this.presenceRequired) return;
 
     const delayMs = this.randomBetween(60_000, 180_000);
-    console.log('[lesson-view] presence scheduler delay(ms)=', delayMs);
-
     this.schedulerTimeoutId = setTimeout(() => {
       this.schedulerTimeoutId = null;
-
-      console.log('[lesson-view] presence scheduler fired', {
-        isPlaying: this.isPlaying,
-        presenceRequired: this.presenceRequired,
-      });
-
-      if (this.isPlaying && !this.presenceRequired) {
-        this.showPresencePrompt();
-      } else {
-        this.startRandomPresenceScheduler();
-      }
+      if (this.isPlaying && !this.presenceRequired) this.showPresencePrompt();
+      else this.startRandomPresenceScheduler();
     }, delayMs);
   }
 
@@ -308,23 +248,17 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   }
 
   private showPresencePrompt() {
-    console.log('[lesson-view] showPresencePrompt() -> overlay ON');
-
     this.presenceRequired = true;
     this.countdown = 30;
     this.sendPlayerCommand('pause');
 
     this.countdownIntervalId = setInterval(() => {
       this.countdown--;
-
-      if (this.countdown <= 0) {
-        this.lockVideoUntilConfirm();
-      }
+      if (this.countdown <= 0) this.lockVideoUntilConfirm();
     }, 1000);
   }
 
   confirmPresence() {
-    console.log('[lesson-view] confirmPresence() -> overlay OFF and play');
     this.clearPresencePrompt();
     this.sendPlayerCommand('play');
     this.startRandomPresenceScheduler();
@@ -350,13 +284,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
   private sendPlayerCommand(command: 'play' | 'pause') {
     const win = this.playerFrame?.nativeElement?.contentWindow;
-
-    console.log('[lesson-view] sendPlayerCommand:', {
-      command,
-      hasFrame: !!this.playerFrame?.nativeElement,
-      hasContentWindow: !!win,
-    });
-
     win?.postMessage({ type: 'PARENT_COMMAND', command }, '*');
   }
 
@@ -367,36 +294,24 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   get totalLessons(): number {
     return this.lessons.length;
   }
-
   get hasPrev(): boolean {
     return this.currentPos > 0;
   }
-
   get hasNext(): boolean {
     return this.currentPos >= 0 && this.currentPos < this.lessons.length - 1;
   }
 
   goTo(lessonId: string) {
-    console.log('[lesson-view] goTo:', lessonId);
     this.router.navigate(['/lesson', this.courseId, lessonId]);
   }
-
   goPrev() {
     if (!this.hasPrev) return;
     const nextPos = this.currentPos - 1;
     this.router.navigate(['/lesson', this.courseId, this.lessons[nextPos].id]);
   }
-
   goNext() {
     if (!this.hasNext) return;
     const nextPos = this.currentPos + 1;
     this.router.navigate(['/lesson', this.courseId, this.lessons[nextPos].id]);
-  }
-
-  onIframeLoad() {
-    console.log('[lesson-view] ✅ iframe LOAD event fired');
-    const el = this.playerFrame?.nativeElement;
-    console.log('[lesson-view] iframe src attr:', el?.getAttribute('src'));
-    console.log('[lesson-view] iframe src prop:', el?.src);
   }
 }
