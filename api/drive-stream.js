@@ -1,10 +1,9 @@
-// api/drive-stream.js
-
+// api/drive-stream.ts
 const jwt = require('jsonwebtoken');
 const { google } = require('googleapis');
 
-function parseCookies(cookieHeader) {
-  const out = {};
+function parseCookies(cookieHeader: string) {
+  const out: Record<string, string> = {};
   if (!cookieHeader) return out;
 
   cookieHeader.split(';').forEach((part) => {
@@ -16,40 +15,35 @@ function parseCookies(cookieHeader) {
   return out;
 }
 
-function normalizeProvider(value) {
-  const v = String(value || '').trim().toLowerCase();
-  if (v === 'gdrive' || v === 'drive' || v === 'google_drive' || v === 'google-drive' || v === 'google drive') return 'gdrive';
-  if (v === 'youtube' || v === 'yt') return 'youtube';
-  return v;
-}
-
-module.exports = async function handler(req, res) {
+async function handler(req: any, res: any) {
   try {
-    const secret = process.env.PLAYER_SESSION_SECRET;
+    const secret = process.env['PLAYER_SESSION_SECRET'];
     if (!secret) return res.status(500).send('Missing env PLAYER_SESSION_SECRET');
 
     const cookies = parseCookies(req.headers.cookie);
-    const token = cookies.ps;
+    const token = cookies['ps'];
     if (!token) return res.status(401).send('Missing session cookie');
 
-    let payload;
+    let payload: any;
     try {
       payload = jwt.verify(token, secret);
-    } catch {
+    } catch (e) {
       return res.status(401).send('Invalid/Expired session');
     }
 
-    const provider = normalizeProvider(payload?.videoProvider);
-    if (provider !== 'gdrive') return res.status(400).send('Not a Google Drive session');
+    if (payload?.videoProvider !== 'gdrive') {
+      return res.status(400).send('Not a Google Drive session');
+    }
 
     const fileId = String(payload?.videoRef || '');
     if (!fileId) return res.status(400).send('Missing fileId in session');
 
-    const clientEmail = process.env.GOOGLE_DRIVE_SA_EMAIL;
-    let privateKey = process.env.GOOGLE_DRIVE_SA_PRIVATE_KEY;
+    const clientEmail = process.env['GOOGLE_DRIVE_SA_EMAIL'];
+    let privateKey = process.env['GOOGLE_DRIVE_SA_PRIVATE_KEY'];
 
-    if (!clientEmail || !privateKey) return res.status(500).send('Missing Google Drive service account env');
-
+    if (!clientEmail || !privateKey) {
+      return res.status(500).send('Missing Google Drive service account env');
+    }
     privateKey = privateKey.replace(/\\n/g, '\n');
 
     const auth = new google.auth.JWT({
@@ -60,57 +54,45 @@ module.exports = async function handler(req, res) {
 
     const drive = google.drive({ version: 'v3', auth });
 
-    // ✅ اقرأ نوع الملف الحقيقي
-    const meta = await drive.files.get({
-      fileId,
-      fields: 'mimeType,name,size',
-      supportsAllDrives: true,
-    });
-
-    const mimeType = String(meta.data.mimeType || '');
-    const fileName = String(meta.data.name || 'video');
-
-    // ✅ لو مش فيديو، رجّع Error واضح بدل "Format error"
-    if (!mimeType.startsWith('video/')) {
-      return res.status(415).json({
-        error: 'UNSUPPORTED_MEDIA_TYPE',
-        mimeType,
-        fileName,
-        hint: 'ارفع الفيديو بصيغة MP4 (H.264 + AAC) أو WebM',
-      });
-    }
-
     const range = req.headers.range;
 
     const driveRes = await drive.files.get(
-      { fileId, alt: 'media', supportsAllDrives: true },
-      { responseType: 'stream', headers: range ? { Range: range } : undefined }
+      { fileId, alt: 'media' },
+      {
+        responseType: 'stream',
+        headers: range ? { Range: range } : undefined,
+      }
     );
 
-    const h = driveRes.headers || {};
-    const ct = String(h['content-type'] || mimeType);
+    // ✅ خُد نفس الـ status اللي راجع من جوجل
+    const status = driveRes?.status || (range ? 206 : 200);
+    res.statusCode = status;
 
-    // ✅ لو Drive رجّع HTML/JSON يبقى فيه مشكلة صلاحيات/خطأ
-    if (ct.includes('text/html') || ct.includes('application/json')) {
-      return res.status(502).json({
-        error: 'DRIVE_RETURNED_NON_VIDEO',
-        contentType: ct,
-        hint: 'راجع صلاحيات الملف: شاركه مع GOOGLE_DRIVE_SA_EMAIL أو اجعله Anyone with link',
-      });
-    }
+    // ✅ هيدرز مهمة للـ video streaming
+    const h = driveRes?.headers || {};
+    const contentType = h['content-type'] || 'video/mp4';
+    const contentLength = h['content-length'];
+    const contentRange = h['content-range'];
 
-    // Headers
-    res.setHeader('Content-Type', mimeType);
-    res.setHeader('Content-Disposition', `inline; filename="${fileName.replace(/"/g, '')}"`);
+    res.setHeader('Content-Type', contentType);
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('X-Robots-Tag', 'noindex');
 
-    if (h['content-length']) res.setHeader('Content-Length', String(h['content-length']));
-    if (h['content-range']) res.setHeader('Content-Range', String(h['content-range']));
+    // لو جوجل رجّع 206 لازم يكون فيه Content-Range
+    // لو مفيش Content-Range يبقى غالبًا جوجل رجّع 200 أصلاً → خليه 200
+    if (status === 206) {
+      if (!contentRange) {
+        // downgrade safely
+        res.statusCode = 200;
+      } else {
+        res.setHeader('Content-Range', contentRange);
+      }
+    }
 
-    if (range) res.statusCode = 206;
+    if (contentLength) res.setHeader('Content-Length', contentLength);
 
-    driveRes.data.on('error', (e) => {
+    driveRes.data.on('error', (e: any) => {
       console.error('[drive-stream] stream error', e);
       if (!res.headersSent) res.status(500).end('Stream error');
       else res.end();
@@ -119,6 +101,8 @@ module.exports = async function handler(req, res) {
     driveRes.data.pipe(res);
   } catch (err) {
     console.error('[drive-stream] ERROR:', err);
-    res.status(500).send('Drive stream failed');
+    return res.status(500).send('Drive stream failed');
   }
-};
+}
+
+module.exports = handler;
