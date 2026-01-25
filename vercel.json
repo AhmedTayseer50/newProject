@@ -1,29 +1,40 @@
 {
-  "version": 2,
-  "framework": "angular",
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist/dr-enam",
+  "framework": "angular",
 
-  "routes": [
-    { "handle": "filesystem" },
+  "redirects": [
+    { "source": "/", "destination": "/ar", "permanent": false }
+  ],
 
-    { "src": "^/$", "status": 307, "headers": { "Location": "/ar/" } },
-
-    { "src": "^/ar(?:/(.*))?$", "dest": "/ar/index.html" },
-    { "src": "^/en(?:/(.*))?$", "dest": "/en/index.html" }
+  "rewrites": [
+    {
+      "source": "/ar/:path*",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/en/:path*",
+      "destination": "/en/index.html"
+    }
   ],
 
   "headers": [
     {
       "source": "/(ar|en)/(.*)\\.(js|css|png|jpg|jpeg|svg|webp|woff|woff2|ttf|eot)$",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/(ar|en)/index.html",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache" }
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
       ]
     }
   ]
