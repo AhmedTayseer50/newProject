@@ -3,19 +3,13 @@
   "outputDirectory": "dist/dr-enam",
   "framework": "angular",
 
-  "redirects": [
-    { "source": "/", "destination": "/ar", "permanent": false }
-  ],
+  "redirects": [{ "source": "/", "destination": "/ar/", "permanent": false }],
 
   "rewrites": [
-    {
-      "source": "/ar/:path*",
-      "destination": "/ar/index.html"
-    },
-    {
-      "source": "/en/:path*",
-      "destination": "/en/index.html"
-    }
+    { "source": "/ar/:path*", "destination": "/ar/index.html" },
+    { "source": "/en/:path*", "destination": "/en/index.html" },
+
+    { "source": "/:path*", "destination": "/ar/index.html" }
   ],
 
   "headers": [
