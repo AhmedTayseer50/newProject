@@ -2,16 +2,15 @@
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist/dr-enam",
   "framework": "angular",
+  "routes": [
+    { "handle": "filesystem" },
 
-  "redirects": [{ "source": "/", "destination": "/ar/", "permanent": false }],
+    { "src": "^/ar(/.*)?$", "dest": "/ar/index.html" },
+    { "src": "^/en(/.*)?$", "dest": "/en/index.html" },
 
-  "rewrites": [
-    { "source": "/ar/:path*", "destination": "/ar/index.html" },
-    { "source": "/en/:path*", "destination": "/en/index.html" },
-
-    { "source": "/:path*", "destination": "/ar/index.html" }
+    { "src": "^/$", "dest": "/ar/index.html" }
   ],
-
+  
   "headers": [
     {
       "source": "/(ar|en)/(.*)\\.(js|css|png|jpg|jpeg|svg|webp|woff|woff2|ttf|eot)$",
