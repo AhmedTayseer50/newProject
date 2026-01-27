@@ -30,7 +30,7 @@
   <div *ngIf="!loading && !error" class="courses-grid">
     <article
       class="course-card"
-      *ngFor="let c of courses | searchCourses : search"
+      *ngFor="let c of courses | searchCourses: search"
     >
       <!-- الصورة -->
       <div
@@ -55,7 +55,7 @@
           <span class="course-level"></span>
 
           <span class="course-price">
-            {{ c.price | currency : "EGP" : "symbol" : "1.0-0" }}
+            {{ c.price | currency: "EGP" : "symbol" : "1.0-0" }}
           </span>
         </div>
       </div>
@@ -75,7 +75,9 @@
             عرض التفاصيل
           </button>
 
-          <button class="btn btn-primary">انضم الآن</button>
+          <button class="btn btn-primary" type="button" (click)="joinNow(c)">
+            انضم الآن
+          </button>
         </ng-template>
       </div>
     </article>
