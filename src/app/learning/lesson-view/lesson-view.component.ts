@@ -260,7 +260,8 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   private startRandomPresenceScheduler() {
     if (this.schedulerTimeoutId || this.presenceRequired) return;
 
-    const delayMs = this.randomBetween(30_000, 60_000);
+    // ✅ Random presence check between 10 and 30 minutes
+    const delayMs = this.randomBetween(10 * 60_000, 30 * 60_000);
     this.schedulerTimeoutId = setTimeout(() => {
       this.schedulerTimeoutId = null;
 

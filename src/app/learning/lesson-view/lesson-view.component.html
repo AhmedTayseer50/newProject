@@ -57,15 +57,13 @@
             allowfullscreen
             referrerpolicy="no-referrer"
           ></iframe>
-    
-
 
           <!-- Presence overlay (يظهر فقط أثناء تشغيل الفيديو) -->
           <div class="presence-overlay" *ngIf="presenceRequired">
             <div class="presence-modal">
-              <h3 class="m-0">هل ما زلت تتابع الجلسة؟</h3>
+              <h3 class="m-0">هل ترغب في متابعة الدرس؟</h3>
               <p class="mt-2 mb-3">
-                اضغط <b>متابعة</b>
+                للاِستمرار، اضغط <b>متابعة</b>
                 <ng-container *ngIf="countdown > 0">
                   خلال <b>{{ countdown }}</b> ثانية
                 </ng-container>
@@ -82,8 +80,6 @@
           </div>
         </div>
       </div>
-
-      
 
       <!-- Lessons List -->
       <div class="lessons-card">
