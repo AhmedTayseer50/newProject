@@ -272,7 +272,7 @@
 <section class="bottom-cta" *ngIf="!loading && !error && diploma as d">
   <div class="container">
     <p>{{ d.bottomCta?.text }}</p>
-    <button class="btn btn-primary" type="button" (click)="openOfferFromBottomCta()">
+    <button class="btn btn-primary" type="button" (click)="onOfferSubscribe()">
       {{ d.bottomCta?.buttonText || 'اشترك الآن' }}
     </button>
   </div>

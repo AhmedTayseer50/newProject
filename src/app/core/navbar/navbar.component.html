@@ -1,5 +1,4 @@
 <header [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'" class="site-header">
-
   <div class="page-container nav">
     <!-- الشعار + اسم المنصّة -->
     <div class="nav-left">
@@ -29,7 +28,20 @@
 
     <!-- روابط الديسكتوب -->
     <nav class="nav-links">
-      <a routerLink="/" fragment="hero" routerLinkActive="active" i18n>الرئيسية</a>
+      <a
+        [routerLink]="['/']"
+        fragment="hero"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{
+          paths: 'exact',
+          queryParams: 'ignored',
+          matrixParams: 'ignored',
+          fragment: 'ignored',
+        }"
+        i18n
+      >
+        الرئيسية
+      </a>
       <a routerLink="/courses" routerLinkActive="active" i18n>الكورسات</a>
       <a routerLink="/diplomas" routerLinkActive="active" i18n>الدبلومات</a>
       <a
@@ -41,7 +53,7 @@
         الاستشارات
       </a>
       <a routerLink="/about" routerLinkActive="active" i18n>عن الدكتورة</a>
-      <a routerLink="/contact" routerLinkActive="active" i18n>تواصل</a>
+      <a routerLink="/contact" routerLinkActive="active" i18n>التواصل و طرق الدفع</a>
     </nav>
 
     <!-- أزرار الديسكتوب -->
@@ -77,7 +89,12 @@
         <button class="btn btn-ghost" type="button" routerLink="/login" i18n>
           دخول
         </button>
-        <button class="btn btn-primary" type="button" routerLink="/register" i18n>
+        <button
+          class="btn btn-primary"
+          type="button"
+          routerLink="/register"
+          i18n
+        >
           حساب جديد
         </button>
       </ng-container>
@@ -90,7 +107,12 @@
           </span>
           <span *ngIf="isDisabled" class="badge-disabled" i18n>حساب معطّل</span>
 
-          <button class="btn btn-ghost" type="button" routerLink="/my-courses" i18n>
+          <button
+            class="btn btn-ghost"
+            type="button"
+            routerLink="/my-courses"
+            i18n
+          >
             كورساتي
           </button>
         </div>
@@ -133,12 +155,27 @@
   <div class="mobile-panel" [class.open]="isMenuOpen">
     <div class="page-container mobile-inner">
       <nav class="mobile-links" (click)="isMenuOpen = false">
-        <a routerLink="/" fragment="hero" routerLinkActive="active" i18n>الرئيسية</a>
+        <a
+          [routerLink]="['/']"
+          fragment="hero"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{
+            paths: 'exact',
+            queryParams: 'ignored',
+            matrixParams: 'ignored',
+            fragment: 'ignored',
+          }"
+          i18n
+        >
+          الرئيسية
+        </a>
         <a routerLink="/courses" routerLinkActive="active" i18n>الكورسات</a>
         <a routerLink="/diplomas" routerLinkActive="active" i18n>الدبلومات</a>
-        <a routerLink="/consultations" routerLinkActive="active" i18n>الاستشارات</a>
+        <a routerLink="/consultations" routerLinkActive="active" i18n
+          >الاستشارات</a
+        >
         <a routerLink="/about" routerLinkActive="active" i18n>عن الدكتورة</a>
-        <a routerLink="/contact" routerLinkActive="active" i18n>تواصل</a>
+        <a routerLink="/contact" routerLinkActive="active" i18n>التواصل و طرق الدفع</a>
       </nav>
 
       <div class="mobile-actions" (click)="isMenuOpen = false">
@@ -156,16 +193,31 @@
         </button>
 
         <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loggedInMobile">
-          <button class="btn btn-ghost w-100" type="button" routerLink="/login" i18n>
+          <button
+            class="btn btn-ghost w-100"
+            type="button"
+            routerLink="/login"
+            i18n
+          >
             دخول
           </button>
-          <button class="btn btn-primary w-100" type="button" routerLink="/register" i18n>
+          <button
+            class="btn btn-primary w-100"
+            type="button"
+            routerLink="/register"
+            i18n
+          >
             حساب جديد
           </button>
         </ng-container>
 
         <ng-template #loggedInMobile>
-          <button class="btn btn-ghost w-100" type="button" routerLink="/my-courses" i18n>
+          <button
+            class="btn btn-ghost w-100"
+            type="button"
+            routerLink="/my-courses"
+            i18n
+          >
             كورساتي
           </button>
 
@@ -187,7 +239,12 @@
             <span i18n>Dashboard</span>
           </button>
 
-          <button class="btn btn-ghost w-100" type="button" routerLink="/profile" i18n>
+          <button
+            class="btn btn-ghost w-100"
+            type="button"
+            routerLink="/profile"
+            i18n
+          >
             الملف الشخصي
           </button>
 

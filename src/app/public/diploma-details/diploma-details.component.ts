@@ -257,11 +257,6 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     this.wa.open(`أريد الاشتراك في الدبلومة: ${diplomaTitle}`);
   }
 
-  openOfferFromBottomCta(): void {
-    this.showOfferPopup = true;
-    this.offerShown = true;
-  }
-
   closeOffer(): void {
     this.showOfferPopup = false;
   }

@@ -31,11 +31,18 @@
 
       <!-- Account -->
       <div class="footer-col">
-        <div class="footer-col-title">الحساب</div>
-        <a routerLink="/login" class="footer-link">تسجيل الدخول</a>
-        <a routerLink="/register" class="footer-link">إنشاء حساب</a>
-        <a routerLink="/my-courses" class="footer-link">كورساتي</a>
-        <a routerLink="/profile" class="footer-link">الملف الشخصي</a>
+        <div class="footer-col-title" i18n>الحساب</div>
+
+        <!-- ✅ Clean auth toggle (no repeated async) -->
+        <ng-container *ngIf="auth.user$ | async as user; else guest">
+          <a routerLink="/my-courses" class="footer-link" i18n>كورساتي</a>
+          <a routerLink="/profile" class="footer-link" i18n>الملف الشخصي</a>
+        </ng-container>
+
+        <ng-template #guest>
+          <a routerLink="/login" class="footer-link" i18n>تسجيل الدخول</a>
+          <a routerLink="/register" class="footer-link" i18n>إنشاء حساب</a>
+        </ng-template>
       </div>
 
       <!-- Social -->
@@ -43,28 +50,38 @@
         <div class="footer-col-title" i18n>تابعنا</div>
 
         <div class="social-row">
-          <!-- حط لينكاتك الحقيقية بدل # -->
-          <a class="social-btn" href="#" target="_blank" rel="noopener" i18n-aria-label aria-label="Facebook">
-            <span class="social-ico">f</span>
-            <span class="social-text" i18n>Facebook</span>
+          <a class="social-btn" href="#" target="_blank" rel="noopener" i18n-aria-label aria-label="Facebook" title="Facebook">
+            <span class="social-ico">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22 12a10 10 0 1 0-11.56 9.87v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.23.2 2.23.2v2.46h-1.25c-1.23 0-1.61.77-1.61 1.55V12h2.74l-.44 2.88h-2.3v6.99A10 10 0 0 0 22 12z"/>
+              </svg>
+            </span>
           </a>
 
-          <a class="social-btn" href="#" target="_blank" rel="noopener" i18n-aria-label aria-label="Instagram">
-            <span class="social-ico">⌁</span>
-            <span class="social-text" i18n>Instagram</span>
+          <a class="social-btn" href="#" target="_blank" rel="noopener" i18n-aria-label aria-label="Instagram" title="Instagram">
+            <span class="social-ico">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4.5A3.5 3.5 0 1 1 8.5 12 3.5 3.5 0 0 1 12 8.5zm0 2A1.5 1.5 0 1 0 13.5 12 1.5 1.5 0 0 0 12 10.5zM17.8 6.2a.8.8 0 1 1-.8.8.8.8 0 0 1 .8-.8z"/>
+              </svg>
+            </span>
           </a>
 
-          <a class="social-btn" href="#" target="_blank" rel="noopener" i18n-aria-label aria-label="YouTube">
-            <span class="social-ico">▶</span>
-            <span class="social-text" i18n>YouTube</span>
+          <a class="social-btn" href="#" target="_blank" rel="noopener" i18n-aria-label aria-label="YouTube" title="YouTube">
+            <span class="social-ico">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.8 4.6 12 4.6 12 4.6s-5.8 0-7.5.5A3 3 0 0 0 2.4 7.2 31.7 31.7 0 0 0 2 12a31.7 31.7 0 0 0 .4 4.8 3 3 0 0 0 2.1 2.1c1.7.5 7.5.5 7.5.5s5.8 0 7.5-.5a3 3 0 0 0 2.1-2.1A31.7 31.7 0 0 0 22 12a31.7 31.7 0 0 0-.4-4.8zM10 15.3V8.7L15.7 12 10 15.3z"/>
+              </svg>
+            </span>
           </a>
 
-          <a class="social-btn" href="#" target="_blank" rel="noopener" i18n-aria-label aria-label="TikTok">
-            <span class="social-ico">♪</span>
-            <span class="social-text" i18n>TikTok</span>
+          <a class="social-btn" href="#" target="_blank" rel="noopener" i18n-aria-label aria-label="TikTok" title="TikTok">
+            <span class="social-ico">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M16.5 2h-2.2v12.2a3.2 3.2 0 1 1-2.7-3.2V8.8a6 6 0 1 0 4.9 5.9V9.7a7.2 7.2 0 0 0 4.2 1.3V8.9A5.2 5.2 0 0 1 16.5 2z"/>
+              </svg>
+            </span>
           </a>
         </div>
-
       </div>
     </div>
 

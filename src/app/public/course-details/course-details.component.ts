@@ -242,11 +242,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   }
 
   // ✅ CTA Popup controls (هنخليهم يشتغلوا فقط لو مفيش صلاحية)
-  openOfferFromBottomCta(): void {
-    if (this.canViewLessons) return;
-    this.showOfferPopup = true;
-    this.offerShown = true;
-  }
+
 
   closeOffer(): void {
     this.showOfferPopup = false;

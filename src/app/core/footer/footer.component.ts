@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-footer',
@@ -7,4 +8,6 @@ import { Component } from '@angular/core';
 })
 export class FooterComponent {
   year = new Date().getFullYear();
+
+  constructor(public auth: AuthService) {}
 }

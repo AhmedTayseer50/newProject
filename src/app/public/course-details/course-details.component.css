@@ -1,12 +1,14 @@
 /* ===================== HERO TOPBAR (Back link) ===================== */
 .hero-topbar {
-  display: grid;
-  justify-content: flex-start; /* يفضل على اليسار بصريًا مع RTL */
   margin: 1rem 0;
 }
 
-[dir="rtl"] .hero-topbar {
-  justify-content: flex-end;
+.hero-topbar .container {
+  display: flex;
+}
+
+.hero-topbar .back-link {
+  margin-inline-start: auto; /* يخليه شمال في RTL */
 }
 
 .back-link {

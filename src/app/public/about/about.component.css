@@ -295,6 +295,11 @@
   margin-bottom: 0.25rem;
 }
 
+.lowerbutton{
+  margin-top: 1.2rem;
+  text-align: center;
+}
+
 /* ============= RESPONSIVE ============= */
 
 @media (max-width: 992px) {
