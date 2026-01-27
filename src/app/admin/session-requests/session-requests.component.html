@@ -41,7 +41,11 @@
             <span>•</span>
             <span>{{ r.maritalStatus }}</span>
             <span>•</span>
-            <span>{{ r.nationality }}</span>
+
+            <!-- ✅ الجنسية الفعلية -->
+            <span>
+              {{ (r.nationality === 'غير ذلك' && r.nationalityOther) ? r.nationalityOther : r.nationality }}
+            </span>
           </div>
         </div>
 
