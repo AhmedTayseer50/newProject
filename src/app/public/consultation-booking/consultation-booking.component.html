@@ -21,24 +21,46 @@
       <div class="grid">
         <div class="field">
           <label>الاسم *</label>
-          <input class="form-control" formControlName="name" placeholder="اكتب الاسم" />
-          <small class="err" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+          <input
+            class="form-control"
+            formControlName="name"
+            placeholder="اكتب الاسم"
+          />
+          <small
+            class="err"
+            *ngIf="form.get('name')?.touched && form.get('name')?.invalid"
+          >
             الاسم مطلوب (3 أحرف على الأقل)
           </small>
         </div>
 
         <div class="field">
           <label>السن *</label>
-          <input class="form-control" type="number" formControlName="age" placeholder="مثال: 28" />
-          <small class="err" *ngIf="form.get('age')?.touched && form.get('age')?.invalid">
+          <input
+            class="form-control"
+            type="number"
+            formControlName="age"
+            placeholder="مثال: 28"
+          />
+          <small
+            class="err"
+            *ngIf="form.get('age')?.touched && form.get('age')?.invalid"
+          >
             أدخل سن صحيح
           </small>
         </div>
 
         <div class="field">
           <label>الوظيفة *</label>
-          <input class="form-control" formControlName="job" placeholder="مثال: مهندس" />
-          <small class="err" *ngIf="form.get('job')?.touched && form.get('job')?.invalid">
+          <input
+            class="form-control"
+            formControlName="job"
+            placeholder="مثال: مهندس"
+          />
+          <small
+            class="err"
+            *ngIf="form.get('job')?.touched && form.get('job')?.invalid"
+          >
             الوظيفة مطلوبة
           </small>
         </div>
@@ -52,16 +74,31 @@
             <option value="مطلق/مطلقة">مطلق/مطلقة</option>
             <option value="أرمل/أرملة">أرمل/أرملة</option>
           </select>
-          <small class="err" *ngIf="form.get('maritalStatus')?.touched && form.get('maritalStatus')?.invalid">
+          <small
+            class="err"
+            *ngIf="
+              form.get('maritalStatus')?.touched &&
+              form.get('maritalStatus')?.invalid
+            "
+          >
             اختر الحالة الاجتماعية
           </small>
         </div>
 
         <div class="field">
           <label>رقم واتساب *</label>
-          <input class="form-control" formControlName="whatsapp" placeholder="+2010xxxxxxx" />
+          <input
+            class="form-control"
+            formControlName="whatsapp"
+            placeholder="+2010xxxxxxx"
+          />
           <small class="hint">اكتب الرقم بصيغة دولية إن أمكن</small>
-          <small class="err" *ngIf="form.get('whatsapp')?.touched && form.get('whatsapp')?.invalid">
+          <small
+            class="err"
+            *ngIf="
+              form.get('whatsapp')?.touched && form.get('whatsapp')?.invalid
+            "
+          >
             أدخل رقم صحيح (8 إلى 15 رقم)
           </small>
         </div>
@@ -83,7 +120,13 @@
             <option value="تونس">تونس</option>
             <option value="غير ذلك">غير ذلك</option>
           </select>
-          <small class="err" *ngIf="form.get('nationality')?.touched && form.get('nationality')?.invalid">
+          <small
+            class="err"
+            *ngIf="
+              form.get('nationality')?.touched &&
+              form.get('nationality')?.invalid
+            "
+          >
             اختر الجنسية
           </small>
 
@@ -94,7 +137,13 @@
               formControlName="nationalityOther"
               placeholder="اكتب جنسيتك"
             />
-            <small class="err" *ngIf="form.get('nationalityOther')?.touched && form.get('nationalityOther')?.invalid">
+            <small
+              class="err"
+              *ngIf="
+                form.get('nationalityOther')?.touched &&
+                form.get('nationalityOther')?.invalid
+              "
+            >
               اكتب الجنسية (حرفين على الأقل)
             </small>
           </div>
@@ -109,7 +158,10 @@
           formControlName="problem"
           placeholder="اكتب وصف مختصر..."
         ></textarea>
-        <small class="err" *ngIf="form.get('problem')?.touched && form.get('problem')?.invalid">
+        <small
+          class="err"
+          *ngIf="form.get('problem')?.touched && form.get('problem')?.invalid"
+        >
           اكتب وصف لا يقل عن 10 أحرف
         </small>
       </div>
@@ -117,9 +169,18 @@
       <div class="policy">
         <label class="chk">
           <input type="checkbox" formControlName="acceptedPolicy" />
-          <span>أوافق على سياسة الاستخدام</span>
+          <span>
+            أُقرّ بالاطلاع والموافقة على ضوابط الجلسات، والتي لا تشمل مناقشة
+            موضوعات المازوخية أو الشذوذ الجنسي.
+          </span>
         </label>
-        <small class="err" *ngIf="form.get('acceptedPolicy')?.touched && form.get('acceptedPolicy')?.invalid">
+        <small
+          class="err"
+          *ngIf="
+            form.get('acceptedPolicy')?.touched &&
+            form.get('acceptedPolicy')?.invalid
+          "
+        >
           يجب الموافقة على السياسة
         </small>
       </div>
@@ -131,7 +192,7 @@
         </div>
 
         <button class="btn btn-primary" type="submit" [disabled]="sending">
-          {{ sending ? 'جارٍ الإرسال…' : 'إرسال الطلب' }}
+          {{ sending ? "جارٍ الإرسال…" : "إرسال الطلب" }}
         </button>
       </div>
     </form>

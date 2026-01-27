@@ -103,8 +103,6 @@
 //   }
 // }
 
-
-
 // src/app/public/consultation-booking/consultation-booking.component.ts
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -126,10 +124,16 @@ export class ConsultationBookingComponent {
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
-    age: [null as any, [Validators.required, Validators.min(10), Validators.max(120)]],
+    age: [
+      null as any,
+      [Validators.required, Validators.min(10), Validators.max(120)],
+    ],
     job: ['', [Validators.required, Validators.minLength(2)]],
     maritalStatus: ['', [Validators.required]],
-    whatsapp: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{8,15}$/)]],
+    whatsapp: [
+      '',
+      [Validators.required, Validators.pattern(/^\+?[0-9]{8,15}$/)],
+    ],
 
     // ✅ nationality select + "other" input
     nationality: ['', [Validators.required]],
@@ -139,7 +143,10 @@ export class ConsultationBookingComponent {
     acceptedPolicy: [false, [Validators.requiredTrue]],
   });
 
-  constructor(private fb: FormBuilder, private reqSvc: SessionRequestsService) {
+  constructor(
+    private fb: FormBuilder,
+    private reqSvc: SessionRequestsService,
+  ) {
     // ✅ لو اختار "غير ذلك" نخلي nationalityOther required
     this.form.get('nationality')?.valueChanges.subscribe((val) => {
       const otherCtrl = this.form.get('nationalityOther');
@@ -196,7 +203,10 @@ export class ConsultationBookingComponent {
     }
 
     // ✅ حماية إضافية: لو اختار غير ذلك ولا كتب
-    if ((this.form.value.nationality || '').trim() === this.OTHER && !this.effectiveNationality) {
+    if (
+      (this.form.value.nationality || '').trim() === this.OTHER &&
+      !this.effectiveNationality
+    ) {
       this.form.get('nationalityOther')?.markAsTouched();
       this.form.get('nationalityOther')?.setErrors({ required: true });
       return;
@@ -217,22 +227,20 @@ export class ConsultationBookingComponent {
       maritalStatus: this.form.value.maritalStatus!,
       whatsapp: this.form.value.whatsapp!.trim(),
 
-      // ✅ نخزن الاثنين:
-      // nationality = الاختيار (مصر/السعودية/غير ذلك)
-      // nationalityOther = الجنسية المكتوبة لو "غير ذلك"
       nationality: nationalitySelected,
-      nationalityOther: nationalitySelected === this.OTHER ? nationalityOther : undefined,
 
       problem: this.form.value.problem!.trim(),
-
       acceptedPolicy: !!this.form.value.acceptedPolicy,
-
-      // ✅ keep this ONLY if your RTDB rules require "acknowledged"
       acknowledged: !!this.form.value.acceptedPolicy,
 
       currency: p.currency,
       price: p.price,
     };
+
+    // ✅ مهم جدًا: أضف nationalityOther فقط لو "غير ذلك"
+    if (nationalitySelected === this.OTHER) {
+      payload.nationalityOther = nationalityOther;
+    }
 
     console.group('📨 SUBMIT Booking Request');
     console.log('payload:', payload);
