@@ -33,11 +33,12 @@
 }
 
 .brand-logo {
-  width: 54px;
-  height: 54px;
+  width: 59px;
+  height: 71px;
   border-radius: 999px;
   overflow: hidden;
   border: 1px solid rgba(168, 140, 255, 0.28);
+ 
 }
 
 .brand-logo img {

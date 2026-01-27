@@ -13,7 +13,8 @@
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url("https://images.pexels.com/photos/3822621/pexels-photo-3822621.jpeg?auto=compress&cs=tinysrgb&w=1600");
+  background-image: url("../../../assets/images/background.jpeg");
+  
   background-size: cover;
   background-position: center;
   filter: brightness(0.82);
