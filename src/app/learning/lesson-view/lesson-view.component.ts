@@ -5,6 +5,8 @@ import {
   OnInit,
   ViewChild,
   ElementRef,
+  NgZone,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Database } from '@angular/fire/database';
@@ -60,21 +62,25 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   @ViewChild('playerFrame') playerFrame?: ElementRef<HTMLIFrameElement>;
 
   private readonly onWindowMessage = (ev: MessageEvent) => {
-    if (!ev?.data || typeof ev.data !== 'object') return;
-    const data: any = ev.data;
+    this.zone.run(() => {
+      if (!ev?.data || typeof ev.data !== 'object') return;
+      const data: any = ev.data;
 
-    console.log('[lesson-view][postMessage] received:', data);
+      console.log('[lesson-view][postMessage] received:', data);
 
-    if (data.type === 'PLAYER_STATE') {
-      if (data.state === 'playing') {
-        this.isPlaying = true;
-        this.startRandomPresenceScheduler();
-      } else if (data.state === 'paused' || data.state === 'ended') {
-        this.isPlaying = false;
-        this.stopRandomPresenceScheduler();
-        this.clearPresencePrompt();
+      if (data.type === 'PLAYER_STATE') {
+        if (data.state === 'playing') {
+          this.isPlaying = true;
+          this.startRandomPresenceScheduler();
+        } else if (data.state === 'paused' || data.state === 'ended') {
+          this.isPlaying = false;
+          this.stopRandomPresenceScheduler();
+          this.clearPresencePrompt();
+        }
       }
-    }
+
+      this.cdr.detectChanges();
+    });
   };
 
   constructor(
@@ -84,6 +90,8 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private auth: Auth,
     private playerSession: PlayerSessionService,
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -120,7 +128,10 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         if (courseChanged || this.lessons.length === 0) {
           console.log('[lesson-view] loading all lessons...');
           await this.loadAllLessons();
-          console.log('[lesson-view] lessons loaded ✅ count=', this.lessons.length);
+          console.log(
+            '[lesson-view] lessons loaded ✅ count=',
+            this.lessons.length,
+          );
         }
 
         this.currentPos = this.lessons.findIndex((l) => l.id === this.lessonId);
@@ -232,11 +243,16 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   private startRandomPresenceScheduler() {
     if (this.schedulerTimeoutId || this.presenceRequired) return;
 
-    const delayMs = this.randomBetween(60_000, 180_000);
+    const delayMs = this.randomBetween(30_000, 60_000);
     this.schedulerTimeoutId = setTimeout(() => {
       this.schedulerTimeoutId = null;
-      if (this.isPlaying && !this.presenceRequired) this.showPresencePrompt();
-      else this.startRandomPresenceScheduler();
+
+      // مهم: رجّعنا Angular Zone عشان الـ UI يتحدث
+      this.zone.run(() => {
+        if (this.isPlaying && !this.presenceRequired) this.showPresencePrompt();
+        else this.startRandomPresenceScheduler();
+        this.cdr.detectChanges();
+      });
     }, delayMs);
   }
 
@@ -248,20 +264,29 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   }
 
   private showPresencePrompt() {
-    this.presenceRequired = true;
-    this.countdown = 30;
-    this.sendPlayerCommand('pause');
+    this.zone.run(() => {
+      this.presenceRequired = true;
+      this.countdown = 30;
+      this.sendPlayerCommand('pause');
+      this.cdr.detectChanges();
 
-    this.countdownIntervalId = setInterval(() => {
-      this.countdown--;
-      if (this.countdown <= 0) this.lockVideoUntilConfirm();
-    }, 1000);
+      this.countdownIntervalId = setInterval(() => {
+        this.zone.run(() => {
+          this.countdown--;
+          this.cdr.detectChanges();
+          if (this.countdown <= 0) this.lockVideoUntilConfirm();
+        });
+      }, 1000);
+    });
   }
 
   confirmPresence() {
-    this.clearPresencePrompt();
-    this.sendPlayerCommand('play');
-    this.startRandomPresenceScheduler();
+    this.zone.run(() => {
+      this.clearPresencePrompt();
+      this.sendPlayerCommand('play');
+      this.startRandomPresenceScheduler();
+      this.cdr.detectChanges();
+    });
   }
 
   private lockVideoUntilConfirm() {
@@ -272,6 +297,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     this.presenceRequired = true;
     this.countdown = 0;
     this.sendPlayerCommand('pause');
+    this.cdr.detectChanges();
   }
 
   private clearPresencePrompt() {
@@ -280,6 +306,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       clearInterval(this.countdownIntervalId);
       this.countdownIntervalId = null;
     }
+    this.cdr.detectChanges();
   }
 
   private sendPlayerCommand(command: 'play' | 'pause') {
