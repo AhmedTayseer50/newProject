@@ -72,7 +72,16 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         if (data.state === 'playing') {
           this.isPlaying = true;
           this.startRandomPresenceScheduler();
-        } else if (data.state === 'paused' || data.state === 'ended') {
+        } else if (data.state === 'paused') {
+          // ✅ مهم: لما نوقف الفيديو بسبب الـ presence prompt،
+          // ما نمسحش الرسالة (عشان ما تختفيش فورًا)
+          this.isPlaying = false;
+          this.stopRandomPresenceScheduler();
+
+          if (!this.presenceRequired) {
+            this.clearPresencePrompt();
+          }
+        } else if (data.state === 'ended') {
           this.isPlaying = false;
           this.stopRandomPresenceScheduler();
           this.clearPresencePrompt();
@@ -147,12 +156,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         console.log('[lesson-view] loading=false (finally)');
       }
     });
-
-    // ✅ Debug: إجبار ظهور الرسالة بعد 5 ثواني للتأكد إن الـ HTML/CSS شغال
-    setTimeout(() => {
-      console.log('[presence] DEBUG: forcing prompt in 5s ✅');
-      this.showPresencePrompt();
-    }, 5000);
   }
 
   ngOnDestroy(): void {
@@ -255,24 +258,11 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
   // ===== Presence =====
   private startRandomPresenceScheduler() {
-    console.log('[presence] startRandomPresenceScheduler()', {
-      schedulerTimeoutId: !!this.schedulerTimeoutId,
-      presenceRequired: this.presenceRequired,
-      isPlaying: this.isPlaying,
-    });
-
     if (this.schedulerTimeoutId || this.presenceRequired) return;
 
     const delayMs = this.randomBetween(30_000, 60_000);
-    console.log('[presence] scheduling next prompt in ms:', delayMs);
-
     this.schedulerTimeoutId = setTimeout(() => {
       this.schedulerTimeoutId = null;
-
-      console.log('[presence] scheduler timeout fired ✅', {
-        isPlaying: this.isPlaying,
-        presenceRequired: this.presenceRequired,
-      });
 
       this.zone.run(() => {
         if (this.isPlaying && !this.presenceRequired) this.showPresencePrompt();
@@ -290,13 +280,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   }
 
   private showPresencePrompt() {
-    console.log('[presence] showPresencePrompt() fired ✅', {
-      isPlaying: this.isPlaying,
-      presenceRequired: this.presenceRequired,
-      countdown: this.countdown,
-      time: new Date().toISOString(),
-    });
-
     this.zone.run(() => {
       this.presenceRequired = true;
       this.countdown = 30;
@@ -306,7 +289,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       this.countdownIntervalId = setInterval(() => {
         this.zone.run(() => {
           this.countdown--;
-          console.log('[presence] tick', { countdown: this.countdown });
           this.cdr.detectChanges();
           if (this.countdown <= 0) this.lockVideoUntilConfirm();
         });
