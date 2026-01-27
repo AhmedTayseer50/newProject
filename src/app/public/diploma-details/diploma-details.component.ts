@@ -14,6 +14,8 @@ import {
   DiplomaTestimonial,
 } from 'src/app/shared/models/diploma.model';
 
+import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
+
 @Component({
   selector: 'app-diploma-details',
   templateUrl: './diploma-details.component.html',
@@ -44,7 +46,8 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private diplomasSvc: DiplomasService,
     private coursesSvc: CoursesService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private wa: WhatsAppService,
   ) {}
 
   private onWindowScroll = () => {
@@ -60,53 +63,55 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(takeUntil(this.destroyed$)).subscribe(async (pm) => {
-      const id = pm.get('id');
-      if (!id) return;
+    this.route.paramMap
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(async (pm) => {
+        const id = pm.get('id');
+        if (!id) return;
 
-      this.diplomaId = id;
-      this.loading = true;
-      this.error = undefined;
+        this.diplomaId = id;
+        this.loading = true;
+        this.error = undefined;
 
-      this.diploma = null;
-      this.includedCourses = [];
-      this.introVideoSafeUrl = null;
+        this.diploma = null;
+        this.includedCourses = [];
+        this.introVideoSafeUrl = null;
 
-      this.showOfferPopup = false;
-      this.offerShown = false;
+        this.showOfferPopup = false;
+        this.offerShown = false;
 
-      // مهم: إزالة الـ listener قبل ما نضيفه تاني (لو تنقلت بين صفحات)
-      window.removeEventListener('scroll', this.onWindowScroll);
+        // مهم: إزالة الـ listener قبل ما نضيفه تاني (لو تنقلت بين صفحات)
+        window.removeEventListener('scroll', this.onWindowScroll);
 
-      try {
-        const d = await this.diplomasSvc.getDiplomaById(this.diplomaId);
-        if (!d) {
-          this.error = 'الدبلومة غير موجودة';
-          return;
+        try {
+          const d = await this.diplomasSvc.getDiplomaById(this.diplomaId);
+          if (!d) {
+            this.error = 'الدبلومة غير موجودة';
+            return;
+          }
+
+          this.diploma = this.withDefaults(d);
+
+          const introUrl = this.diploma.introVideoUrl;
+          this.introVideoSafeUrl = introUrl
+            ? this.sanitizer.bypassSecurityTrustResourceUrl(introUrl)
+            : null;
+
+          const ids = Object.keys(this.diploma.courseIds || {});
+          if (ids.length) {
+            const list = await Promise.all(
+              ids.map((cid) => this.coursesSvc.getCourseById(cid)),
+            );
+            this.includedCourses = list.filter(Boolean);
+          }
+
+          window.addEventListener('scroll', this.onWindowScroll);
+        } catch (e: any) {
+          this.error = e?.message ?? 'حدث خطأ أثناء تحميل الدبلومة';
+        } finally {
+          this.loading = false;
         }
-
-        this.diploma = this.withDefaults(d);
-
-        const introUrl = this.diploma.introVideoUrl;
-        this.introVideoSafeUrl = introUrl
-          ? this.sanitizer.bypassSecurityTrustResourceUrl(introUrl)
-          : null;
-
-        const ids = Object.keys(this.diploma.courseIds || {});
-        if (ids.length) {
-          const list = await Promise.all(
-            ids.map((cid) => this.coursesSvc.getCourseById(cid))
-          );
-          this.includedCourses = list.filter(Boolean);
-        }
-
-        window.addEventListener('scroll', this.onWindowScroll);
-      } catch (e: any) {
-        this.error = e?.message ?? 'حدث خطأ أثناء تحميل الدبلومة';
-      } finally {
-        this.loading = false;
-      }
-    });
+      });
   }
 
   private withDefaults(d: any): Diploma & { id: string } {
@@ -202,20 +207,25 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     return {
       ...d,
       heroEyebrow: d.heroEyebrow || 'دبلومة متكاملة بمسار تدريجي',
-      heroTagline: d.heroTagline || 'مسار متدرج يجمع أهم الكورسات داخل دبلومة واحدة.',
+      heroTagline:
+        d.heroTagline || 'مسار متدرج يجمع أهم الكورسات داخل دبلومة واحدة.',
       programDuration: d.programDuration || '—',
       targetAudience: d.targetAudience || '—',
 
       goalTitle: d.goalTitle || 'الهدف من الدراسة',
-      goalDescription: d.goalDescription || 'تكوين فهم أعمق وخطة عملية للتطبيق خطوة بخطوة.',
+      goalDescription:
+        d.goalDescription || 'تكوين فهم أعمق وخطة عملية للتطبيق خطوة بخطوة.',
 
-      expectedStudyTimeTitle: d.expectedStudyTimeTitle || 'المدة المتوقعة للدراسة',
+      expectedStudyTimeTitle:
+        d.expectedStudyTimeTitle || 'المدة المتوقعة للدراسة',
       expectedStudyTimeDescription:
-        d.expectedStudyTimeDescription || 'جدول مرن يناسب وقتك — مشاهدة + تطبيق عملي.',
+        d.expectedStudyTimeDescription ||
+        'جدول مرن يناسب وقتك — مشاهدة + تطبيق عملي.',
 
       prerequisitesTitle: d.prerequisitesTitle || 'الخبرات السابقة المطلوبة',
       prerequisitesDescription:
-        d.prerequisitesDescription || 'لا يشترط خبرة مسبقة — المهم الاستمرارية.',
+        d.prerequisitesDescription ||
+        'لا يشترط خبرة مسبقة — المهم الاستمرارية.',
 
       specs,
       communityPerks,
@@ -243,8 +253,8 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
   }
 
   goToPurchase(): void {
-    console.log('[goToPurchase] شراء الدبلومة:', this.diplomaId);
-    // لاحقاً: this.router.navigate(['/checkout', this.diplomaId])
+    const diplomaTitle = (this.diploma?.title || '').trim() || 'بدون اسم';
+    this.wa.open(`أريد الاشتراك في الدبلومة: ${diplomaTitle}`);
   }
 
   openOfferFromBottomCta(): void {

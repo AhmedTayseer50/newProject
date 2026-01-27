@@ -48,18 +48,18 @@
         <div class="course-meta">
           <div class="d-flex flex-column gap-1">
             <span class="small text-muted" *ngIf="d.meta?.totalCourses">
-             يشمل {{ d.meta?.totalCourses || 0 }} كورس
+              يشمل {{ d.meta?.totalCourses || 0 }} كورس
             </span>
             <span class="small text-muted" *ngIf="d.programDuration">
               مدة البرنامج: {{ d.programDuration }}
             </span>
             <span class="small text-muted" *ngIf="d.meta?.level">
-             المستوى: {{ d.meta?.level || '—' }}
+              المستوى: {{ d.meta?.level || "—" }}
             </span>
           </div>
 
           <span class="course-price">
-            {{ d.price | currency : "EGP" : "symbol" : "1.0-0" }}
+            {{ d.price | currency: "EGP" : "symbol" : "1.0-0" }}
           </span>
         </div>
       </div>
@@ -68,7 +68,7 @@
         <button class="btn" [routerLink]="['/diplomas', d.id]">
           عرض التفاصيل
         </button>
-        <button class="btn btn-primary" [routerLink]="['/diplomas', d.id]">
+        <button class="btn btn-primary" type="button" (click)="joinNow(d)">
           انضم الآن
         </button>
       </div>

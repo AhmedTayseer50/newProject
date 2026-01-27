@@ -2,8 +2,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CoursesService } from '../services/courses.service';
-import { Auth, onAuthStateChanged, User, Unsubscribe } from '@angular/fire/auth';
+import {
+  Auth,
+  onAuthStateChanged,
+  User,
+  Unsubscribe,
+} from '@angular/fire/auth';
 import { EnrollmentsService } from 'src/app/core/services/enrollments.service';
+
+import { firstValueFrom } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { DiplomasService } from '../services/diplomas.service';
+import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
 
 // RTDB
 import { Database } from '@angular/fire/database';
@@ -15,7 +25,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 @Component({
   selector: 'app-course-details',
   templateUrl: './course-details.component.html',
-  styleUrls: ['./course-details.component.css']
+  styleUrls: ['./course-details.component.css'],
 })
 export class CourseDetailsComponent implements OnInit, OnDestroy {
   public courseId!: string;
@@ -47,7 +57,9 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     private auth: Auth,
     private enrollments: EnrollmentsService,
     private db: Database,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private diplomasSvc: DiplomasService,
+    private wa: WhatsAppService,
   ) {}
 
   // ✅ Popup الخصم يظهر فقط لو مفيش صلاحية
@@ -66,66 +78,75 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // ✅ متابعة تغيّر :id
-    this.route.paramMap.pipe(takeUntil(this.destroyed$)).subscribe(async pm => {
-      const id = pm.get('id');
-      if (!id) return;
+    this.route.paramMap
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(async (pm) => {
+        const id = pm.get('id');
+        if (!id) return;
 
-      this.courseId = id;
-      this.loading = true;
-      this.error = undefined;
-      this.course = null;
-      this.lectureNames = [];
-      this.firstLessonId = null;
-      this.introVideoSafeUrl = null;
+        this.courseId = id;
+        this.loading = true;
+        this.error = undefined;
+        this.course = null;
+        this.lectureNames = [];
+        this.firstLessonId = null;
+        this.introVideoSafeUrl = null;
 
-      // reset popup state لكل كورس
-      this.showOfferPopup = false;
-      this.offerShown = false;
-
-      try {
-        this.course = await this.courses.getCourseById(this.courseId);
-        this.lectureNames = (this.course?.lectureNames ?? []) as string[];
-
-        const introUrl = this.course?.introVideoUrl as string | undefined;
-        this.introVideoSafeUrl = introUrl
-          ? this.sanitizer.bypassSecurityTrustResourceUrl(introUrl)
-          : null;
-
-        this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(this.courseId);
-      } catch (e: any) {
-        this.error = e?.message ?? 'حدث خطأ أثناء تحميل الكورس';
-      } finally {
-        this.loading = false;
-      }
-
-      window.addEventListener('scroll', this.onWindowScroll);
-    });
-
-    // ✅ متابعة الصلاحية
-    this.authUnsub = onAuthStateChanged(this.auth, async (user: User | null) => {
-      if (!user) {
-        this.canViewLessons = false;
+        // reset popup state لكل كورس
         this.showOfferPopup = false;
         this.offerShown = false;
-        return;
-      }
 
-      try {
-        const myCourses = await this.enrollments.listUserEnrollments(user.uid);
-        this.canViewLessons = myCourses.includes(this.courseId);
+        try {
+          this.course = await this.courses.getCourseById(this.courseId);
+          this.lectureNames = (this.course?.lectureNames ?? []) as string[];
 
-        // ✅ لو اتضافت الصلاحية: اقفل/امنع popup نهائيًا
-        if (this.canViewLessons) {
-          this.showOfferPopup = false;
-          this.offerShown = true;
-        } else {
-          // لو مفيش صلاحية: نسمح للـ popup يظهر تاني أثناء التصفح
-          this.offerShown = false;
+          const introUrl = this.course?.introVideoUrl as string | undefined;
+          this.introVideoSafeUrl = introUrl
+            ? this.sanitizer.bypassSecurityTrustResourceUrl(introUrl)
+            : null;
+
+          this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(
+            this.courseId,
+          );
+        } catch (e: any) {
+          this.error = e?.message ?? 'حدث خطأ أثناء تحميل الكورس';
+        } finally {
+          this.loading = false;
         }
-      } catch {
-        this.canViewLessons = false;
-      }
-    });
+
+        window.addEventListener('scroll', this.onWindowScroll);
+      });
+
+    // ✅ متابعة الصلاحية
+    this.authUnsub = onAuthStateChanged(
+      this.auth,
+      async (user: User | null) => {
+        if (!user) {
+          this.canViewLessons = false;
+          this.showOfferPopup = false;
+          this.offerShown = false;
+          return;
+        }
+
+        try {
+          const myCourses = await this.enrollments.listUserEnrollments(
+            user.uid,
+          );
+          this.canViewLessons = myCourses.includes(this.courseId);
+
+          // ✅ لو اتضافت الصلاحية: اقفل/امنع popup نهائيًا
+          if (this.canViewLessons) {
+            this.showOfferPopup = false;
+            this.offerShown = true;
+          } else {
+            // لو مفيش صلاحية: نسمح للـ popup يظهر تاني أثناء التصفح
+            this.offerShown = false;
+          }
+        } catch {
+          this.canViewLessons = false;
+        }
+      },
+    );
   }
 
   ngOnDestroy(): void {
@@ -139,10 +160,15 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   /** الذهاب لأول درس فعلي */
   public async goToLessons(): Promise<void> {
     if (!this.firstLessonId) {
-      this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(this.courseId);
+      this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(
+        this.courseId,
+      );
     }
     if (!this.firstLessonId) {
-      console.warn('[goToLessons] لا يوجد دروس متاحة لهذا الكورس:', this.courseId);
+      console.warn(
+        '[goToLessons] لا يوجد دروس متاحة لهذا الكورس:',
+        this.courseId,
+      );
       return;
     }
 
@@ -150,11 +176,33 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(commands);
   }
 
-  public goToPurchase(): void {
-    console.log('[goToPurchase] شراء الكورس:', this.courseId);
+  async goToPurchase(): Promise<void> {
+  const courseTitle = (this.course?.title || '').trim() || 'بدون اسم';
+
+  let diplomaNames: string[] = [];
+  try {
+    const diplomas = await firstValueFrom(this.diplomasSvc.watchDiplomas().pipe(take(1)));
+    diplomaNames = diplomas
+      .filter(d => !!d.courseIds?.[this.courseId])
+      .map(d => (d.title || '').trim())
+      .filter(Boolean);
+  } catch {
+    diplomaNames = [];
   }
 
-  private async resolveFirstLessonIdFromRTDB(courseId: string): Promise<string | null> {
+  const lines: string[] = [];
+  lines.push(`أريد الاشتراك على كورس: ${courseTitle}`);
+  if (diplomaNames.length) {
+    lines.push(`الدبلومات المرتبطة: ${diplomaNames.join('، ')}`);
+  }
+
+  this.wa.open(lines.join('\n'));
+}
+
+
+  private async resolveFirstLessonIdFromRTDB(
+    courseId: string,
+  ): Promise<string | null> {
     try {
       let firstId = await this.pickFirstKeyByChild(courseId, 'lessonIndex');
       if (firstId) return firstId;
@@ -175,11 +223,14 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async pickFirstKeyByChild(courseId: string, child: string): Promise<string | null> {
+  private async pickFirstKeyByChild(
+    courseId: string,
+    child: string,
+  ): Promise<string | null> {
     const qy = query(
       ref(this.db, `lessons/${courseId}`),
       orderByChild(child),
-      limitToFirst(1)
+      limitToFirst(1),
     );
     const snap = await get(qy);
     if (snap.exists()) {

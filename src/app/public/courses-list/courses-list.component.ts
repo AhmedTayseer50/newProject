@@ -3,7 +3,11 @@ import { CoursesService } from '../services/courses.service';
 import { Course } from 'src/app/shared/models/course.model';
 import { EnrollmentsService } from 'src/app/core/services/enrollments.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
+import { take } from 'rxjs/operators';
+
+import { DiplomasService } from '../services/diplomas.service';
+import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
 
 @Component({
   selector: 'app-courses-list',
@@ -30,7 +34,9 @@ export class CoursesListComponent implements OnInit, OnDestroy {
   constructor(
     private coursesSvc: CoursesService,
     private enrollmentsSvc: EnrollmentsService,
-    private auth: AuthService
+    private auth: AuthService,
+    private diplomasSvc: DiplomasService,
+    private wa: WhatsAppService
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +63,6 @@ export class CoursesListComponent implements OnInit, OnDestroy {
         const ids = await this.enrollmentsSvc.listUserEnrollments(u.uid);
         this.myCourseIds = new Set(ids);
       } catch (e) {
-        // لو حصل خطأ، خلّيها فاضية وكمّل عادي
         this.myCourseIds.clear();
       }
     });
@@ -71,5 +76,30 @@ export class CoursesListComponent implements OnInit, OnDestroy {
   // هل المستخدم له صلاحية على كورس معيّن؟
   hasAccess(courseId: string): boolean {
     return this.isLoggedIn && this.myCourseIds.has(courseId);
+  }
+
+  // ✅ زر انضم الآن => واتساب + رسالة فيها اسم الكورس + أسماء الدبلومات المرتبطة
+  async joinNow(c: Course) {
+    const courseTitle = (c?.title || '').trim() || 'بدون اسم';
+
+    let diplomaNames: string[] = [];
+    try {
+      const diplomas = await firstValueFrom(this.diplomasSvc.watchDiplomas().pipe(take(1)));
+      diplomaNames = diplomas
+        .filter(d => !!d.courseIds?.[c.id])
+        .map(d => (d.title || '').trim())
+        .filter(Boolean);
+    } catch {
+      // لو فشلنا نجيب الدبلومات، كمل عادي
+      diplomaNames = [];
+    }
+
+    const lines: string[] = [];
+    lines.push(`أريد الاشتراك على كورس: ${courseTitle}`);
+    if (diplomaNames.length) {
+      lines.push(`الدبلومات المرتبطة: ${diplomaNames.join('، ')}`);
+    }
+
+    this.wa.open(lines.join('\n'));
   }
 }

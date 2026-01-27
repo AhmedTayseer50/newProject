@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DiplomasService } from '../services/diplomas.service';
 import { Diploma } from 'src/app/shared/models/diploma.model';
+import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
 
 @Component({
   selector: 'app-diplomas-list',
@@ -17,7 +18,10 @@ export class DiplomasListComponent implements OnInit, OnDestroy {
 
   private sub?: Subscription;
 
-  constructor(private diplomasSvc: DiplomasService) {}
+  constructor(
+    private diplomasSvc: DiplomasService,
+    private wa: WhatsAppService
+  ) {}
 
   ngOnInit(): void {
     this.sub = this.diplomasSvc.watchDiplomas().subscribe({
@@ -43,5 +47,10 @@ export class DiplomasListComponent implements OnInit, OnDestroy {
       (d.title || '').toLowerCase().includes(k) ||
       (d.description || '').toLowerCase().includes(k)
     );
+  }
+
+  joinNow(d: { id: string } & Diploma) {
+    const diplomaTitle = (d?.title || '').trim() || 'بدون اسم';
+    this.wa.open(`أريد الاشتراك في الدبلومة: ${diplomaTitle}`);
   }
 }
