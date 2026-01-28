@@ -26,9 +26,26 @@ export class AuthService {
   isLoggedIn$: Observable<boolean> = this.user$.pipe(map((u) => !!u));
 
   /** إنشاء حساب جديد + مزامنة بياناته في Realtime DB (وتحديد إن كان أدمن) */
-  async signup(email: string, password: string): Promise<UserCredential> {
-    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
-    await this.userSvc.syncUser(cred.user);
+  async signup(
+    email: string,
+    password: string,
+    extra?: { displayName?: string; whatsapp?: string },
+  ): Promise<UserCredential> {
+    const cred = await createUserWithEmailAndPassword(
+      this.auth,
+      email,
+      password,
+    );
+
+    if (extra?.displayName) {
+      const { updateProfile } = await import('@angular/fire/auth');
+      await updateProfile(cred.user, { displayName: extra.displayName });
+    }
+
+    await this.userSvc.syncUser(cred.user, {
+      displayName: extra?.displayName,
+      whatsapp: extra?.whatsapp,
+    });
     return cred;
   }
 

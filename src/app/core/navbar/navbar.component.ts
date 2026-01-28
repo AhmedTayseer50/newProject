@@ -1,6 +1,6 @@
 // src/app/core/navbar/navbar.component.ts
 import { Component, OnDestroy, OnInit, isDevMode } from '@angular/core';
-import { of, Subscription, switchMap, catchError } from 'rxjs';
+import { of, Subscription, switchMap, catchError, from } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { AuthService } from 'src/app/auth/services/auth.service';
@@ -22,6 +22,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isDisabled = false;
   isStaff = false;
 
+  // اسم المستخدم للعرض في الـ Navbar
+  greetingName = '';
+
   isMenuOpen = false;
 
   // Theme
@@ -32,6 +35,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   currentLang: 'ar' | 'en' = 'ar';
 
   private sub?: Subscription;
+  private profileSub?: Subscription;
 
   ngOnInit(): void {
     this.initTheme();
@@ -56,6 +60,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.isDisabled = roles.isDisabled;
       this.isStaff = roles.isStaff;
     });
+
+    // ✅ اسم المستخدم (من Realtime DB أولاً ثم fallback من Auth)
+    this.profileSub = this.auth.user$
+      .pipe(
+        switchMap((user) => {
+          if (!user) return of(null);
+          return from(this.userSvc.getUserProfile(user.uid)).pipe(catchError(() => of(null)));
+        })
+      )
+      .subscribe((p) => {
+        const name = (p?.displayName || '').trim();
+        this.greetingName = name || '';
+      });
   }
 
   private detectLangFromPath(): 'ar' | 'en' {
@@ -111,5 +128,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.profileSub?.unsubscribe();
+  }
+
+  async onLogout() {
+    await this.auth.logout();
+    this.isMenuOpen = false;
+    this.router.navigateByUrl('/');
   }
 }

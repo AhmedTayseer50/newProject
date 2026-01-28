@@ -18,6 +18,14 @@ export class UsersComponent implements OnInit {
     q: ['']
   });
 
+  // --- edit user ---
+  editingUid: string | null = null;
+  editForm = this.fb.group({
+    email: [''],
+    displayName: [''],
+    whatsapp: [''],
+  });
+
   constructor(private adminUsers: UsersAdminService, private fb: FormBuilder) {}
 
   async ngOnInit() {
@@ -44,8 +52,45 @@ export class UsersComponent implements OnInit {
       : this.users.filter(u =>
           (u.email || '').toLowerCase().includes(k) ||
           (u.displayName || '').toLowerCase().includes(k) ||
+          (u.whatsapp || '').toLowerCase().includes(k) ||
           (u.uid || '').toLowerCase().includes(k)
         );
+  }
+
+  startEdit(u: AdminUserRow) {
+    this.editingUid = u.uid;
+    this.editForm.reset({
+      email: u.email || '',
+      displayName: u.displayName || '',
+      whatsapp: u.whatsapp || '',
+    });
+  }
+
+  cancelEdit() {
+    this.editingUid = null;
+  }
+
+  async saveEdit(u: AdminUserRow) {
+    if (!this.editingUid || this.editingUid !== u.uid) return;
+    this.loading = true;
+    this.error = undefined;
+    try {
+      const v = this.editForm.value;
+      await this.adminUsers.updateUser(u.uid, {
+        email: (v.email || '').trim(),
+        displayName: (v.displayName || '').trim(),
+        whatsapp: (v.whatsapp || '').trim(),
+      });
+
+      u.email = (v.email || '').trim();
+      u.displayName = (v.displayName || '').trim();
+      u.whatsapp = (v.whatsapp || '').trim();
+      this.editingUid = null;
+    } catch (e: any) {
+      this.error = e?.message ?? 'تعذّر حفظ تعديلات المستخدم';
+    } finally {
+      this.loading = false;
+    }
   }
 
   async toggleAdmin(u: AdminUserRow) {

@@ -111,6 +111,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .badge-disabled {
@@ -156,6 +160,11 @@
 }
 
 body.dark-theme .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+
+body.dark-theme .nav-user-label {
   background: rgba(255, 255, 255, 0.06);
 }
 

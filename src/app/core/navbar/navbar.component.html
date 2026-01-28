@@ -105,7 +105,7 @@
       <ng-template #loggedIn>
         <div class="nav-user-info">
           <span *ngIf="auth.user$ | async as u" class="nav-user-label" i18n>
-            مرحبًا، {{ u.email }}
+            مرحبًا، {{ greetingName || u.displayName || u.email }}
           </span>
           <span *ngIf="isDisabled" class="badge-disabled" i18n>حساب معطّل</span>
 
@@ -144,7 +144,7 @@
         <button
           class="btn btn-ghost btn-logout"
           type="button"
-          (click)="auth.logout()"
+          (click)="onLogout()"
           i18n
         >
           خروج
