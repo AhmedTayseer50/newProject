@@ -13,14 +13,15 @@
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url("/assets/images/background.jpeg"); 
 
-
+  /* ✅ background-image اتنقل للـ HTML */
   background-size: cover;
   background-position: center;
+
   filter: brightness(0.82);
   transform: scale(1.03);
 }
+
 
 body.dark-theme .hero-bg {
   filter: brightness(0.5);
