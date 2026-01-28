@@ -1,35 +1,88 @@
-<div class="container py-4" dir="rtl">
-  <h3 class="mb-3" i18n>إنشاء حساب</h3>
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="mb-3">
-      <label class="form-label" i18n>الاسم</label>
-      <input type="text" class="form-control" formControlName="displayName" placeholder="مثال: أحمد محمد">
-      <div class="form-text" i18n>سيظهر هذا الاسم في شريط التنقّل (الـ Navbar).</div>
-    </div>
+<div class="auth-page" dir="rtl">
+  <div class="page-container">
+    <div class="auth-grid card-ui">
+      <!-- Side / Brand -->
+      <div class="auth-side">
+        <div class="auth-badge" aria-hidden="true"></div>
 
-    <div class="mb-3">
-      <label class="form-label" i18n>رقم واتساب</label>
-      <input
-        type="tel"
-        class="form-control"
-        formControlName="whatsapp"
-        placeholder="مثال: +201234567890"
-      />
-      <div class="form-text" i18n>الأرقام فقط أو + (بدون مسافات).</div>
-    </div>
+        <h2 class="auth-title" i18n>أهلاً بيك 👋</h2>
+        <p class="auth-subtitle text-muted" i18n>
+          أنشئ حسابك الآن علشان تقدر تدخل للكورسات وتتابع تقدمك بسهولة.
+        </p>
 
-    <div class="mb-3">
-      <label class="form-label" i18n>البريد الإلكتروني</label>
-      <input type="email" class="form-control" formControlName="email">
-    </div>
+        <ul class="auth-points text-muted">
+          <li i18n>بياناتك محفوظة وآمنة</li>
+          <li i18n>تقدر تعدل معلوماتك لاحقًا</li>
+          <li i18n>تجربة استخدام بسيطة وسريعة</li>
+        </ul>
 
-    <div class="mb-3">
-      <label class="form-label" i18n>كلمة المرور</label>
-      <input type="password" class="form-control" formControlName="password">
-    </div>
+        <div class="auth-side-footer text-muted">
+          <span i18n>لديك حساب بالفعل؟</span>
+          <a class="auth-link" routerLink="/login" i18n>تسجيل الدخول</a>
+        </div>
+      </div>
 
-    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-    <button class="btn btn-success" [disabled]="loading" i18n>تسجيل</button>
-    <a routerLink="/login" class="btn btn-link" i18n>لديك حساب؟ دخول</a>
-  </form>
+      <!-- Form -->
+      <div class="auth-form">
+        <h3 class="mb-2" i18n>إنشاء حساب</h3>
+        <p class="text-muted mb-4" i18n>املأ البيانات التالية لإنشاء حساب جديد.</p>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form-inner">
+          <div class="mb-3">
+            <label class="form-label" i18n>الاسم</label>
+            <input
+              type="text"
+              class="form-control auth-input"
+              formControlName="displayName"
+              placeholder="مثال: أحمد محمد"
+            />
+            <div class="form-text" i18n>سيظهر هذا الاسم في شريط التنقّل (الـ Navbar).</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" i18n>رقم واتساب</label>
+            <input
+              type="tel"
+              class="form-control auth-input"
+              formControlName="whatsapp"
+              placeholder="مثال: +201234567890"
+            />
+            <div class="form-text" i18n>الأرقام فقط أو + (بدون مسافات).</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" i18n>البريد الإلكتروني</label>
+            <input
+              type="email"
+              class="form-control auth-input"
+              formControlName="email"
+              placeholder="name@example.com"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" i18n>كلمة المرور</label>
+            <input
+              type="password"
+              class="form-control auth-input"
+              formControlName="password"
+              placeholder="••••••"
+            />
+            <div class="form-text" i18n>6 أحرف على الأقل.</div>
+          </div>
+
+          <div *ngIf="error" class="alert alert-danger auth-alert">{{ error }}</div>
+
+          <button class="btn btn-primary w-100 auth-btn" [disabled]="loading" i18n>
+            {{ loading ? 'جارٍ إنشاء الحساب...' : 'تسجيل' }}
+          </button>
+
+          <div class="auth-inline text-muted">
+            <span i18n>لديك حساب؟</span>
+            <a routerLink="/login" class="auth-link" i18n>دخول</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

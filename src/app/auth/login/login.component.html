@@ -1,45 +1,89 @@
-<div class="container py-4" dir="rtl">
-  <h3 class="mb-3">تسجيل الدخول</h3>
+<div class="auth-page" dir="rtl">
+  <div class="page-container">
+    <div class="auth-grid card-ui">
+      <!-- Side / Brand -->
+      <div class="auth-side">
+        <div class="auth-badge" aria-hidden="true"></div>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="mb-3">
-      <label class="form-label">البريد الإلكتروني</label>
-      <input type="email" class="form-control" formControlName="email" />
+        <h2 class="auth-title">مرحبًا بعودتك</h2>
+        <p class="auth-subtitle text-muted">
+          سجّل دخولك لمتابعة الكورسات والحالات بسرعة.
+        </p>
+
+        <ul class="auth-points text-muted">
+          <li>وصول سريع لمحتوى الكورسات</li>
+          <li>إدارة الحالات بسهولة</li>
+          <li>تجربة متناسقة مع وضع الليل</li>
+        </ul>
+
+        <div class="auth-side-footer text-muted">
+          <span>ليس لديك حساب؟</span>
+          <a class="auth-link" routerLink="/register">إنشاء حساب</a>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="auth-form">
+        <h3 class="mb-2">تسجيل الدخول</h3>
+        <p class="text-muted mb-4">أدخل بيانات حسابك للدخول.</p>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form-inner">
+          <div class="mb-3">
+            <label class="form-label">البريد الإلكتروني</label>
+            <input
+              type="email"
+              class="form-control auth-input"
+              formControlName="email"
+              placeholder="name@example.com"
+            />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">كلمة المرور</label>
+            <input
+              type="password"
+              class="form-control auth-input"
+              formControlName="password"
+              placeholder="••••••"
+            />
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+            <a routerLink="/forgot-password" class="auth-link-sm">نسيت كلمة المرور؟</a>
+          </div>
+
+          <div *ngIf="error" class="alert alert-danger auth-alert">{{ error }}</div>
+
+          <button class="btn btn-primary w-100 auth-btn" [disabled]="loading || googleLoading">
+            {{ (loading || googleLoading) ? 'جارٍ تسجيل الدخول...' : 'دخول' }}
+          </button>
+
+          <div class="auth-divider">
+            <span>أو</span>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-outline-dark w-100 google-btn"
+            (click)="onGoogleLogin()"
+            [disabled]="loading || googleLoading"
+          >
+            <span class="d-inline-flex align-items-center gap-2 justify-content-center">
+              <img
+                class="google-icon"
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google"
+              />
+              <span>{{ googleLoading ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول عبر Google' }}</span>
+            </span>
+          </button>
+
+          <div class="auth-inline text-muted">
+            <span>ليس لديك حساب؟</span>
+            <a routerLink="/register" class="auth-link">إنشاء حساب</a>
+          </div>
+        </form>
+      </div>
     </div>
-
-    <div class="mb-3">
-      <label class="form-label">كلمة المرور</label>
-      <input type="password" class="form-control" formControlName="password" />
-    </div>
-
-    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-
-    <div class="d-flex gap-2 flex-wrap align-items-center">
-      <button class="btn btn-primary" [disabled]="loading || googleLoading">
-        دخول
-      </button>
-
-      <a routerLink="/forgot-password" class="btn btn-link">
-        نسيت كلمة المرور؟
-      </a>
-    </div>
-
-    <hr class="my-4" />
-
-    <button
-      type="button"
-      class="btn btn-outline-dark w-100 google-btn"
-      (click)="onGoogleLogin()"
-      [disabled]="loading || googleLoading"
-    >
-      <span class="d-inline-flex align-items-center gap-2">
-        <img
-          class="google-icon"
-          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-          alt="Google"
-        />
-        <span>{{ googleLoading ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول عبر Google' }}</span>
-      </span>
-    </button>
-  </form>
+  </div>
 </div>
