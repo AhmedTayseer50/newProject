@@ -7,7 +7,9 @@ import {
   signOut,
   sendPasswordResetEmail,
   UserCredential,
-  User
+  User,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from '@angular/fire/auth';
 import { Observable, map } from 'rxjs';
 import { UserService } from 'src/app/core/services/user.service';
@@ -21,7 +23,7 @@ export class AuthService {
   user$: Observable<User | null> = authState(this.auth);
 
   /** هل المستخدم مسجّل دخول؟ */
-  isLoggedIn$: Observable<boolean> = this.user$.pipe(map(u => !!u));
+  isLoggedIn$: Observable<boolean> = this.user$.pipe(map((u) => !!u));
 
   /** إنشاء حساب جديد + مزامنة بياناته في Realtime DB (وتحديد إن كان أدمن) */
   async signup(email: string, password: string): Promise<UserCredential> {
@@ -33,6 +35,16 @@ export class AuthService {
   /** تسجيل دخول + مزامنة بياناته في Realtime DB (وتحديث حالة الأدمن إن لزم) */
   async login(email: string, password: string): Promise<UserCredential> {
     const cred = await signInWithEmailAndPassword(this.auth, email, password);
+    await this.userSvc.syncUser(cred.user);
+    return cred;
+  }
+
+  /** ✅ تسجيل دخول عبر Google + مزامنة بياناته في Realtime DB */
+  async loginWithGoogle(): Promise<UserCredential> {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    const cred = await signInWithPopup(this.auth, provider);
     await this.userSvc.syncUser(cred.user);
     return cred;
   }
