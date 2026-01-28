@@ -22,14 +22,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isDisabled = false;
   isStaff = false;
 
-  // اسم المستخدم للعرض في الـ Navbar
   greetingName = '';
 
   isMenuOpen = false;
 
+  // ✅ Dropdown for logged-in user menu
+  isUserMenuOpen = false;
+
   // Theme
   isDarkTheme = false;
-  private readonly THEME_KEY = 'theme'; // 'dark' | 'light'
+  private readonly THEME_KEY = 'theme';
 
   // Language
   currentLang: 'ar' | 'en' = 'ar';
@@ -39,11 +41,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initTheme();
-
-    // ✅ Detect language from real browser path: /ar/... or /en/...
     this.currentLang = this.detectLangFromPath();
 
-    // user roles
     this.sub = this.auth.user$.pipe(
       switchMap(user => {
         if (!user) return of({ isAdmin: false, isDisabled: false, isStaff: false });
@@ -61,7 +60,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.isStaff = roles.isStaff;
     });
 
-    // ✅ اسم المستخدم (من Realtime DB أولاً ثم fallback من Auth)
     this.profileSub = this.auth.user$
       .pipe(
         switchMap((user) => {
@@ -96,7 +94,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     document.body.classList.toggle('dark-theme', this.isDarkTheme);
   }
 
-  // ✅ Switch /ar <-> /en and keep same route
   switchLanguage(): void {
     const nextLang = this.currentLang === 'ar' ? 'en' : 'ar';
     const { pathname, search, hash } = window.location;
@@ -106,7 +103,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     let restPath = pathname;
 
-    // if URL starts with /ar or /en
     if (first === 'ar' || first === 'en') {
       restPath = '/' + parts.slice(2).join('/');
       if (restPath === '/' || restPath === '') restPath = '/';
@@ -115,15 +111,22 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const newUrl = `/${nextLang}${restPath}${search}${hash}`;
 
     if (isDevMode()) {
-      // لو أنت فعلاً شغال بـ portين محلياً
       const port = nextLang === 'en' ? '4201' : '4200';
       const host = window.location.hostname;
       const protocol = window.location.protocol;
       window.location.assign(`${protocol}//${host}:${port}${newUrl}`);
     } else {
-      // Prod (Vercel): Reload to load correct localized bundles
       window.location.assign(newUrl);
     }
+  }
+
+  // ✅ Toggle logged-in dropdown
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  closeUserMenu(): void {
+    this.isUserMenuOpen = false;
   }
 
   ngOnDestroy(): void {
@@ -134,6 +137,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   async onLogout() {
     await this.auth.logout();
     this.isMenuOpen = false;
+    this.isUserMenuOpen = false;
     this.router.navigateByUrl('/');
   }
 }
