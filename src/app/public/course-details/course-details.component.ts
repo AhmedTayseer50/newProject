@@ -10,17 +10,15 @@ import {
 } from '@angular/fire/auth';
 import { EnrollmentsService } from 'src/app/core/services/enrollments.service';
 
-import { firstValueFrom } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { firstValueFrom, Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 import { DiplomasService } from '../services/diplomas.service';
 import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
 
-// RTDB
 import { Database } from '@angular/fire/database';
 import { ref, get, query, orderByChild, limitToFirst } from 'firebase/database';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Course } from 'src/app/shared/models/course.model';
 
 @Component({
   selector: 'app-course-details',
@@ -29,7 +27,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 })
 export class CourseDetailsComponent implements OnInit, OnDestroy {
   public courseId!: string;
-  public course: any | null = null;
+  public course: Course | null = null;
 
   defaultThumbnail =
     'https://images.pexels.com/photos/4100423/pexels-photo-4100423.jpeg?auto=compress&cs=tinysrgb&w=800';
@@ -38,13 +36,10 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   private offerShown = false;
 
   public lectureNames: string[] = [];
-
   public canViewLessons = false;
   public loading = true;
   public error?: string;
-
   public firstLessonId: string | null = null;
-
   public introVideoSafeUrl: SafeResourceUrl | null = null;
 
   private authUnsub?: Unsubscribe;
@@ -62,9 +57,120 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     private wa: WhatsAppService,
   ) {}
 
-  // ✅ Popup الخصم يظهر فقط لو مفيش صلاحية
+  get isEnglish(): boolean {
+    return window.location.pathname.startsWith('/en');
+  }
+
+  get backLabel(): string {
+    return this.isEnglish ? 'Back to courses' : 'رجوع لكل الكورسات';
+  }
+
+  get enrollButtonText(): string {
+    if (this.course?.bottomCta?.buttonText?.trim()) {
+      return this.course.bottomCta.buttonText;
+    }
+    return this.isEnglish ? 'Enroll now' : 'اشترك الآن';
+  }
+
+  get sectionTitleLearn(): string {
+    return this.isEnglish ? 'What will you learn?' : 'ماذا ستتعلم داخل البرنامج؟';
+  }
+
+  get sectionTitleAudience(): string {
+    return this.isEnglish ? 'Who is this program for?' : 'لمن صُمم هذا البرنامج؟';
+  }
+
+  get sectionTitleCurriculum(): string {
+    return this.isEnglish ? 'Program curriculum' : 'محتوى البرنامج';
+  }
+
+  get sectionTitlePlans(): string {
+    return this.isEnglish ? 'Choose your plan' : 'اختر الخطة المناسبة لك';
+  }
+
+  get sectionTitleTestimonials(): string {
+    return this.isEnglish ? 'Participants feedback' : 'آراء وتجارب المشاركين';
+  }
+
+  get sectionTitleFaqs(): string {
+    return this.isEnglish ? 'Frequently asked questions' : 'الأسئلة الشائعة';
+  }
+
+  get defaultGoalTitle(): string {
+    return this.isEnglish ? 'Program goal' : 'هدف البرنامج';
+  }
+
+  get defaultExpectedStudyTitle(): string {
+    return this.isEnglish ? 'Expected duration' : 'المدة المتوقعة';
+  }
+
+  get defaultPrerequisitesTitle(): string {
+    return this.isEnglish ? 'Before you begin' : 'قبل أن تبدأ';
+  }
+
+  get defaultAudienceEmpty(): string {
+    return this.isEnglish
+      ? 'Audience details will be added soon.'
+      : 'سيتم إضافة الفئة المستهدفة قريبًا.';
+  }
+
+  get defaultCurriculumEmpty(): string {
+    return this.isEnglish
+      ? 'Curriculum details will be added soon.'
+      : 'سيتم إضافة تفاصيل المنهج قريبًا.';
+  }
+
+  get defaultOutcomesEmpty(): string {
+    return this.isEnglish
+      ? 'Learning outcomes will be added soon.'
+      : 'سيتم إضافة مخرجات التعلم قريبًا.';
+  }
+
+  get defaultTestimonialsEmpty(): string {
+    return this.isEnglish
+      ? 'Testimonials will be added soon.'
+      : 'سيتم إضافة الآراء والتجارب قريبًا.';
+  }
+
+  get defaultFaqEmpty(): string {
+    return this.isEnglish
+      ? 'FAQ section will be updated soon.'
+      : 'سيتم تحديث قسم الأسئلة الشائعة قريبًا.';
+  }
+
+  get defaultNoAccess(): string {
+    return this.isEnglish
+      ? 'You do not have access to watch this course yet.'
+      : 'لم يتم منحك الصلاحية لمشاهدة هذا الكورس بعد.';
+  }
+
+  get defaultAccessGranted(): string {
+    return this.isEnglish
+      ? 'You already have access to this course.'
+      : 'لديك صلاحية مشاهدة هذا الكورس.';
+  }
+
+  get watchLessonsLabel(): string {
+    return this.isEnglish ? 'Go to lessons' : 'اذهب لمشاهدة الدروس';
+  }
+
+  get pricingSubtitle(): string {
+    return this.isEnglish
+      ? 'Choose the format that fits your journey and current level of support.'
+      : 'اختر الطريقة الأنسب لرحلتك الحالية ومستوى الدعم الذي تحتاجه.';
+  }
+
+  get heroFallbackEyebrow(): string {
+    return this.isEnglish ? 'A practical transformative program' : 'برنامج عملي متكامل';
+  }
+
+  get heroFallbackTagline(): string {
+    return this.isEnglish
+      ? 'A guided journey that helps you understand, apply, and move toward a more balanced inner state.'
+      : 'رحلة تعليمية تساعدك على الفهم والتطبيق والانتقال نحو توازن داخلي أعمق.';
+  }
+
   private onWindowScroll = () => {
-    // لو عنده صلاحية، ممنوع popup
     if (this.canViewLessons) return;
 
     const scrollPosition = window.innerHeight + window.scrollY;
@@ -76,8 +182,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     }
   };
 
-  ngOnInit() {
-    // ✅ متابعة تغيّر :id
+  ngOnInit(): void {
     this.route.paramMap
       .pipe(takeUntil(this.destroyed$))
       .subscribe(async (pm) => {
@@ -91,8 +196,6 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         this.lectureNames = [];
         this.firstLessonId = null;
         this.introVideoSafeUrl = null;
-
-        // reset popup state لكل كورس
         this.showOfferPopup = false;
         this.offerShown = false;
 
@@ -109,15 +212,17 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
             this.courseId,
           );
         } catch (e: any) {
-          this.error = e?.message ?? 'حدث خطأ أثناء تحميل الكورس';
+          this.error = e?.message ?? (this.isEnglish
+            ? 'An error occurred while loading the course.'
+            : 'حدث خطأ أثناء تحميل الكورس');
         } finally {
           this.loading = false;
         }
 
+        window.removeEventListener('scroll', this.onWindowScroll);
         window.addEventListener('scroll', this.onWindowScroll);
       });
 
-    // ✅ متابعة الصلاحية
     this.authUnsub = onAuthStateChanged(
       this.auth,
       async (user: User | null) => {
@@ -129,17 +234,13 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         }
 
         try {
-          const myCourses = await this.enrollments.listUserEnrollments(
-            user.uid,
-          );
+          const myCourses = await this.enrollments.listUserEnrollments(user.uid);
           this.canViewLessons = myCourses.includes(this.courseId);
 
-          // ✅ لو اتضافت الصلاحية: اقفل/امنع popup نهائيًا
           if (this.canViewLessons) {
             this.showOfferPopup = false;
             this.offerShown = true;
           } else {
-            // لو مفيش صلاحية: نسمح للـ popup يظهر تاني أثناء التصفح
             this.offerShown = false;
           }
         } catch {
@@ -153,52 +254,64 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     if (this.authUnsub) this.authUnsub();
     this.destroyed$.next();
     this.destroyed$.complete();
-
     window.removeEventListener('scroll', this.onWindowScroll);
   }
 
-  /** الذهاب لأول درس فعلي */
   public async goToLessons(): Promise<void> {
     if (!this.firstLessonId) {
-      this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(
-        this.courseId,
-      );
+      this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(this.courseId);
     }
+
     if (!this.firstLessonId) {
-      console.warn(
-        '[goToLessons] لا يوجد دروس متاحة لهذا الكورس:',
-        this.courseId,
-      );
+      console.warn('[goToLessons] no lessons found for course:', this.courseId);
       return;
     }
 
-    const commands = ['/lesson', this.courseId, this.firstLessonId];
-    this.router.navigate(commands);
+    this.router.navigate(['/lesson', this.courseId, this.firstLessonId]);
   }
 
   async goToPurchase(): Promise<void> {
-  const courseTitle = (this.course?.title || '').trim() || 'بدون اسم';
+    const courseTitle =
+      (this.course?.title || '').trim() ||
+      (this.isEnglish ? 'Untitled course' : 'بدون اسم');
 
-  let diplomaNames: string[] = [];
-  try {
-    const diplomas = await firstValueFrom(this.diplomasSvc.watchDiplomas().pipe(take(1)));
-    diplomaNames = diplomas
-      .filter(d => !!d.courseIds?.[this.courseId])
-      .map(d => (d.title || '').trim())
-      .filter(Boolean);
-  } catch {
-    diplomaNames = [];
+    let diplomaNames: string[] = [];
+    try {
+      const diplomas = await firstValueFrom(
+        this.diplomasSvc.watchDiplomas().pipe(take(1)),
+      );
+      diplomaNames = diplomas
+        .filter((d) => !!d.courseIds?.[this.courseId])
+        .map((d) => (d.title || '').trim())
+        .filter(Boolean);
+    } catch {
+      diplomaNames = [];
+    }
+
+    const lines: string[] = [];
+    if (this.isEnglish) {
+      lines.push(`I want to enroll in the course: ${courseTitle}`);
+      if (diplomaNames.length) {
+        lines.push(`Related diplomas: ${diplomaNames.join(', ')}`);
+      }
+    } else {
+      lines.push(`أريد الاشتراك على كورس: ${courseTitle}`);
+      if (diplomaNames.length) {
+        lines.push(`الدبلومات المرتبطة: ${diplomaNames.join('، ')}`);
+      }
+    }
+
+    this.wa.open(lines.join('\n'));
   }
 
-  const lines: string[] = [];
-  lines.push(`أريد الاشتراك على كورس: ${courseTitle}`);
-  if (diplomaNames.length) {
-    lines.push(`الدبلومات المرتبطة: ${diplomaNames.join('، ')}`);
+  lessonLabel(index: number): string {
+    return this.isEnglish ? `Lesson ${index + 1}` : `المحاضرة ${index + 1}`;
   }
 
-  this.wa.open(lines.join('\n'));
-}
-
+  starsArray(rating?: number): number[] {
+    const count = Math.max(0, Math.min(5, Number(rating || 0)));
+    return Array.from({ length: count }, (_, i) => i + 1);
+  }
 
   private async resolveFirstLessonIdFromRTDB(
     courseId: string,
@@ -232,17 +345,16 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
       orderByChild(child),
       limitToFirst(1),
     );
+
     const snap = await get(qy);
     if (snap.exists()) {
       const val = snap.val() as Record<string, any>;
       const keys = Object.keys(val);
       if (keys.length) return keys[0];
     }
+
     return null;
   }
-
-  // ✅ CTA Popup controls (هنخليهم يشتغلوا فقط لو مفيش صلاحية)
-
 
   closeOffer(): void {
     this.showOfferPopup = false;

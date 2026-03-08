@@ -1,10 +1,8 @@
-<!-- src/app/admin/course-editor/course-editor.component.html -->
-<div class="container py-4" dir="rtl">
-  <a routerLink="/admin/dashboard" class="btn btn-link ps-0 mb-3"
-    >&larr; رجوع للوحة التحكم</a
-  >
+<div class="container py-4 course-editor-page" dir="rtl">
+  <a routerLink="/admin/dashboard" class="btn btn-link ps-0 mb-3">
+    &larr; رجوع للوحة التحكم
+  </a>
 
-  <!-- ✅ وضع القائمة: يظهر فقط عندما لا يوجد courseId -->
   <ng-container *ngIf="!courseId">
     <div class="d-flex align-items-center mb-3">
       <h3 class="mb-0">كل الكورسات</h3>
@@ -17,9 +15,9 @@
       </button>
     </div>
 
-    <div class="card mb-4">
+    <div class="card shadow-sm mb-4">
       <div class="table-responsive">
-        <table class="table table-sm mb-0">
+        <table class="table table-sm mb-0 align-middle">
           <thead class="table-light">
             <tr>
               <th>العنوان</th>
@@ -30,7 +28,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let c of courses">
-              <td>{{ c.title || "بدون عنوان" }}</td>
+              <td>{{ getCourseTitleForList(c) }}</td>
               <td>{{ c.price ?? 0 }}</td>
               <td>
                 <span
@@ -45,8 +43,9 @@
                 <a
                   class="btn btn-sm btn-primary"
                   [routerLink]="['/admin/course-editor', c.id]"
-                  >تعديل</a
                 >
+                  تعديل
+                </a>
                 <button
                   class="btn btn-sm btn-outline-danger"
                   (click)="deleteCourseFromList(c.id)"
@@ -65,271 +64,611 @@
       </div>
     </div>
 
-    <h4 class="mb-2">إضافة كورس جديد</h4>
+    <h4 class="mb-3">إضافة كورس جديد</h4>
   </ng-container>
 
-  <!-- ✅ وضع التعديل: يظهر العنوان عند وجود courseId -->
   <h3 class="mb-3" *ngIf="courseId">تعديل كورس</h3>
 
-  <!-- رسائل عامة -->
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
   <div *ngIf="loading" class="alert alert-info">جارٍ المعالجة…</div>
 
-  <!-- نموذج الكورس (يُستخدم في الإنشاء أو التعديل) -->
-  <form [formGroup]="courseForm" (ngSubmit)="saveCourse()" class="card mb-4">
+  <form [formGroup]="courseForm" (ngSubmit)="saveCourse()" class="card shadow-sm mb-4">
+    <div class="card-header bg-white border-0 pb-0">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <h5 class="mb-1">بيانات الكورس</h5>
+          <p class="text-muted small mb-0">
+            استخدم أزرار اللغة لإدخال المحتوى العربي والإنجليزي لكل جزء.
+          </p>
+        </div>
+
+        <div class="lang-toggle btn-group" role="group" aria-label="Language toggle">
+          <button
+            type="button"
+            class="btn"
+            [class.btn-primary]="activeLang === 'ar'"
+            [class.btn-outline-primary]="activeLang !== 'ar'"
+            (click)="setLang('ar')"
+          >
+            AR
+          </button>
+          <button
+            type="button"
+            class="btn"
+            [class.btn-primary]="activeLang === 'en'"
+            [class.btn-outline-primary]="activeLang !== 'en'"
+            (click)="setLang('en')"
+          >
+            EN
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="card-body">
-      <div class="mb-3">
-        <label class="form-label">عنوان الكورس</label>
-        <input
-          formControlName="title"
-          class="form-control"
-          placeholder="مثال: أساسيات الصحة النفسية"
-        />
+      <div class="editor-lang-banner mb-4">
+        أنت الآن تُدخل بيانات:
+        <strong>{{ activeLang === 'ar' ? 'العربية' : 'الإنجليزية' }}</strong>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">الوصف</label>
-        <textarea
-          formControlName="description"
-          rows="3"
-          class="form-control"
-        ></textarea>
-      </div>
+      <!-- basic -->
+      <div class="editor-section">
+        <h6 class="editor-section__title">البيانات الأساسية</h6>
 
-      <div class="row g-3">
-        <div class="col-sm-4">
-          <label class="form-label">السعر</label>
-          <input type="number" formControlName="price" class="form-control" />
-        </div>
-        <div class="col-sm-4">
-          <label class="form-label">التصنيف</label>
+        <div class="mb-3">
+          <label class="form-label">
+            عنوان الكورس
+            <span class="text-muted small">
+              ({{ activeLang === 'ar' ? 'Arabic' : 'English' }})
+            </span>
+          </label>
           <input
-            formControlName="categoryId"
             class="form-control"
-            placeholder="cat_intro"
+            [formControl]="courseForm.controls.title.controls[activeLang]"
+            [placeholder]="activeLang === 'ar' ? 'عنوان الكورس بالعربية' : 'Course title in English'"
           />
         </div>
-        <div class="col-sm-4 form-check mt-4">
-          <input
-            id="pub"
-            type="checkbox"
-            class="form-check-input"
-            formControlName="published"
-          />
-          <label for="pub" class="form-check-label">نشر الكورس</label>
-        </div>
-      </div>
 
-      <div class="mb-3 mt-3">
-        <label class="form-label">رابط الصورة المصغّرة (اختياري)</label>
-        <input
-          formControlName="thumbnail"
-          class="form-control"
-          placeholder="https://..."
-        />
-      </div>
-
-      <!-- ✅ الحقول الإضافية للعرض التسويقي -->
-      <hr />
-
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">مدة البرنامج</label>
-          <input
-            formControlName="programDuration"
+        <div class="mb-3">
+          <label class="form-label">الوصف المختصر</label>
+          <textarea
+            rows="3"
             class="form-control"
-            placeholder="مثال: ٤ أسابيع / شهر"
-          />
+            [formControl]="courseForm.controls.description.controls[activeLang]"
+            [placeholder]="activeLang === 'ar' ? 'اكتب وصفًا عربيًا' : 'Write the English description'"
+          ></textarea>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">لمن هذا الكورس؟</label>
-          <input
-            formControlName="targetAudience"
-            class="form-control"
-            placeholder="مثال: لأي شخص يعاني من..."
-          />
-        </div>
-      </div>
 
-      <div class="mt-3">
-        <label class="form-label">الهدف من الدراسة</label>
-        <div class="row g-2">
+        <div class="row g-3">
           <div class="col-md-4">
-            <input
-              formControlName="goalTitle"
-              class="form-control"
-              placeholder="عنوان مختصر"
-            />
+            <label class="form-label">السعر</label>
+            <input type="number" formControlName="price" class="form-control" />
           </div>
-          <div class="col-md-8">
-            <textarea
-              formControlName="goalDescription"
-              rows="2"
-              class="form-control"
-              placeholder="وصف الهدف بالتفصيل"
-            ></textarea>
-          </div>
-        </div>
-      </div>
 
-      <div class="mt-3">
-        <label class="form-label">المدة المتوقعة للدراسة</label>
-        <div class="row g-2">
           <div class="col-md-4">
+            <label class="form-label">التصنيف</label>
             <input
-              formControlName="expectedStudyTimeTitle"
               class="form-control"
-              placeholder="مثال: ٣ ساعات أسبوعيًا"
+              [formControl]="courseForm.controls.categoryId.controls[activeLang]"
+              [placeholder]="activeLang === 'ar' ? 'تصنيف بالعربية' : 'Category in English'"
             />
           </div>
-          <div class="col-md-8">
-            <textarea
-              formControlName="expectedStudyTimeDescription"
-              rows="2"
+
+          <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check">
+              <input
+                id="pub"
+                type="checkbox"
+                class="form-check-input"
+                formControlName="published"
+              />
+              <label for="pub" class="form-check-label">نشر الكورس</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+          <div class="col-md-6">
+            <label class="form-label">رابط الصورة المصغرة</label>
+            <input
+              formControlName="thumbnail"
               class="form-control"
-              placeholder="تفاصيل المدة المتوقعة"
-            ></textarea>
+              placeholder="https://..."
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">رابط الفيديو التعريفي</label>
+            <input
+              formControlName="introVideoUrl"
+              class="form-control"
+              placeholder="https://youtube.com/embed/..."
+            />
           </div>
         </div>
       </div>
 
-      <div class="mt-3">
-        <label class="form-label">الخبرات السابقة المطلوبة</label>
-        <div class="row g-2">
+      <!-- hero -->
+      <div class="editor-section">
+        <h6 class="editor-section__title">Hero Section</h6>
+
+        <div class="row g-3">
           <div class="col-md-4">
+            <label class="form-label">Eyebrow</label>
             <input
-              formControlName="prerequisitesTitle"
               class="form-control"
-              placeholder="مثال: لا يحتاج خبرة سابقة"
-            />
-          </div>
-          <div class="col-md-8">
-            <textarea
-              formControlName="prerequisitesDescription"
-              rows="2"
-              class="form-control"
-              placeholder="تفاصيل المتطلبات إن وجدت"
-            ></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-3">
-        <label class="form-label">رابط الفيديو التعريفي</label>
-        <input
-          formControlName="introVideoUrl"
-          class="form-control"
-          placeholder="https://youtube.com/embed/..."
-        />
-      </div>
-
-      <div class="mt-4">
-        <label class="form-label">رأي أحد المتدربين</label>
-        <div class="row g-2">
-          <div class="col-md-3">
-            <input
-              formControlName="testimonialName"
-              class="form-control"
-              placeholder="الاسم"
-            />
-          </div>
-          <div class="col-md-3">
-            <input
-              formControlName="testimonialProblem"
-              class="form-control"
-              placeholder="المشكلة قبل الكورس"
+              [formControl]="courseForm.controls.heroEyebrow.controls[activeLang]"
+              [placeholder]="activeLang === 'ar' ? 'عنوان صغير أعلى الهيرو' : 'Hero eyebrow'"
             />
           </div>
           <div class="col-md-4">
+            <label class="form-label">Tagline</label>
             <input
-              formControlName="testimonialText"
               class="form-control"
-              placeholder="وصف التجربة / التغيير"
+              [formControl]="courseForm.controls.heroTagline.controls[activeLang]"
+              [placeholder]="activeLang === 'ar' ? 'سطر تعريفي قصير' : 'Short hero tagline'"
             />
           </div>
+          <div class="col-md-4">
+            <label class="form-label">Highlighted title part</label>
+            <input
+              class="form-control"
+              [formControl]="courseForm.controls.heroTitleHighlight.controls[activeLang]"
+              [placeholder]="activeLang === 'ar' ? 'الجزء المميز من العنوان' : 'Highlighted text'"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- summary fields -->
+      <div class="editor-section">
+        <h6 class="editor-section__title">الملخص التسويقي</h6>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">مدة البرنامج</label>
+            <input
+              class="form-control"
+              [formControl]="courseForm.controls.programDuration.controls[activeLang]"
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">لمن هذا البرنامج؟</label>
+            <input
+              class="form-control"
+              [formControl]="courseForm.controls.targetAudience.controls[activeLang]"
+            />
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">الهدف من البرنامج</label>
+          <div class="row g-2">
+            <div class="col-md-4">
+              <input
+                class="form-control"
+                [formControl]="courseForm.controls.goalTitle.controls[activeLang]"
+                [placeholder]="activeLang === 'ar' ? 'عنوان' : 'Title'"
+              />
+            </div>
+            <div class="col-md-8">
+              <textarea
+                rows="2"
+                class="form-control"
+                [formControl]="courseForm.controls.goalDescription.controls[activeLang]"
+                [placeholder]="activeLang === 'ar' ? 'الوصف' : 'Description'"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">المدة المتوقعة للدراسة</label>
+          <div class="row g-2">
+            <div class="col-md-4">
+              <input
+                class="form-control"
+                [formControl]="courseForm.controls.expectedStudyTimeTitle.controls[activeLang]"
+              />
+            </div>
+            <div class="col-md-8">
+              <textarea
+                rows="2"
+                class="form-control"
+                [formControl]="courseForm.controls.expectedStudyTimeDescription.controls[activeLang]"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">المتطلبات السابقة</label>
+          <div class="row g-2">
+            <div class="col-md-4">
+              <input
+                class="form-control"
+                [formControl]="courseForm.controls.prerequisitesTitle.controls[activeLang]"
+              />
+            </div>
+            <div class="col-md-8">
+              <textarea
+                rows="2"
+                class="form-control"
+                [formControl]="courseForm.controls.prerequisitesDescription.controls[activeLang]"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- meta -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">Meta pills</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addMetaItem()">
+            + إضافة عنصر
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of meta.controls; let i = index" [formGroup]="item">
+          <div class="row g-2">
+            <div class="col-md-5">
+              <label class="form-label">Label</label>
+              <input
+                class="form-control"
+                [formControl]="item.controls.label.controls[activeLang]"
+              />
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">Value</label>
+              <input
+                class="form-control"
+                [formControl]="item.controls.value.controls[activeLang]"
+              />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeMetaItem(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- lecture names -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">أسماء الدروس (للعرض)</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addLectureName()">
+            + إضافة
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of lectureNames.controls; let i = index">
+          <div class="row g-2">
+            <div class="col-md-10">
+              <input
+                class="form-control"
+                [formControl]="item.controls[activeLang]"
+                [placeholder]="activeLang === 'ar' ? 'اسم الدرس' : 'Lesson name'"
+              />
+            </div>
+            <div class="col-md-2">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeLectureName(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- outcomes -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">ماذا سيتعلم الطالب؟</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addOutcome()">
+            + إضافة
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of outcomes.controls; let i = index">
+          <div class="row g-2">
+            <div class="col-md-10">
+              <input class="form-control" [formControl]="item.controls[activeLang]" />
+            </div>
+            <div class="col-md-2">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeOutcome(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- audience -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">الفئة المستهدفة</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAudienceItem()">
+            + إضافة
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of audienceItems.controls; let i = index">
+          <div class="row g-2">
+            <div class="col-md-10">
+              <input class="form-control" [formControl]="item.controls[activeLang]" />
+            </div>
+            <div class="col-md-2">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeAudienceItem(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- section cards -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">بطاقات المزايا / السكاشن</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addSectionCard()">
+            + إضافة كارت
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of sectionCards.controls; let i = index" [formGroup]="item">
+          <div class="row g-2">
+            <div class="col-md-4">
+              <label class="form-label">العنوان</label>
+              <input class="form-control" [formControl]="item.controls.title.controls[activeLang]" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">الوصف</label>
+              <textarea
+                rows="2"
+                class="form-control"
+                [formControl]="item.controls.description.controls[activeLang]"
+              ></textarea>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeSectionCard(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- curriculum -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">المنهج / المحاور</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addCurriculumItem()">
+            + إضافة محور
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of curriculum.controls; let i = index" [formGroup]="item">
+          <div class="row g-2">
+            <div class="col-md-4">
+              <label class="form-label">عنوان المحور</label>
+              <input class="form-control" [formControl]="item.controls.title.controls[activeLang]" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">
+                نقاط المحور
+                <span class="text-muted small">(كل نقطة في سطر)</span>
+              </label>
+
+              <textarea
+                rows="5"
+                class="form-control"
+                [formControl]="activeLang === 'ar' ? item.controls.pointsAr : item.controls.pointsEn"
+              ></textarea>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeCurriculumItem(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- pricing -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">الخطط السعرية</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addPricingPlan()">
+            + إضافة خطة
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of pricingPlans.controls; let i = index" [formGroup]="item">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">اسم الخطة</label>
+              <input class="form-control" [formControl]="item.controls.name.controls[activeLang]" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Badge</label>
+              <input class="form-control" [formControl]="item.controls.badge.controls[activeLang]" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">السعر المعروض</label>
+              <input class="form-control" [formControl]="item.controls.priceText.controls[activeLang]" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">ملاحظة إضافية</label>
+              <input class="form-control" [formControl]="item.controls.note.controls[activeLang]" />
+            </div>
+
+            <div class="col-md-9">
+              <label class="form-label">
+                مميزات الخطة
+                <span class="text-muted small">(كل سطر = ميزة)</span>
+              </label>
+              <textarea
+                rows="4"
+                class="form-control"
+                [formControl]="activeLang === 'ar' ? item.controls.featuresAr : item.controls.featuresEn"
+              ></textarea>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" [formControl]="item.controls.highlighted" />
+                <label class="form-check-label">مميزة</label>
+              </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removePricingPlan(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- testimonials -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">آراء المتدربين</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addTestimonial()">
+            + إضافة رأي
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of testimonials.controls; let i = index" [formGroup]="item">
+          <div class="row g-2">
+            <div class="col-md-3">
+              <label class="form-label">الاسم</label>
+              <input class="form-control" [formControl]="item.controls.name.controls[activeLang]" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">الصفة / التاج</label>
+              <input class="form-control" [formControl]="item.controls.tag.controls[activeLang]" />
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">التقييم</label>
+              <input type="number" class="form-control" [formControl]="item.controls.rating" min="1" max="5" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">النص</label>
+              <textarea rows="2" class="form-control" [formControl]="item.controls.text.controls[activeLang]"></textarea>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeTestimonial(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- faqs -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">الأسئلة الشائعة</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addFaq()">
+            + إضافة سؤال
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of faqs.controls; let i = index" [formGroup]="item">
+          <div class="row g-2">
+            <div class="col-md-4">
+              <label class="form-label">السؤال</label>
+              <input class="form-control" [formControl]="item.controls.question.controls[activeLang]" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">الإجابة</label>
+              <textarea rows="2" class="form-control" [formControl]="item.controls.answer.controls[activeLang]"></textarea>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeFaq(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- community perks -->
+      <div class="editor-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="editor-section__title mb-0">مميزات إضافية / المجتمع</h6>
+          <button type="button" class="btn btn-sm btn-outline-primary" (click)="addCommunityPerk()">
+            + إضافة
+          </button>
+        </div>
+
+        <div class="repeater-card" *ngFor="let item of communityPerks.controls; let i = index">
+          <div class="row g-2">
+            <div class="col-md-10">
+              <input class="form-control" [formControl]="item.controls[activeLang]" />
+            </div>
+            <div class="col-md-2">
+              <button type="button" class="btn btn-outline-danger w-100" (click)="removeCommunityPerk(i)">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- offer -->
+      <div class="editor-section">
+        <h6 class="editor-section__title">Offer Section</h6>
+
+        <div class="row g-3">
           <div class="col-md-2">
-            <input
-              formControlName="testimonialRating"
-              class="form-control"
-              placeholder="التقييم (مثال: 5/5)"
-            />
+            <label class="form-label">النسبة %</label>
+            <input type="number" class="form-control" formControlName="offerPercent" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">عنوان العرض</label>
+            <input class="form-control" [formControl]="courseForm.controls.offerHeading.controls[activeLang]" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">نص العرض</label>
+            <input class="form-control" [formControl]="courseForm.controls.offerText.controls[activeLang]" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">نص الزر</label>
+            <input class="form-control" [formControl]="courseForm.controls.offerCtaText.controls[activeLang]" />
           </div>
         </div>
       </div>
 
-      <div class="mt-4">
-        <label class="form-label">الخطط السعرية</label>
-        <div class="row g-2">
-          <div class="col-md-4">
-            <input
-              formControlName="pricingBasic"
+      <!-- bottom cta -->
+      <div class="editor-section">
+        <h6 class="editor-section__title">Bottom CTA</h6>
+
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">النص</label>
+            <textarea
+              rows="2"
               class="form-control"
-              placeholder="الخطة الأساسية"
-            />
+              [formControl]="courseForm.controls.bottomCtaText.controls[activeLang]"
+            ></textarea>
           </div>
           <div class="col-md-4">
+            <label class="form-label">نص الزر</label>
             <input
-              formControlName="pricingGroup"
               class="form-control"
-              placeholder="خطة المتابعة الجماعية"
-            />
-          </div>
-          <div class="col-md-4">
-            <input
-              formControlName="pricingPremium"
-              class="form-control"
-              placeholder="الخطة المميزة"
+              [formControl]="courseForm.controls.bottomCtaButtonText.controls[activeLang]"
             />
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ✅ نفس جزء أسماء الدروس كما هو -->
-    <div class="card mt-3">
-      <div
-        class="card-header d-flex justify-content-between align-items-center"
-      >
-        <span>أسماء الدروس (للعرض فقط)</span>
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-primary"
-          (click)="addLectureName()"
-        >
-          + إضافة درس
-        </button>
-      </div>
-      <ul class="list-group list-group-flush">
-        <li
-          class="list-group-item"
-          *ngFor="let ctrl of lectureNames.controls; let i = index"
-        >
-          <div class="d-flex gap-2">
-            <input
-              class="form-control"
-              [formControl]="ctrl"
-              placeholder="اسم الدرس رقم {{ i + 1 }}"
-            />
-            <button
-              type="button"
-              class="btn btn-outline-danger"
-              (click)="removeLectureName(i)"
-              aria-label="حذف"
-            >
-              حذف
-            </button>
-          </div>
-        </li>
-        <li class="list-group-item" *ngIf="lectureNames.length === 0">
-          لا توجد أسماء دروس — اضغط “+ إضافة درس”.
-        </li>
-      </ul>
-    </div>
-
-    <div class="card-footer d-flex gap-2">
+    <div class="card-footer d-flex gap-2 flex-wrap">
       <button class="btn btn-success" [disabled]="loading">
         {{ courseId ? "حفظ التعديلات" : "إنشاء الكورس" }}
       </button>
+
       <button
         *ngIf="courseId"
         type="button"
@@ -342,32 +681,24 @@
     </div>
   </form>
 
-  <!-- إدارة الدروس: تظهر فقط في وضع التعديل -->
   <ng-container *ngIf="courseId">
     <h4 class="mb-3">الدروس</h4>
 
-    <!-- نموذج الدرس -->
-    <form [formGroup]="lessonForm" (ngSubmit)="saveLesson()" class="card mb-3">
+    <form [formGroup]="lessonForm" (ngSubmit)="saveLesson()" class="card shadow-sm mb-3">
       <div class="card-body row g-3">
         <input type="hidden" formControlName="id" />
+
         <div class="col-md-5">
           <label class="form-label">عنوان الدرس</label>
-          <input
-            formControlName="title"
-            class="form-control"
-            placeholder="مقدمة"
-          />
+          <input formControlName="title" class="form-control" placeholder="مقدمة" />
         </div>
+
         <div class="col-md-2">
           <label class="form-label">ترتيب</label>
-          <input
-            type="number"
-            formControlName="lessonIndex"
-            class="form-control"
-            min="1"
-          />
+          <input type="number" formControlName="lessonIndex" class="form-control" min="1" />
         </div>
-        <div class="col-md-3">
+
+        <div class="col-md-2">
           <label class="form-label">المنصة</label>
           <select formControlName="videoProvider" class="form-select">
             <option value="youtube">YouTube</option>
@@ -375,7 +706,7 @@
           </select>
         </div>
 
-        <div class="col-md-5">
+        <div class="col-md-3">
           <label class="form-label">
             {{
               lessonForm.get("videoProvider")?.value === "gdrive"
@@ -393,37 +724,19 @@
                 : 'مثال: dQw4w9WgXcQ'
             "
           />
-
-          <div
-            class="form-text"
-            *ngIf="lessonForm.get('videoProvider')?.value === 'youtube'"
-          >
-            ارفع الفيديو Unlisted وخُد الـ videoId من الرابط.
-          </div>
-
-          <div
-            class="form-text"
-            *ngIf="lessonForm.get('videoProvider')?.value === 'gdrive'"
-          >
-            حط Google Drive fileId فقط (الجزء بين /d/ و /view).
-          </div>
         </div>
       </div>
+
       <div class="card-footer d-flex gap-2">
         <button class="btn btn-primary" [disabled]="loading">
           {{ lessonForm.value.id ? "تحديث الدرس" : "إضافة الدرس" }}
         </button>
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          (click)="resetLessonForm()"
-        >
+        <button type="button" class="btn btn-outline-secondary" (click)="resetLessonForm()">
           تفريغ الحقول
         </button>
       </div>
     </form>
 
-    <!-- قائمة الدروس -->
     <div class="list-group">
       <div
         class="list-group-item d-flex justify-content-between align-items-center"
@@ -434,16 +747,10 @@
           <div class="text-muted small" *ngIf="l.videoRef">فيديو مضبوط</div>
         </div>
         <div class="btn-group">
-          <button
-            class="btn btn-sm btn-outline-primary"
-            (click)="editLesson(l)"
-          >
+          <button class="btn btn-sm btn-outline-primary" (click)="editLesson(l)">
             تعديل
           </button>
-          <button
-            class="btn btn-sm btn-outline-danger"
-            (click)="deleteLesson(l.id)"
-          >
+          <button class="btn btn-sm btn-outline-danger" (click)="deleteLesson(l.id)">
             حذف
           </button>
         </div>
