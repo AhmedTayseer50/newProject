@@ -58,7 +58,7 @@ export class DiplomaEditorComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private diplomasAdmin: DiplomasAdminService,
-    private adminCourses: AdminService
+    private adminCourses: AdminService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -67,7 +67,10 @@ export class DiplomaEditorComponent implements OnInit {
 
     try {
       const rawCourses = await this.adminCourses.listCourses();
-      this.courses = rawCourses.map((c) => ({ id: c.id, title: c.title }));
+      this.courses = rawCourses.map((c) => ({
+        id: c.id,
+        title: c.title?.ar || c.title?.en || '',
+      }));
 
       const id = this.route.snapshot.paramMap.get('id');
       if (id) {
@@ -197,7 +200,8 @@ export class DiplomaEditorComponent implements OnInit {
 
   private ensureDefaults(): void {
     // meta
-    if (!this.data.meta) this.data.meta = { level: '', totalCourses: 0, totalLessons: 0 };
+    if (!this.data.meta)
+      this.data.meta = { level: '', totalCourses: 0, totalLessons: 0 };
 
     // arrays
     if (!Array.isArray(this.data.specs)) this.data.specs = [];
@@ -224,7 +228,10 @@ export class DiplomaEditorComponent implements OnInit {
           badge: 'لبداية هادئة ومركّزة',
           priceText: '—',
           note: 'دفع لمرة واحدة – دخول فوري للمحتوى',
-          features: ['الوصول الكامل لمحتوى الدبلومة.', 'تحميل الملفات والتطبيقات العملية.'],
+          features: [
+            'الوصول الكامل لمحتوى الدبلومة.',
+            'تحميل الملفات والتطبيقات العملية.',
+          ],
           highlighted: false,
         },
         {
@@ -232,7 +239,10 @@ export class DiplomaEditorComponent implements OnInit {
           badge: 'دعم أكبر + متابعة',
           priceText: '—',
           note: 'تشمل مزايا الخطة الأساسية وأكثر',
-          features: ['كل مزايا الخطة الأساسية.', 'متابعة داخل جروب للأسئلة والنقاش.'],
+          features: [
+            'كل مزايا الخطة الأساسية.',
+            'متابعة داخل جروب للأسئلة والنقاش.',
+          ],
           highlighted: true,
         },
         {
@@ -266,9 +276,17 @@ export class DiplomaEditorComponent implements OnInit {
 
     // offer + bottomCta
     if (!this.data.offer) {
-      this.data.offer = { percent: 30, heading: 'عرض خاص', text: '', ctaText: 'اشترك الآن' };
+      this.data.offer = {
+        percent: 30,
+        heading: 'عرض خاص',
+        text: '',
+        ctaText: 'اشترك الآن',
+      };
     } else {
-      this.data.offer.percent = typeof this.data.offer.percent === 'number' ? this.data.offer.percent : 30;
+      this.data.offer.percent =
+        typeof this.data.offer.percent === 'number'
+          ? this.data.offer.percent
+          : 30;
       this.data.offer.heading = this.data.offer.heading ?? '';
       this.data.offer.text = this.data.offer.text ?? '';
       this.data.offer.ctaText = this.data.offer.ctaText ?? 'اشترك الآن';
@@ -278,7 +296,8 @@ export class DiplomaEditorComponent implements OnInit {
       this.data.bottomCta = { text: '', buttonText: 'اشترك الآن' };
     } else {
       this.data.bottomCta.text = this.data.bottomCta.text ?? '';
-      this.data.bottomCta.buttonText = this.data.bottomCta.buttonText ?? 'اشترك الآن';
+      this.data.bottomCta.buttonText =
+        this.data.bottomCta.buttonText ?? 'اشترك الآن';
     }
 
     // courseIds always object
@@ -320,7 +339,9 @@ export class DiplomaEditorComponent implements OnInit {
   }
 
   removePerk(i: number): void {
-    this.data.communityPerks = (this.data.communityPerks ?? []).filter((_, idx) => idx !== i);
+    this.data.communityPerks = (this.data.communityPerks ?? []).filter(
+      (_, idx) => idx !== i,
+    );
   }
 
   addFeature(planIndex: number): void {
@@ -346,8 +367,12 @@ export class DiplomaEditorComponent implements OnInit {
       if (!this.data.title?.trim()) throw new Error('اكتب عنوان الدبلومة');
 
       // clean arrays (remove empty items)
-      this.data.specs = (this.data.specs ?? []).map((x) => (x ?? '').trim()).filter(Boolean);
-      this.data.communityPerks = (this.data.communityPerks ?? []).map((x) => (x ?? '').trim()).filter(Boolean);
+      this.data.specs = (this.data.specs ?? [])
+        .map((x) => (x ?? '').trim())
+        .filter(Boolean);
+      this.data.communityPerks = (this.data.communityPerks ?? [])
+        .map((x) => (x ?? '').trim())
+        .filter(Boolean);
 
       // testimonials
       this.data.testimonials = (this.data.testimonials ?? [])
@@ -370,7 +395,9 @@ export class DiplomaEditorComponent implements OnInit {
           badge: (p.badge ?? '').trim(),
           priceText: (p.priceText ?? '—').trim(),
           note: (p.note ?? '').trim(),
-          features: (p.features ?? []).map((x) => (x ?? '').trim()).filter(Boolean),
+          features: (p.features ?? [])
+            .map((x) => (x ?? '').trim())
+            .filter(Boolean),
           highlighted: !!p.highlighted,
         }));
 

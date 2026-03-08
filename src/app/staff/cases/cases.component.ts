@@ -29,7 +29,9 @@ export class StaffCasesComponent implements OnInit {
     userUid: this.fb.control<string>('', { validators: [Validators.required] }),
     courseChecks: this.fb.array<FormControl<boolean>>([]),
     proofUrl: this.fb.control<string>(''),
-    amount: this.fb.control<number>(0, { validators: [Validators.required, Validators.min(0)] }),
+    amount: this.fb.control<number>(0, {
+      validators: [Validators.required, Validators.min(0)],
+    }),
   });
 
   constructor(
@@ -37,7 +39,7 @@ export class StaffCasesComponent implements OnInit {
     private casesSvc: CasesService,
     private usersSvc: UsersAdminService,
     private adminSvc: AdminService,
-    private auth: Auth
+    private auth: Auth,
   ) {}
 
   get courseChecks(): FormArray<FormControl<boolean>> {
@@ -45,7 +47,7 @@ export class StaffCasesComponent implements OnInit {
   }
 
   async ngOnInit() {
-      this.error = undefined;   // تنظيف الرسالة القديمة
+    this.error = undefined; // تنظيف الرسالة القديمة
     try {
       const u = this.auth.currentUser;
       if (!u) throw new Error('يجب تسجيل الدخول');
@@ -55,7 +57,10 @@ export class StaffCasesComponent implements OnInit {
 
       // الكورسات ثم بناء الشيك بوكس
       const rawCourses = await this.adminSvc.listCourses();
-      this.courses = rawCourses.map(c => ({ id: c.id, title: c.title }));
+      this.courses = rawCourses.map((c) => ({
+        id: c.id,
+        title: c.title?.ar || c.title?.en || '',
+      }));
 
       this.courseChecks.clear();
       for (let i = 0; i < this.courses.length; i++) {
@@ -92,11 +97,11 @@ export class StaffCasesComponent implements OnInit {
     }
 
     const { userUid, proofUrl, amount } = this.form.getRawValue();
-    const user = this.users.find(x => x.uid === userUid);
+    const user = this.users.find((x) => x.uid === userUid);
 
     const courseIdsMap = selectedIds.reduce(
       (acc: Record<string, true>, id) => ((acc[id] = true), acc),
-      {}
+      {},
     );
 
     const rec: CaseRecord = {
@@ -106,7 +111,7 @@ export class StaffCasesComponent implements OnInit {
       proofUrl: proofUrl || '',
       amount: Number(amount) || 0,
       status: 'onhold',
-      createdAt: Date.now(), 
+      createdAt: Date.now(),
       createdBy: me.uid,
       processedAt: null,
       processedBy: null,
@@ -118,7 +123,7 @@ export class StaffCasesComponent implements OnInit {
 
       // Reset
       this.form.patchValue({ userUid: '', proofUrl: '', amount: 0 });
-      this.courseChecks.controls.forEach(ctrl => ctrl.setValue(false));
+      this.courseChecks.controls.forEach((ctrl) => ctrl.setValue(false));
       this.form.markAsPristine();
       this.form.markAsUntouched();
     } catch (e: any) {

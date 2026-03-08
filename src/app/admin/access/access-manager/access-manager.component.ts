@@ -7,7 +7,7 @@ import { Auth } from '@angular/fire/auth';
 @Component({
   selector: 'app-access-manager',
   templateUrl: './access-manager.component.html',
-  styleUrls: ['./access-manager.component.css']
+  styleUrls: ['./access-manager.component.css'],
 })
 export class AccessManagerComponent implements OnInit {
   loading = true;
@@ -30,14 +30,14 @@ export class AccessManagerComponent implements OnInit {
   get filteredUsers() {
     const k = this.q.trim().toLowerCase();
     if (!k) return this.users;
-    return this.users.filter(u => (u.email || '').toLowerCase().includes(k));
+    return this.users.filter((u) => (u.email || '').toLowerCase().includes(k));
   }
 
   constructor(
     private usersSvc: UsersAdminService,
     private adminSvc: AdminService,
     private enrollSvc: EnrollmentsService,
-    private auth: Auth
+    private auth: Auth,
   ) {}
 
   async ngOnInit() {
@@ -54,26 +54,28 @@ export class AccessManagerComponent implements OnInit {
       // - لكن اسمح بظهور الأدمن الحالي فقط
       const all = await this.usersSvc.listUsers();
       this.users = all
-        .filter(u =>
-          !!u.email &&
-          u.isDisabled !== true &&
-          (
-            (u.isAdmin !== true && u.isStaff !== true) ||
-            (u.uid === currentAdminUid) // 👈 السماح للأدمن الحالي بالظهور
-          )
+        .filter(
+          (u) =>
+            !!u.email &&
+            u.isDisabled !== true &&
+            ((u.isAdmin !== true && u.isStaff !== true) ||
+              u.uid === currentAdminUid), // 👈 السماح للأدمن الحالي بالظهور
         )
-        .map(u => ({ uid: u.uid, email: u.email }));
+        .map((u) => ({ uid: u.uid, email: u.email }));
 
       // 2) جلب كل الكورسات
       const rawCourses = await this.adminSvc.listCourses();
-      this.courses = rawCourses.map(c => ({ id: c.id, title: c.title }));
+      this.courses = rawCourses.map((c) => ({
+        id: c.id,
+        title: c.title?.ar || c.title?.en || '',
+      }));
 
       // 3) تحميل صلاحيات كل مستخدم (متوازيًا لسرعة أفضل)
       const pairs = await Promise.all(
-        this.users.map(async u => {
+        this.users.map(async (u) => {
           const list = await this.enrollSvc.listUserEnrollments(u.uid);
           return [u.uid, list] as const;
-        })
+        }),
       );
 
       for (const [uid, list] of pairs) {
@@ -87,7 +89,7 @@ export class AccessManagerComponent implements OnInit {
   }
 
   courseTitle(id: string): string {
-    return this.courses.find(c => c.id === id)?.title || id;
+    return this.courses.find((c) => c.id === id)?.title || id;
   }
 
   async grant(u: { uid: string; email?: string }) {
@@ -121,7 +123,9 @@ export class AccessManagerComponent implements OnInit {
     this.error = undefined;
     try {
       await this.enrollSvc.revoke(u.uid, courseId);
-      this.userEnrollments[u.uid] = (this.userEnrollments[u.uid] || []).filter(x => x !== courseId);
+      this.userEnrollments[u.uid] = (this.userEnrollments[u.uid] || []).filter(
+        (x) => x !== courseId,
+      );
     } catch (e: any) {
       this.error = e?.message ?? 'تعذر إلغاء الصلاحية';
     }
