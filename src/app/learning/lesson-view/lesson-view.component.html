@@ -41,7 +41,19 @@
     <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
     <ng-container *ngIf="!loading && !error">
-      <h2 class="lesson-title">{{ title }}</h2>
+      <div
+        class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3"
+      >
+        <h2 class="lesson-title mb-0">{{ title }}</h2>
+
+        <a
+          *ngIf="pdfDriveFileId"
+          class="btn btn-outline-primary"
+          [routerLink]="['/lesson-material', courseId, lessonId]"
+        >
+          {{ pdfTitle || "عرض المادة العلمية" }}
+        </a>
+      </div>
 
       <!-- Video -->
       <div class="video-card" *ngIf="safeUrl">
@@ -101,14 +113,5 @@
         </ul>
       </div>
     </ng-container>
-  </div>
-
-  <div class="mb-3" *ngIf="pdfDriveFileId">
-    <a
-      class="btn btn-outline-primary"
-      [routerLink]="['/lesson-material', courseId, lessonId]"
-    >
-      {{ pdfTitle || "عرض المادة العلمية" }}
-    </a>
   </div>
 </div>
