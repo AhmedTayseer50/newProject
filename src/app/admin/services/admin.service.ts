@@ -104,6 +104,8 @@ export interface AdminLesson {
   lessonIndex: number;
   videoProvider?: 'youtube' | 'gdrive';
   videoRef?: string;
+  pdfDriveFileId?: string;
+  pdfTitle?: string;
   createdAt?: number;
 }
 
@@ -123,7 +125,10 @@ export class AdminService {
     return snap.exists() ? { id, ...(snap.val() as AdminCourse) } : null;
   }
 
-  async createCourse(data: AdminCourse, opts?: { id?: string }): Promise<string> {
+  async createCourse(
+    data: AdminCourse,
+    opts?: { id?: string },
+  ): Promise<string> {
     const now = Date.now();
     let id = opts?.id?.trim();
 
@@ -157,7 +162,9 @@ export class AdminService {
     await remove(ref(this.db, `courses/${id}`));
   }
 
-  async listLessons(courseId: string): Promise<Array<{ id: string } & AdminLesson>> {
+  async listLessons(
+    courseId: string,
+  ): Promise<Array<{ id: string } & AdminLesson>> {
     const snap = await get(ref(this.db, `lessons/${courseId}`));
     if (!snap.exists()) return [];
     const obj = snap.val() as Record<string, AdminLesson>;
@@ -176,6 +183,8 @@ export class AdminService {
       lessonIndex: data.lessonIndex,
       videoProvider: (data.videoProvider ?? 'youtube') as 'youtube' | 'gdrive',
       videoRef: data.videoRef || '',
+      pdfDriveFileId: data.pdfDriveFileId || '',
+      pdfTitle: data.pdfTitle || '',
       createdAt: Date.now(),
     };
 
@@ -202,7 +211,9 @@ export class AdminService {
     };
   }
 
-  buildLocalizedList(value?: Partial<LocalizedStringList>): LocalizedStringList {
+  buildLocalizedList(
+    value?: Partial<LocalizedStringList>,
+  ): LocalizedStringList {
     return {
       ar: Array.isArray(value?.ar)
         ? value!.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)

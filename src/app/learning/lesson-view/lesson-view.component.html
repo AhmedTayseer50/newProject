@@ -46,13 +46,11 @@
       <!-- Video -->
       <div class="video-card" *ngIf="safeUrl">
         <div class="ratio ratio-16x9 position-relative">
-
           <iframe
             #playerFrame
             [src]="safeUrl"
             style="border: 0"
             title="Lesson video"
-
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowfullscreen
             referrerpolicy="no-referrer"
@@ -103,5 +101,14 @@
         </ul>
       </div>
     </ng-container>
+  </div>
+
+  <div class="mb-3" *ngIf="pdfDriveFileId">
+    <a
+      class="btn btn-outline-primary"
+      [routerLink]="['/lesson-material', courseId, lessonId]"
+    >
+      {{ pdfTitle || "عرض المادة العلمية" }}
+    </a>
   </div>
 </div>

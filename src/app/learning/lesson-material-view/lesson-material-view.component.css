@@ -1,0 +1,25 @@
+.lesson-material-page {
+  min-height: 100vh;
+  background: #f8f9fb;
+}
+
+.lesson-topbar {
+  background: #1f2937;
+  padding: 14px 0;
+}
+
+.pdf-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+}
+
+.pdf-frame {
+  width: 100%;
+  height: calc(100vh - 180px);
+  min-height: 700px;
+  display: block;
+  background: #fff;
+}

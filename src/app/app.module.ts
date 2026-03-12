@@ -54,6 +54,8 @@ import { SessionRequestsComponent } from './admin/session-requests/session-reque
 import { DiplomasListComponent } from './public/diplomas-list/diplomas-list.component';
 import { DiplomaDetailsComponent } from './public/diploma-details/diploma-details.component';
 import { DiplomaEditorComponent } from './admin/diploma-editor/diploma-editor.component';
+import { LessonMaterialViewComponent } from './learning/lesson-material-view/lesson-material-view.component';
+
 
 @NgModule({
   declarations: [
@@ -92,6 +94,8 @@ import { DiplomaEditorComponent } from './admin/diploma-editor/diploma-editor.co
     DiplomasListComponent,
     DiplomaDetailsComponent,
     DiplomaEditorComponent,
+    LessonMaterialViewComponent,
+    
   ],
   imports: [
     BrowserModule,

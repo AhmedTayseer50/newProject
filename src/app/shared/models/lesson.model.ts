@@ -10,6 +10,12 @@ export interface Lesson {
   /** مرجع الفيديو (YouTube videoId أو Google Drive fileId) */
   videoRef?: string | null;
 
+  /** Google Drive fileId الخاص بملف المادة العلمية PDF */
+  pdfDriveFileId?: string | null;
+
+  /** عنوان اختياري لزر المادة العلمية */
+  pdfTitle?: string | null;
+
   createdAt?: number | null;
   updatedAt?: number | null;
 }

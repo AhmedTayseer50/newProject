@@ -8,8 +8,10 @@ export interface Lesson {
   courseId: string;
   title: string;
   lessonIndex: number;
-  videoProvider?: 'youtube';
+  videoProvider?: 'youtube' | 'gdrive';
   videoRef?: string;
+  pdfDriveFileId?: string;
+  pdfTitle?: string;
   createdAt?: number;
 }
 

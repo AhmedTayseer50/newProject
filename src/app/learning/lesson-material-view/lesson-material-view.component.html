@@ -1,0 +1,32 @@
+<div class="lesson-material-page" dir="rtl">
+  <div class="lesson-topbar">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <button class="btn btn-outline-light btn-sm" type="button" (click)="backToLesson()">
+        رجوع للدرس
+      </button>
+
+      <div class="text-white fw-semibold">
+        {{ pdfTitle || 'المادة العلمية' }}
+      </div>
+    </div>
+  </div>
+
+  <div class="container py-4">
+    <div *ngIf="loading" class="alert alert-info">جارِ تحميل المادة العلمية…</div>
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+    <ng-container *ngIf="!loading && !error && safePdfUrl">
+      <h2 class="h4 mb-3">{{ lessonTitle }}</h2>
+
+      <div class="pdf-card">
+        <iframe
+          [src]="safePdfUrl"
+          title="Lesson PDF"
+          class="pdf-frame"
+          frameborder="0"
+          referrerpolicy="no-referrer"
+        ></iframe>
+      </div>
+    </ng-container>
+  </div>
+</div>

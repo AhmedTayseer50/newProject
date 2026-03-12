@@ -39,6 +39,7 @@ import { SessionRequestsComponent } from './admin/session-requests/session-reque
 import { DiplomasListComponent } from './public/diplomas-list/diplomas-list.component';
 import { DiplomaDetailsComponent } from './public/diploma-details/diploma-details.component';
 import { DiplomaEditorComponent } from './admin/diploma-editor/diploma-editor.component';
+import { LessonMaterialViewComponent } from './learning/lesson-material-view/lesson-material-view.component';
 
 const routes: Routes = [
   // 🏠 الصفحة الرئيسية الجديدة
@@ -90,6 +91,12 @@ const routes: Routes = [
     component: LessonViewComponent,
     canActivate: [EnrollmentGuard],
     data: { title: $localize`:@@title_lesson_view:الدرس` },
+  },
+  {
+    path: 'lesson-material/:courseId/:lessonId',
+    component: LessonMaterialViewComponent,
+    canActivate: [EnrollmentGuard],
+    data: { title: $localize`:@@title_lesson_material:المادة العلمية` },
   },
   {
     path: 'my-courses',
@@ -149,7 +156,9 @@ const routes: Routes = [
       {
         path: 'course-editor/:id',
         component: CourseEditorComponent,
-        data: { title: $localize`:@@title_admin_course_editor_edit:تعديل الكورس` },
+        data: {
+          title: $localize`:@@title_admin_course_editor_edit:تعديل الكورس`,
+        },
       },
       {
         path: 'users',
@@ -169,24 +178,32 @@ const routes: Routes = [
       {
         path: 'sales-analytics',
         component: SalesAnalyticsComponent,
-        data: { title: $localize`:@@title_admin_sales_analytics:تحليلات المبيعات` },
+        data: {
+          title: $localize`:@@title_admin_sales_analytics:تحليلات المبيعات`,
+        },
       },
       {
         path: 'diploma-editor',
         component: DiplomaEditorComponent,
-        data: { title: $localize`:@@title_admin_diploma_editor:إدارة الدبلومات` },
+        data: {
+          title: $localize`:@@title_admin_diploma_editor:إدارة الدبلومات`,
+        },
       },
       {
         path: 'diploma-editor/:id',
         component: DiplomaEditorComponent,
-        data: { title: $localize`:@@title_admin_diploma_editor_edit:تعديل الدبلومة` },
+        data: {
+          title: $localize`:@@title_admin_diploma_editor_edit:تعديل الدبلومة`,
+        },
       },
 
       // ✅ NEW: Admin session requests (Realtime)
       {
         path: 'session-requests',
         component: SessionRequestsComponent,
-        data: { title: $localize`:@@title_admin_session_requests:طلبات الجلسات` },
+        data: {
+          title: $localize`:@@title_admin_session_requests:طلبات الجلسات`,
+        },
       },
 
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

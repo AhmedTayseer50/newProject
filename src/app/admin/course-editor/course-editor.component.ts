@@ -38,6 +38,8 @@ type LessonRow = {
   lessonIndex: number;
   videoProvider?: 'youtube' | 'gdrive';
   videoRef?: string;
+  pdfDriveFileId?: string;
+  pdfTitle?: string;
 };
 
 type LangTextGroup = FormGroup<{
@@ -98,9 +100,19 @@ export class CourseEditorComponent implements OnInit {
     meta: FormArray<FormGroup<{ label: LangTextGroup; value: LangTextGroup }>>;
     outcomes: FormArray<LangTextGroup>;
     audienceItems: FormArray<LangTextGroup>;
-    sectionCards: FormArray<FormGroup<{ title: LangTextGroup; description: LangTextGroup }>>;
-    curriculum: FormArray<FormGroup<{ title: LangTextGroup; pointsAr: FormControl<string>; pointsEn: FormControl<string> }>>;
-    faqs: FormArray<FormGroup<{ question: LangTextGroup; answer: LangTextGroup }>>;
+    sectionCards: FormArray<
+      FormGroup<{ title: LangTextGroup; description: LangTextGroup }>
+    >;
+    curriculum: FormArray<
+      FormGroup<{
+        title: LangTextGroup;
+        pointsAr: FormControl<string>;
+        pointsEn: FormControl<string>;
+      }>
+    >;
+    faqs: FormArray<
+      FormGroup<{ question: LangTextGroup; answer: LangTextGroup }>
+    >;
     communityPerks: FormArray<LangTextGroup>;
     testimonials: FormArray<
       FormGroup<{
@@ -137,6 +149,8 @@ export class CourseEditorComponent implements OnInit {
     lessonIndex: FormControl<number>;
     videoProvider: FormControl<'youtube' | 'gdrive'>;
     videoRef: FormControl<string>;
+    pdfDriveFileId: FormControl<string>;
+    pdfTitle: FormControl<string>;
   }>;
 
   ngOnInit(): void {
@@ -196,10 +210,14 @@ export class CourseEditorComponent implements OnInit {
       prerequisitesDescription: this.createLangTextGroup(),
 
       lectureNames: this.fb.array<LangTextGroup>([]),
-      meta: this.fb.array<FormGroup<{ label: LangTextGroup; value: LangTextGroup }>>([]),
+      meta: this.fb.array<
+        FormGroup<{ label: LangTextGroup; value: LangTextGroup }>
+      >([]),
       outcomes: this.fb.array<LangTextGroup>([]),
       audienceItems: this.fb.array<LangTextGroup>([]),
-      sectionCards: this.fb.array<FormGroup<{ title: LangTextGroup; description: LangTextGroup }>>([]),
+      sectionCards: this.fb.array<
+        FormGroup<{ title: LangTextGroup; description: LangTextGroup }>
+      >([]),
       curriculum: this.fb.array<
         FormGroup<{
           title: LangTextGroup;
@@ -207,7 +225,9 @@ export class CourseEditorComponent implements OnInit {
           pointsEn: FormControl<string>;
         }>
       >([]),
-      faqs: this.fb.array<FormGroup<{ question: LangTextGroup; answer: LangTextGroup }>>([]),
+      faqs: this.fb.array<
+        FormGroup<{ question: LangTextGroup; answer: LangTextGroup }>
+      >([]),
       communityPerks: this.fb.array<LangTextGroup>([]),
       testimonials: this.fb.array<
         FormGroup<{
@@ -242,8 +262,12 @@ export class CourseEditorComponent implements OnInit {
       id: this.fb.control<string | null>(null),
       title: this.fb.nonNullable.control(''),
       lessonIndex: this.fb.nonNullable.control(1),
-      videoProvider: this.fb.nonNullable.control<'youtube' | 'gdrive'>('youtube'),
+      videoProvider: this.fb.nonNullable.control<'youtube' | 'gdrive'>(
+        'youtube',
+      ),
       videoRef: this.fb.nonNullable.control(''),
+      pdfDriveFileId: this.fb.nonNullable.control(''),
+      pdfTitle: this.fb.nonNullable.control(''),
     });
 
     this.addLectureName();
@@ -262,8 +286,12 @@ export class CourseEditorComponent implements OnInit {
     return this.courseForm.get('lectureNames') as FormArray<LangTextGroup>;
   }
 
-  get meta(): FormArray<FormGroup<{ label: LangTextGroup; value: LangTextGroup }>> {
-    return this.courseForm.get('meta') as FormArray<FormGroup<{ label: LangTextGroup; value: LangTextGroup }>>;
+  get meta(): FormArray<
+    FormGroup<{ label: LangTextGroup; value: LangTextGroup }>
+  > {
+    return this.courseForm.get('meta') as FormArray<
+      FormGroup<{ label: LangTextGroup; value: LangTextGroup }>
+    >;
   }
 
   get outcomes(): FormArray<LangTextGroup> {
@@ -274,11 +302,21 @@ export class CourseEditorComponent implements OnInit {
     return this.courseForm.get('audienceItems') as FormArray<LangTextGroup>;
   }
 
-  get sectionCards(): FormArray<FormGroup<{ title: LangTextGroup; description: LangTextGroup }>> {
-    return this.courseForm.get('sectionCards') as FormArray<FormGroup<{ title: LangTextGroup; description: LangTextGroup }>>;
+  get sectionCards(): FormArray<
+    FormGroup<{ title: LangTextGroup; description: LangTextGroup }>
+  > {
+    return this.courseForm.get('sectionCards') as FormArray<
+      FormGroup<{ title: LangTextGroup; description: LangTextGroup }>
+    >;
   }
 
-  get curriculum(): FormArray<FormGroup<{ title: LangTextGroup; pointsAr: FormControl<string>; pointsEn: FormControl<string> }>> {
+  get curriculum(): FormArray<
+    FormGroup<{
+      title: LangTextGroup;
+      pointsAr: FormControl<string>;
+      pointsEn: FormControl<string>;
+    }>
+  > {
     return this.courseForm.get('curriculum') as FormArray<
       FormGroup<{
         title: LangTextGroup;
@@ -288,8 +326,12 @@ export class CourseEditorComponent implements OnInit {
     >;
   }
 
-  get faqs(): FormArray<FormGroup<{ question: LangTextGroup; answer: LangTextGroup }>> {
-    return this.courseForm.get('faqs') as FormArray<FormGroup<{ question: LangTextGroup; answer: LangTextGroup }>>;
+  get faqs(): FormArray<
+    FormGroup<{ question: LangTextGroup; answer: LangTextGroup }>
+  > {
+    return this.courseForm.get('faqs') as FormArray<
+      FormGroup<{ question: LangTextGroup; answer: LangTextGroup }>
+    >;
   }
 
   get communityPerks(): FormArray<LangTextGroup> {
@@ -340,7 +382,10 @@ export class CourseEditorComponent implements OnInit {
 
   private createLangTextGroup(required = false): LangTextGroup {
     return this.fb.group({
-      ar: this.fb.nonNullable.control('', required ? [Validators.required, Validators.minLength(2)] : []),
+      ar: this.fb.nonNullable.control(
+        '',
+        required ? [Validators.required, Validators.minLength(2)] : [],
+      ),
       en: this.fb.nonNullable.control(''),
     });
   }
@@ -410,8 +455,12 @@ export class CourseEditorComponent implements OnInit {
     this.curriculum.push(
       this.fb.group({
         title: this.createLangTextValue(value?.title),
-        pointsAr: this.fb.nonNullable.control((value?.points?.ar || []).join('\n')),
-        pointsEn: this.fb.nonNullable.control((value?.points?.en || []).join('\n')),
+        pointsAr: this.fb.nonNullable.control(
+          (value?.points?.ar || []).join('\n'),
+        ),
+        pointsEn: this.fb.nonNullable.control(
+          (value?.points?.en || []).join('\n'),
+        ),
       }),
     );
   }
@@ -464,8 +513,12 @@ export class CourseEditorComponent implements OnInit {
         priceText: this.createLangTextValue(value?.priceText),
         note: this.createLangTextValue(value?.note),
         highlighted: this.fb.nonNullable.control(!!value?.highlighted),
-        featuresAr: this.fb.nonNullable.control((value?.features?.ar || []).join('\n')),
-        featuresEn: this.fb.nonNullable.control((value?.features?.en || []).join('\n')),
+        featuresAr: this.fb.nonNullable.control(
+          (value?.features?.ar || []).join('\n'),
+        ),
+        featuresEn: this.fb.nonNullable.control(
+          (value?.features?.en || []).join('\n'),
+        ),
       }),
     );
   }
@@ -480,26 +533,30 @@ export class CourseEditorComponent implements OnInit {
 
   async loadCoursesList(): Promise<void> {
     this.courses = (await this.admin.listCourses()).sort((a, b) =>
-      this.getCourseTitleForList(a).localeCompare(this.getCourseTitleForList(b)),
+      this.getCourseTitleForList(a).localeCompare(
+        this.getCourseTitleForList(b),
+      ),
     );
   }
 
-  private clearFormArray<T extends FormGroup | FormControl>(arr: FormArray<T>): void {
+  private clearFormArray<T extends FormGroup | FormControl>(
+    arr: FormArray<T>,
+  ): void {
     while (arr.length) {
       arr.removeAt(0);
     }
   }
 
   private toLocalizedItems(list?: LocalizedStringList): LocalizedText[] {
-  const ar = Array.isArray(list?.ar) ? list!.ar : [];
-  const en = Array.isArray(list?.en) ? list!.en : [];
-  const max = Math.max(ar.length, en.length);
+    const ar = Array.isArray(list?.ar) ? list!.ar : [];
+    const en = Array.isArray(list?.en) ? list!.en : [];
+    const max = Math.max(ar.length, en.length);
 
-  return Array.from({ length: max }, (_, index) => ({
-    ar: (ar[index] || '').trim(),
-    en: (en[index] || '').trim(),
-  })).filter((item) => item.ar || item.en);
-}
+    return Array.from({ length: max }, (_, index) => ({
+      ar: (ar[index] || '').trim(),
+      en: (en[index] || '').trim(),
+    })).filter((item) => item.ar || item.en);
+  }
 
   private patchCourseForm(course: { id: string } & AdminCourse): void {
     this.courseForm.patchValue({
@@ -512,7 +569,9 @@ export class CourseEditorComponent implements OnInit {
 
       heroEyebrow: this.admin.buildLocalizedText(course.heroEyebrow),
       heroTagline: this.admin.buildLocalizedText(course.heroTagline),
-      heroTitleHighlight: this.admin.buildLocalizedText(course.heroTitleHighlight),
+      heroTitleHighlight: this.admin.buildLocalizedText(
+        course.heroTitleHighlight,
+      ),
 
       introVideoUrl: course.introVideoUrl || '',
 
@@ -520,10 +579,18 @@ export class CourseEditorComponent implements OnInit {
       targetAudience: this.admin.buildLocalizedText(course.targetAudience),
       goalTitle: this.admin.buildLocalizedText(course.goalTitle),
       goalDescription: this.admin.buildLocalizedText(course.goalDescription),
-      expectedStudyTimeTitle: this.admin.buildLocalizedText(course.expectedStudyTimeTitle),
-      expectedStudyTimeDescription: this.admin.buildLocalizedText(course.expectedStudyTimeDescription),
-      prerequisitesTitle: this.admin.buildLocalizedText(course.prerequisitesTitle),
-      prerequisitesDescription: this.admin.buildLocalizedText(course.prerequisitesDescription),
+      expectedStudyTimeTitle: this.admin.buildLocalizedText(
+        course.expectedStudyTimeTitle,
+      ),
+      expectedStudyTimeDescription: this.admin.buildLocalizedText(
+        course.expectedStudyTimeDescription,
+      ),
+      prerequisitesTitle: this.admin.buildLocalizedText(
+        course.prerequisitesTitle,
+      ),
+      prerequisitesDescription: this.admin.buildLocalizedText(
+        course.prerequisitesDescription,
+      ),
 
       offerPercent: Number(course.offer?.percent || 0),
       offerHeading: this.admin.buildLocalizedText(course.offer?.heading),
@@ -531,7 +598,9 @@ export class CourseEditorComponent implements OnInit {
       offerCtaText: this.admin.buildLocalizedText(course.offer?.ctaText),
 
       bottomCtaText: this.admin.buildLocalizedText(course.bottomCta?.text),
-      bottomCtaButtonText: this.admin.buildLocalizedText(course.bottomCta?.buttonText),
+      bottomCtaButtonText: this.admin.buildLocalizedText(
+        course.bottomCta?.buttonText,
+      ),
     });
 
     this.clearFormArray(this.lectureNames);
@@ -545,14 +614,22 @@ export class CourseEditorComponent implements OnInit {
     this.clearFormArray(this.testimonials);
     this.clearFormArray(this.pricingPlans);
 
-    (this.toLocalizedItems(course.lectureNames)).forEach((item) => this.addLectureName(item));
+    this.toLocalizedItems(course.lectureNames).forEach((item) =>
+      this.addLectureName(item),
+    );
     (course.meta || []).forEach((item) => this.addMetaItem(item));
-    this.toLocalizedItems(course.outcomes).forEach((item) => this.addOutcome(item));
-    this.toLocalizedItems(course.audienceItems).forEach((item) => this.addAudienceItem(item));
+    this.toLocalizedItems(course.outcomes).forEach((item) =>
+      this.addOutcome(item),
+    );
+    this.toLocalizedItems(course.audienceItems).forEach((item) =>
+      this.addAudienceItem(item),
+    );
     (course.sectionCards || []).forEach((item) => this.addSectionCard(item));
     (course.curriculum || []).forEach((item) => this.addCurriculumItem(item));
     (course.faqs || []).forEach((item) => this.addFaq(item));
-    this.toLocalizedItems(course.communityPerks).forEach((item) => this.addCommunityPerk(item));
+    this.toLocalizedItems(course.communityPerks).forEach((item) =>
+      this.addCommunityPerk(item),
+    );
     (course.testimonials || []).forEach((item) => this.addTestimonial(item));
     (course.pricingPlans || []).forEach((item) => this.addPricingPlan(item));
 
@@ -575,10 +652,16 @@ export class CourseEditorComponent implements OnInit {
     };
   }
 
-  private textListFromArray(arr: FormArray<LangTextGroup>): LocalizedStringList {
+  private textListFromArray(
+    arr: FormArray<LangTextGroup>,
+  ): LocalizedStringList {
     return {
-      ar: arr.controls.map((ctrl) => (ctrl.get('ar')?.value || '').trim()).filter(Boolean),
-      en: arr.controls.map((ctrl) => (ctrl.get('en')?.value || '').trim()).filter(Boolean),
+      ar: arr.controls
+        .map((ctrl) => (ctrl.get('ar')?.value || '').trim())
+        .filter(Boolean),
+      en: arr.controls
+        .map((ctrl) => (ctrl.get('en')?.value || '').trim())
+        .filter(Boolean),
     };
   }
 
@@ -623,9 +706,13 @@ export class CourseEditorComponent implements OnInit {
       goalTitle: this.textValue(formValue.goalTitle),
       goalDescription: this.textValue(formValue.goalDescription),
       expectedStudyTimeTitle: this.textValue(formValue.expectedStudyTimeTitle),
-      expectedStudyTimeDescription: this.textValue(formValue.expectedStudyTimeDescription),
+      expectedStudyTimeDescription: this.textValue(
+        formValue.expectedStudyTimeDescription,
+      ),
       prerequisitesTitle: this.textValue(formValue.prerequisitesTitle),
-      prerequisitesDescription: this.textValue(formValue.prerequisitesDescription),
+      prerequisitesDescription: this.textValue(
+        formValue.prerequisitesDescription,
+      ),
 
       lectureNames: this.textListFromArray(this.lectureNames),
 
@@ -634,7 +721,10 @@ export class CourseEditorComponent implements OnInit {
           label: this.textValue(group.controls.label),
           value: this.textValue(group.controls.value),
         }))
-        .filter((item) => item.label.ar || item.label.en || item.value.ar || item.value.en),
+        .filter(
+          (item) =>
+            item.label.ar || item.label.en || item.value.ar || item.value.en,
+        ),
 
       outcomes: this.textListFromArray(this.outcomes),
       audienceItems: this.textListFromArray(this.audienceItems),
@@ -644,7 +734,13 @@ export class CourseEditorComponent implements OnInit {
           title: this.textValue(group.controls.title),
           description: this.textValue(group.controls.description),
         }))
-        .filter((item) => item.title.ar || item.title.en || item.description.ar || item.description.en),
+        .filter(
+          (item) =>
+            item.title.ar ||
+            item.title.en ||
+            item.description.ar ||
+            item.description.en,
+        ),
 
       curriculum: this.curriculum.controls
         .map((group) => ({
@@ -669,7 +765,10 @@ export class CourseEditorComponent implements OnInit {
         }))
         .filter(
           (item) =>
-            item.question.ar || item.question.en || item.answer.ar || item.answer.en,
+            item.question.ar ||
+            item.question.en ||
+            item.answer.ar ||
+            item.answer.en,
         ),
 
       communityPerks: this.textListFromArray(this.communityPerks),
@@ -683,7 +782,12 @@ export class CourseEditorComponent implements OnInit {
         }))
         .filter(
           (item) =>
-            item.name.ar || item.name.en || item.tag.ar || item.tag.en || item.text.ar || item.text.en,
+            item.name.ar ||
+            item.name.en ||
+            item.tag.ar ||
+            item.tag.en ||
+            item.text.ar ||
+            item.text.en,
         ),
 
       pricingPlans: this.pricingPlans.controls
@@ -777,6 +881,8 @@ export class CourseEditorComponent implements OnInit {
       lessonIndex: l.lessonIndex,
       videoProvider: (l.videoProvider ?? 'youtube') as 'youtube' | 'gdrive',
       videoRef: l.videoRef || '',
+      pdfDriveFileId: l.pdfDriveFileId || '',
+      pdfTitle: l.pdfTitle || '',
     }));
 
     this.lessonForm.patchValue({
@@ -797,17 +903,25 @@ export class CourseEditorComponent implements OnInit {
 
     const id = this.lessonForm.get('id')!.value;
     const title = (this.lessonForm.get('title')!.value || '').trim();
-    const lessonIndex = Math.max(1, Number(this.lessonForm.get('lessonIndex')!.value) || 1);
-    const videoProvider = (this.lessonForm.get('videoProvider')!.value || 'youtube') as
-      | 'youtube'
-      | 'gdrive';
+    const lessonIndex = Math.max(
+      1,
+      Number(this.lessonForm.get('lessonIndex')!.value) || 1,
+    );
+    const videoProvider = (this.lessonForm.get('videoProvider')!.value ||
+      'youtube') as 'youtube' | 'gdrive';
     const videoRef = (this.lessonForm.get('videoRef')!.value || '').trim();
+    const pdfDriveFileId = (
+      this.lessonForm.get('pdfDriveFileId')!.value || ''
+    ).trim();
+    const pdfTitle = (this.lessonForm.get('pdfTitle')!.value || '').trim();
 
     const payload: AdminLesson = {
       title,
       lessonIndex,
       videoProvider,
       videoRef,
+      pdfDriveFileId,
+      pdfTitle,
     };
 
     try {
@@ -831,8 +945,12 @@ export class CourseEditorComponent implements OnInit {
       id: lesson.id,
       title: lesson.title || '',
       lessonIndex: lesson.lessonIndex || 1,
-      videoProvider: (lesson.videoProvider ?? 'youtube') as 'youtube' | 'gdrive',
+      videoProvider: (lesson.videoProvider ?? 'youtube') as
+        | 'youtube'
+        | 'gdrive',
       videoRef: lesson.videoRef || '',
+      pdfDriveFileId: lesson.pdfDriveFileId || '',
+      pdfTitle: lesson.pdfTitle || '',
     });
   }
 
@@ -843,6 +961,8 @@ export class CourseEditorComponent implements OnInit {
       lessonIndex: (this.lessons?.length || 0) + 1,
       videoProvider: 'youtube',
       videoRef: '',
+      pdfDriveFileId: '',
+      pdfTitle: '',
     });
   }
 

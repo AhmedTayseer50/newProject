@@ -22,6 +22,8 @@ type ViewLesson = {
   lessonIndex: number;
   videoProvider?: 'youtube' | 'gdrive';
   videoRef?: string;
+  pdfDriveFileId?: string;
+  pdfTitle?: string;
 };
 
 @Component({
@@ -36,6 +38,8 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   title = '';
   videoProvider?: 'youtube' | 'gdrive';
   videoRef?: string;
+  pdfDriveFileId?: string;
+  pdfTitle?: string;
 
   /** رابط داخلي مؤقت للاعب الفيديو (Vercel API) */
   playerUrl?: string;
@@ -184,6 +188,8 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         lessonIndex?: number;
         videoProvider?: string;
         videoRef?: string;
+        pdfDriveFileId?: string;
+        pdfTitle?: string;
       }
     >;
 
@@ -194,10 +200,15 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         lessonIndex: Number(v?.lessonIndex ?? 0),
         videoProvider: (v?.videoProvider ?? 'youtube') as 'youtube' | 'gdrive',
         videoRef: (v?.videoRef ?? '').toString(),
+        pdfDriveFileId: (v?.pdfDriveFileId ?? '').toString(),
+        pdfTitle: (v?.pdfTitle ?? '').toString(),
       }))
       .sort((a, b) => (a.lessonIndex ?? 0) - (b.lessonIndex ?? 0));
 
-    console.log('[lesson-view] loadAllLessons() ✅ first item:', this.lessons[0]);
+    console.log(
+      '[lesson-view] loadAllLessons() ✅ first item:',
+      this.lessons[0],
+    );
   }
 
   private async loadCurrentLesson() {
@@ -206,14 +217,20 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       `lessons/${this.courseId}/${this.lessonId}`,
     );
 
-    const snap = await get(ref(this.db, `lessons/${this.courseId}/${this.lessonId}`));
+    const snap = await get(
+      ref(this.db, `lessons/${this.courseId}/${this.lessonId}`),
+    );
     if (!snap.exists()) throw new Error('الدرس غير موجود');
 
     const data = snap.val() as any;
 
     this.title = data.title ?? '';
-    this.videoProvider = (data.videoProvider ?? 'youtube') as 'youtube' | 'gdrive';
+    this.videoProvider = (data.videoProvider ?? 'youtube') as
+      | 'youtube'
+      | 'gdrive';
     this.videoRef = data.videoRef;
+    this.pdfDriveFileId = data.pdfDriveFileId || '';
+    this.pdfTitle = data.pdfTitle || '';
 
     if (!this.videoProvider || !this.videoRef) {
       this.playerUrl = undefined;
@@ -244,7 +261,9 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     // ✅ ده اللي يمنع NG0904
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
 
-    console.log('[lesson-view] iframe url set ✅', { playerUrl: this.playerUrl });
+    console.log('[lesson-view] iframe url set ✅', {
+      playerUrl: this.playerUrl,
+    });
 
     // Debug: اتأكد إن property src اتغير
     setTimeout(() => {
