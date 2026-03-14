@@ -112,6 +112,49 @@
     </button>
   </div>
 
+  <div
+    *ngIf="canViewLessons"
+      class="alert alert-light border d-flex align-items-center justify-content-between flex-wrap gap-2"
+  >
+    <div>
+      <div class="fw-semibold mb-1">
+        {{
+          isEnglish ? "Telegram community access" : "الدخول إلى جروب التليجرام"
+        }}
+      </div>
+
+      <div class="small text-muted" *ngIf="telegramEligible">
+        {{
+          isEnglish
+            ? "Your Telegram access is ready. This button can only be used once."
+            : "تم تجهيز صلاحية دخولك إلى جروب التليجرام. هذا الزر يعمل مرة واحدة فقط."
+        }}
+      </div>
+
+      <div class="small text-muted" *ngIf="telegramUsed">
+        {{ telegramMessage }}
+      </div>
+    </div>
+
+    <button
+      *ngIf="telegramEligible"
+      class="btn btn-success btn-sm"
+      type="button"
+      [disabled]="telegramBusy"
+      (click)="joinTelegramGroup()"
+    >
+      {{
+        telegramBusy
+          ? isEnglish
+            ? "Opening..."
+            : "جارٍ الفتح..."
+          : isEnglish
+            ? "Join Telegram group"
+            : "الانضمام إلى جروب التليجرام"
+      }}
+    </button>
+  </div>
+
   <div *ngIf="!canViewLessons" class="alert alert-warning">
     {{ defaultNoAccess }}
   </div>

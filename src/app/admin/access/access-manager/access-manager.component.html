@@ -1,50 +1,141 @@
-<div class="container py-4" dir="rtl">
-  <a routerLink="/admin/dashboard" class="btn btn-link ps-0 mb-3">&larr; رجوع للوحة التحكم</a>
-  <h3 class="mb-3">🔐 إدارة صلاحيات الوصول للكورسات</h3>
-
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-  <div *ngIf="loading" class="alert alert-info">جارٍ التحميل…</div>
-
-  <div class="d-flex align-items-center gap-2 mb-3">
-    <input class="form-control" style="max-width: 320px" [(ngModel)]="q" placeholder="ابحث بالبريد…">
-    <span class="text-muted ms-auto small">المستخدمون: {{ filteredUsers.length }}</span>
+<div class="card shadow-sm border-0">
+  <div
+    class="card-header bg-white d-flex justify-content-between align-items-center"
+  >
+    <div>
+      <h5 class="mb-1">إدارة صلاحيات الكورسات</h5>
+      <p class="text-muted mb-0 small">
+        منح أو سحب صلاحيات الكورسات، مع التحكم في زر التليجرام لكل عميل.
+      </p>
+    </div>
   </div>
 
-  <div class="card" *ngIf="!loading">
-    <div class="list-group list-group-flush">
-      <div class="list-group-item" *ngFor="let u of filteredUsers">
-        <div class="d-flex align-items-center flex-wrap gap-2">
-          <div class="me-auto">
-            <strong>{{ u.email }}</strong>
-            <div class="small text-muted">{{ u.uid }}</div>
-          </div>
-
-          <!-- اختيار الكورس -->
-          <div class="d-flex align-items-center gap-2">
-            <select class="form-select form-select-sm" style="min-width: 280px"
-                    [(ngModel)]="selectedCourse[u.uid]">
-              <option value="">— اختر كورس —</option>
-              <option *ngFor="let c of courses" [value]="c.id">{{ c.title || c.id }}</option>
-            </select>
-            <button class="btn btn-sm btn-primary" (click)="grant(u)">إتاحة</button>
-          </div>
-        </div>
-
-        <!-- الكورسات الممنوحة لهذا المستخدم -->
-        <div class="mt-2">
-          <ng-container *ngIf="(userEnrollments[u.uid]?.length || 0) > 0; else noEnr">
-            <span class="badge text-bg-secondary me-1" *ngFor="let cid of userEnrollments[u.uid]">
-              {{ courseTitle(cid) }}
-              <button class="btn-close btn-close-white btn-close-sm ms-1 align-middle"
-                      title="إلغاء الإتاحة"
-                      (click)="revoke(u, cid)"></button>
-            </span>
-          </ng-container>
-          <ng-template #noEnr>
-            <span class="text-muted small">لا توجد صلاحيات بعد</span>
-          </ng-template>
-        </div>
-      </div>
+  <div class="card-body">
+    <div *ngIf="error" class="alert alert-danger mb-3">
+      {{ error }}
     </div>
+
+    <div *ngIf="loading" class="text-center py-4">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <div *ngIf="users.length; else emptyState" class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>العميل</th>
+              <th>البريد الإلكتروني</th>
+              <th style="min-width: 360px">منح صلاحية جديدة</th>
+              <th style="min-width: 420px">الكورسات الممنوحة</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let u of filteredUsers">
+              <td>{{ u.displayName || 'بدون اسم' }}</td>
+              <td>{{ u.email || '—' }}</td>
+
+              <td>
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                  <select
+                    class="form-select form-select-sm"
+                    style="min-width: 280px"
+                    [(ngModel)]="selectedCourse[u.uid]"
+                  >
+                    <option value="">— اختر كورس —</option>
+                    <option *ngFor="let c of courses" [value]="c.id">
+                      {{ c.title || c.id }}
+                    </option>
+                  </select>
+
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [id]="'tg-' + u.uid"
+                      [(ngModel)]="grantTelegramWithCourse[u.uid]"
+                    />
+                    <label class="form-check-label" [for]="'tg-' + u.uid">
+                      تفعيل زر التليجرام مع الصلاحية
+                    </label>
+                  </div>
+
+                  <button class="btn btn-sm btn-primary" (click)="grant(u)">
+                    إتاحة
+                  </button>
+                </div>
+              </td>
+
+              <td>
+                <div class="mt-3">
+                  <ng-container
+                    *ngIf="(userEnrollments[u.uid]?.length || 0) > 0; else noEnr"
+                  >
+                    <div
+                      class="border rounded p-2 mb-2"
+                      *ngFor="let cid of userEnrollments[u.uid]"
+                    >
+                      <div class="d-flex align-items-center flex-wrap gap-2">
+                        <span class="badge text-bg-secondary">
+                          {{ courseTitle(cid) }}
+                        </span>
+
+                        <span
+                          class="small text-success"
+                          *ngIf="telegramState(u.uid, cid) === 'ready'"
+                        >
+                          زر التليجرام مفعّل
+                        </span>
+
+                        <span
+                          class="small text-muted"
+                          *ngIf="telegramState(u.uid, cid) === 'used'"
+                        >
+                          تم استخدام رابط التليجرام
+                        </span>
+
+                        <button
+                          class="btn btn-sm btn-outline-success"
+                          *ngIf="telegramState(u.uid, cid) === 'none'"
+                          (click)="enableTelegram(u, cid)"
+                        >
+                          تفعيل زر التليجرام
+                        </button>
+
+                        <button
+                          class="btn btn-sm btn-outline-warning"
+                          *ngIf="telegramState(u.uid, cid) !== 'none'"
+                          (click)="disableTelegram(u, cid)"
+                        >
+                          إلغاء زر التليجرام
+                        </button>
+
+                        <button
+                          class="btn btn-sm btn-outline-danger ms-auto"
+                          (click)="revoke(u, cid)"
+                        >
+                          إلغاء الكورس
+                        </button>
+                      </div>
+                    </div>
+                  </ng-container>
+
+                  <ng-template #noEnr>
+                    <span class="text-muted small">لا توجد صلاحيات بعد</span>
+                  </ng-template>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #emptyState>
+        <div class="text-center text-muted py-4">
+          لا يوجد مستخدمون لعرضهم حالياً.
+        </div>
+      </ng-template>
+    </ng-container>
   </div>
 </div>

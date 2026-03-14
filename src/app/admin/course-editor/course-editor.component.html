@@ -190,7 +190,7 @@
         </div>
 
         <div class="row g-3 mt-1">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label class="form-label">رابط الصورة المصغرة</label>
             <input
               formControlName="thumbnail"
@@ -198,13 +198,27 @@
               placeholder="https://..."
             />
           </div>
-          <div class="col-md-6">
+
+          <div class="col-md-4">
             <label class="form-label">رابط الفيديو التعريفي</label>
             <input
               formControlName="introVideoUrl"
               class="form-control"
               placeholder="https://youtube.com/embed/..."
             />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">رابط دعوة جروب التليجرام (مخفي)</label>
+            <input
+              formControlName="telegramInviteUrl"
+              class="form-control"
+              placeholder="https://t.me/..."
+            />
+            <div class="form-text">
+              هذا الرابط لا يُعرض في بيانات الكورس العامة، ويُستخدم فقط عبر API
+              آمن.
+            </div>
           </div>
         </div>
       </div>
@@ -1039,7 +1053,7 @@
         <div>
           <strong>الدرس {{ l.lessonIndex }}:</strong> {{ l.title }}
           <div class="text-muted small" *ngIf="l.videoRef">فيديو مضبوط</div>
-<div class="text-muted small" *ngIf="l.pdfDriveFileId">PDF مضبوط</div>
+          <div class="text-muted small" *ngIf="l.pdfDriveFileId">PDF مضبوط</div>
         </div>
         <div class="btn-group">
           <button

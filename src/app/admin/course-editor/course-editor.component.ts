@@ -86,6 +86,7 @@ export class CourseEditorComponent implements OnInit {
     heroTitleHighlight: LangTextGroup;
 
     introVideoUrl: FormControl<string>;
+    telegramInviteUrl: FormControl<string>;
 
     programDuration: LangTextGroup;
     targetAudience: LangTextGroup;
@@ -172,7 +173,13 @@ export class CourseEditorComponent implements OnInit {
           throw new Error('الكورس غير موجود');
         }
 
+        const coursePrivate = await this.admin.getCoursePrivate(this.courseId);
+
         this.patchCourseForm(course);
+        this.courseForm.patchValue({
+          telegramInviteUrl: coursePrivate.telegramInviteUrl || '',
+        });
+
         await this.refreshLessons();
       } else {
         await this.loadCoursesList();
@@ -199,6 +206,7 @@ export class CourseEditorComponent implements OnInit {
       heroTitleHighlight: this.createLangTextGroup(),
 
       introVideoUrl: this.fb.nonNullable.control(''),
+      telegramInviteUrl: this.fb.nonNullable.control(''),
 
       programDuration: this.createLangTextGroup(),
       targetAudience: this.createLangTextGroup(),
@@ -828,12 +836,22 @@ export class CourseEditorComponent implements OnInit {
 
     try {
       const payload = this.buildCoursePayload();
+      const telegramInviteUrl =
+        this.courseForm.controls.telegramInviteUrl.value.trim();
+
+      let targetCourseId = this.courseId;
 
       if (this.courseId) {
         await this.admin.updateCourse(this.courseId, payload);
       } else {
-        const newId = await this.admin.createCourse(payload);
-        await this.router.navigate(['/admin/course-editor', newId]);
+        targetCourseId = await this.admin.createCourse(payload);
+        await this.router.navigate(['/admin/course-editor', targetCourseId]);
+      }
+
+      if (targetCourseId) {
+        await this.admin.saveCoursePrivate(targetCourseId, {
+          telegramInviteUrl,
+        });
       }
     } catch (e: any) {
       this.error = e?.message ?? 'تعذّر الحفظ';

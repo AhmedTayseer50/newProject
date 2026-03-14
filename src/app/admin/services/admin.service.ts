@@ -13,6 +13,10 @@ export type AdminLang = 'ar' | 'en';
 export type LocalizedText = { ar: string; en: string };
 export type LocalizedStringList = { ar: string[]; en: string[] };
 
+export interface AdminCoursePrivate {
+  telegramInviteUrl?: string;
+}
+
 export interface AdminCourseMetaItem {
   label: LocalizedText;
   value: LocalizedText;
@@ -125,6 +129,20 @@ export class AdminService {
     return snap.exists() ? { id, ...(snap.val() as AdminCourse) } : null;
   }
 
+  async getCoursePrivate(id: string): Promise<AdminCoursePrivate> {
+    const snap = await get(ref(this.db, `coursePrivate/${id}`));
+    return snap.exists() ? (snap.val() as AdminCoursePrivate) : {};
+  }
+
+  async saveCoursePrivate(
+    id: string,
+    data: AdminCoursePrivate,
+  ): Promise<void> {
+    await update(ref(this.db, `coursePrivate/${id}`), {
+      telegramInviteUrl: (data.telegramInviteUrl || '').trim(),
+    });
+  }
+
   async createCourse(
     data: AdminCourse,
     opts?: { id?: string },
@@ -160,6 +178,7 @@ export class AdminService {
 
   async deleteCourse(id: string): Promise<void> {
     await remove(ref(this.db, `courses/${id}`));
+    await remove(ref(this.db, `coursePrivate/${id}`));
   }
 
   async listLessons(

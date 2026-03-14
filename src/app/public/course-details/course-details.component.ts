@@ -19,6 +19,7 @@ import { Database } from '@angular/fire/database';
 import { ref, get, query, orderByChild, limitToFirst } from 'firebase/database';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Course } from 'src/app/shared/models/course.model';
+import { TelegramJoinService } from '../services/telegram-join.service';
 
 @Component({
   selector: 'app-course-details',
@@ -42,6 +43,11 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   public firstLessonId: string | null = null;
   public introVideoSafeUrl: SafeResourceUrl | null = null;
 
+  public telegramEligible = false;
+  public telegramUsed = false;
+  public telegramBusy = false;
+  public telegramMessage = '';
+
   private authUnsub?: Unsubscribe;
   private destroyed$ = new Subject<void>();
 
@@ -55,6 +61,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private diplomasSvc: DiplomasService,
     private wa: WhatsAppService,
+    private telegramJoin: TelegramJoinService,
   ) {}
 
   get isEnglish(): boolean {
@@ -199,6 +206,11 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         this.showOfferPopup = false;
         this.offerShown = false;
 
+        this.telegramEligible = false;
+        this.telegramUsed = false;
+        this.telegramBusy = false;
+        this.telegramMessage = '';
+
         try {
           this.course = await this.courses.getCourseById(this.courseId);
           this.lectureNames = (this.course?.lectureNames ?? []) as string[];
@@ -212,9 +224,11 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
             this.courseId,
           );
         } catch (e: any) {
-          this.error = e?.message ?? (this.isEnglish
-            ? 'An error occurred while loading the course.'
-            : 'حدث خطأ أثناء تحميل الكورس');
+          this.error =
+            e?.message ??
+            (this.isEnglish
+              ? 'An error occurred while loading the course.'
+              : 'حدث خطأ أثناء تحميل الكورس');
         } finally {
           this.loading = false;
         }
@@ -230,6 +244,10 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
           this.canViewLessons = false;
           this.showOfferPopup = false;
           this.offerShown = false;
+          this.telegramEligible = false;
+          this.telegramUsed = false;
+          this.telegramBusy = false;
+          this.telegramMessage = '';
           return;
         }
 
@@ -240,11 +258,20 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
           if (this.canViewLessons) {
             this.showOfferPopup = false;
             this.offerShown = true;
+            await this.loadTelegramAccessState(user.uid);
           } else {
             this.offerShown = false;
+            this.telegramEligible = false;
+            this.telegramUsed = false;
+            this.telegramBusy = false;
+            this.telegramMessage = '';
           }
         } catch {
           this.canViewLessons = false;
+          this.telegramEligible = false;
+          this.telegramUsed = false;
+          this.telegramBusy = false;
+          this.telegramMessage = '';
         }
       },
     );
@@ -311,6 +338,77 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   starsArray(rating?: number): number[] {
     const count = Math.max(0, Math.min(5, Number(rating || 0)));
     return Array.from({ length: count }, (_, i) => i + 1);
+  }
+
+  async joinTelegramGroup(): Promise<void> {
+    if (this.telegramBusy || !this.telegramEligible) return;
+
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    this.telegramBusy = true;
+    this.error = undefined;
+
+    try {
+      const idToken = await user.getIdToken();
+      const res = await firstValueFrom(
+        this.telegramJoin.createSession(this.courseId, idToken),
+      );
+
+      this.telegramEligible = false;
+      this.telegramUsed = true;
+      this.telegramMessage = this.isEnglish
+        ? 'Your Telegram registration has been recorded successfully. If the group does not open or you face any issue, please contact support and we will help you.'
+        : 'تم تسجيل استخدام رابط التليجرام بنجاح. إذا لم يفتح الجروب معك أو واجهت أي مشكلة، يرجى التواصل مع الدعم وسنساعدك فورًا.';
+
+      window.open(res.redirectUrl, '_blank', 'noopener');
+    } catch (e: any) {
+      this.error =
+        e?.error ||
+        e?.message ||
+        (this.isEnglish
+          ? 'Unable to open the Telegram group right now.'
+          : 'تعذر فتح جروب التليجرام الآن.');
+    } finally {
+      this.telegramBusy = false;
+    }
+  }
+
+  private async loadTelegramAccessState(uid: string): Promise<void> {
+    try {
+      const snap = await get(ref(this.db, `telegramAccess/${uid}/${this.courseId}`));
+
+      if (!snap.exists()) {
+        this.telegramEligible = false;
+        this.telegramUsed = false;
+        this.telegramBusy = false;
+        this.telegramMessage = '';
+        return;
+      }
+
+      const data = snap.val() as {
+        enabled?: boolean;
+        status?: 'ready' | 'used';
+        usedAt?: number | null;
+      };
+
+      this.telegramUsed = !!data?.usedAt || data?.status === 'used';
+      this.telegramEligible = !!data?.enabled && !this.telegramUsed;
+      this.telegramBusy = false;
+
+      if (this.telegramUsed) {
+        this.telegramMessage = this.isEnglish
+          ? 'Your Telegram registration link has already been used. If you could not access the group, please contact support and we will help you.'
+          : 'تم استخدام رابط التسجيل الخاص بجروب التليجرام بالفعل. إذا لم تتمكن من دخول الجروب، يرجى التواصل مع الدعم وسنساعدك في حل المشكلة.';
+      } else {
+        this.telegramMessage = '';
+      }
+    } catch {
+      this.telegramEligible = false;
+      this.telegramUsed = false;
+      this.telegramBusy = false;
+      this.telegramMessage = '';
+    }
   }
 
   private async resolveFirstLessonIdFromRTDB(
