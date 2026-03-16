@@ -1,0 +1,26 @@
+.checkout-page {
+  min-height: 70vh;
+}
+
+.checkout-card,
+.checkout-summary {
+  border-radius: 16px;
+}
+
+.course-thumb {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.course-box {
+  background: #f8f9fa;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.price-line {
+  color: #0d6efd;
+  font-size: 1rem;
+}

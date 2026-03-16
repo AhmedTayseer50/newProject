@@ -1,1 +1,102 @@
-<p>purchase-course works!</p>
+<div class="checkout-page" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
+  <div class="container py-5">
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <div *ngIf="!loading && course" class="row g-4">
+      <div class="col-lg-7">
+        <div class="card shadow-sm border-0 checkout-card">
+          <div class="card-body p-4">
+            <h2 class="mb-3">
+              {{ isEnglish ? "Checkout" : "إتمام الشراء" }}
+            </h2>
+
+            <div *ngIf="error" class="alert alert-danger">
+              {{ error }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">
+                {{ isEnglish ? "Full name" : "الاسم الكامل" }}
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="customerName"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">
+                {{ isEnglish ? "Email" : "البريد الإلكتروني" }}
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                [(ngModel)]="customerEmail"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">
+                {{ isEnglish ? "WhatsApp / Phone" : "رقم الواتساب / الهاتف" }}
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="customerPhone"
+              />
+            </div>
+
+            <button
+              class="btn btn-primary w-100"
+              type="button"
+              [disabled]="submitting"
+              (click)="payNow()"
+            >
+              {{
+                submitting
+                  ? (isEnglish ? "Redirecting to payment..." : "جارٍ التحويل إلى الدفع...")
+                  : (isEnglish ? "Pay with Paymob" : "الدفع عبر Paymob")
+              }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card shadow-sm border-0 checkout-summary">
+          <div class="card-body p-4">
+            <h5 class="mb-3">
+              {{ isEnglish ? "Order summary" : "ملخص الطلب" }}
+            </h5>
+
+            <div class="course-box d-flex gap-3 align-items-start">
+              <img
+                [src]="course.thumbnail || 'https://via.placeholder.com/120x90'"
+                [alt]="course.title"
+                class="course-thumb"
+              />
+
+              <div class="flex-grow-1">
+                <h6 class="mb-1">{{ course.title }}</h6>
+                <p class="text-muted small mb-2">{{ course.description }}</p>
+                <div class="price-line">
+                  <strong>{{ totalPrice | number:'1.0-0' }} EGP</strong>
+                </div>
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="d-flex justify-content-between fw-bold">
+              <span>{{ isEnglish ? "Total" : "الإجمالي" }}</span>
+              <span>{{ totalPrice | number:'1.0-0' }} EGP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
