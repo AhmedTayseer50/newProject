@@ -4,6 +4,10 @@ function send(res, status, payload) {
   res.status(status).json(payload);
 }
 
+function isMockModeEnabled() {
+  return String(process.env.PAYMOB_MOCK_MODE || 'true').toLowerCase() === 'true';
+}
+
 async function paymobAuth(apiKey) {
   const response = await fetch('https://accept.paymob.com/api/auth/tokens', {
     method: 'POST',
@@ -109,17 +113,6 @@ module.exports = async function handler(req, res) {
       return send(res, 400, { message: 'Customer info is required' });
     }
 
-    const apiKey = process.env.PAYMOB_API_KEY;
-    const integrationId = process.env.PAYMOB_INTEGRATION_ID;
-    const iframeId = process.env.PAYMOB_IFRAME_ID;
-
-    if (!apiKey || !integrationId || !iframeId) {
-      return send(res, 500, {
-        message:
-          'Missing Paymob env vars: PAYMOB_API_KEY / PAYMOB_INTEGRATION_ID / PAYMOB_IFRAME_ID',
-      });
-    }
-
     const admin = getFirebaseAdmin();
     const decoded = await admin.auth().verifyIdToken(idToken);
     const uid = decoded.uid;
@@ -179,14 +172,33 @@ module.exports = async function handler(req, res) {
       }, {}),
       items: resolvedCourses,
       status: 'pending',
-      paymentProvider: 'paymob',
+      paymentProvider: isMockModeEnabled() ? 'paymob-mock' : 'paymob',
       createdAt: Date.now(),
     };
 
-    await admin
-      .database()
-      .ref(`paymentOrders/${merchantOrderId}`)
-      .set(pendingOrder);
+    await admin.database().ref(`paymentOrders/${merchantOrderId}`).set(pendingOrder);
+
+    if (isMockModeEnabled()) {
+      const mockUrl = `/api/paymob-mock-complete?merchantOrderId=${encodeURIComponent(
+        merchantOrderId
+      )}&status=paid`;
+
+      return send(res, 200, {
+        iframeUrl: mockUrl,
+        merchantOrderId,
+      });
+    }
+
+    const apiKey = process.env.PAYMOB_API_KEY;
+    const integrationId = process.env.PAYMOB_INTEGRATION_ID;
+    const iframeId = process.env.PAYMOB_IFRAME_ID;
+
+    if (!apiKey || !integrationId || !iframeId) {
+      return send(res, 500, {
+        message:
+          'Missing Paymob env vars: PAYMOB_API_KEY / PAYMOB_INTEGRATION_ID / PAYMOB_IFRAME_ID',
+      });
+    }
 
     const authData = await paymobAuth(apiKey);
     const authToken = authData.token;

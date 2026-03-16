@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
 import { CoursesService } from 'src/app/public/services/courses.service';
 import { PaymentsService } from '../services/payments.service';
 import { UserService } from 'src/app/core/services/user.service';
@@ -13,6 +14,7 @@ import { Course } from 'src/app/shared/models/course.model';
 export class PurchaseCourseComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private auth = inject(Auth);
   private coursesService = inject(CoursesService);
   private paymentsService = inject(PaymentsService);
   private userService = inject(UserService);
@@ -46,7 +48,7 @@ export class PurchaseCourseComponent implements OnInit {
     try {
       this.course = await this.coursesService.getCourseById(this.courseId);
 
-      const user = await this.getCurrentUser();
+      const user = this.auth.currentUser;
       if (user?.uid) {
         const profile = await this.userService.getUserProfile(user.uid);
         this.customerName = profile?.displayName || user.displayName || '';
@@ -102,12 +104,5 @@ export class PurchaseCourseComponent implements OnInit {
     } finally {
       this.submitting = false;
     }
-  }
-
-  private async getCurrentUser(): Promise<any> {
-    return await new Promise((resolve) => {
-      const auth = (window as any).ng?.getInjector?.(document.body)?.get?.('Auth');
-      resolve(auth?.currentUser || null);
-    }).catch(() => null);
   }
 }
