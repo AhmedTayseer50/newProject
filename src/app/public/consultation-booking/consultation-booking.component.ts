@@ -1,112 +1,9 @@
-// // src/app/public/consultation-booking/consultation-booking.component.ts
-// import { Component } from '@angular/core';
-// import { FormBuilder, Validators } from '@angular/forms';
-// import { SessionRequestsService } from 'src/app/core/services/session-requests.service';
-
-// @Component({
-//   selector: 'app-consultation-booking',
-//   templateUrl: './consultation-booking.component.html',
-//   styleUrls: ['./consultation-booking.component.css'],
-// })
-// export class ConsultationBookingComponent {
-//   sending = false;
-//   sent = false;
-//   error?: string;
-
-//   // ✅ constants
-//   readonly EGYPT = 'مصر';
-
-//   form = this.fb.group({
-//     name: ['', [Validators.required, Validators.minLength(3)]],
-//     age: [null as any, [Validators.required, Validators.min(10), Validators.max(120)]],
-//     job: ['', [Validators.required, Validators.minLength(2)]],
-//     maritalStatus: ['', [Validators.required]],
-//     whatsapp: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{8,15}$/)]],
-//     nationality: ['', [Validators.required]],
-//     problem: ['', [Validators.required, Validators.minLength(10)]],
-//     acceptedPolicy: [false, [Validators.requiredTrue]],
-//   });
-
-//   constructor(private fb: FormBuilder, private reqSvc: SessionRequestsService) {}
-
-//   get isEgyptian(): boolean {
-//     const n = (this.form.value.nationality || '').trim();
-//     return n === this.EGYPT;
-//   }
-
-//   get priceText(): string {
-//     return this.isEgyptian ? '800 جنيه' : '25 دولار';
-//   }
-
-//   private buildPrice() {
-//     return this.isEgyptian
-//       ? { currency: 'EGP' as const, price: 800 }
-//       : { currency: 'USD' as const, price: 25 };
-//   }
-
-//   // ✅ Helper: console detailed error
-//   private logFirebaseError(err: any) {
-//     console.error('❌ Firebase Error FULL:', err);
-//     console.error('❌ code:', err?.code);
-//     console.error('❌ message:', err?.message);
-//     console.error('❌ stack:', err?.stack);
-//   }
-
-//   async submit() {
-//     this.error = undefined;
-//     this.sent = false;
-
-//     if (this.form.invalid) {
-//       this.form.markAllAsTouched();
-//       return;
-//     }
-
-//     this.sending = true;
-
-//     const p = this.buildPrice();
-
-//     // ✅ payload
-//     const payload: any = {
-//       name: this.form.value.name!.trim(),
-//       age: Number(this.form.value.age),
-//       job: this.form.value.job!.trim(),
-//       maritalStatus: this.form.value.maritalStatus!,
-//       whatsapp: this.form.value.whatsapp!.trim(),
-//       nationality: this.form.value.nationality!.trim(),
-//       problem: this.form.value.problem!.trim(),
-
-//       acceptedPolicy: !!this.form.value.acceptedPolicy,
-
-//       // ✅ keep this ONLY if your RTDB rules require "acknowledged"
-//       acknowledged: !!this.form.value.acceptedPolicy,
-
-//       currency: p.currency,
-//       price: p.price,
-//     };
-
-//     console.group('📨 SUBMIT Booking Request');
-//     console.log('payload:', payload);
-//     console.groupEnd();
-
-//     try {
-//       const id = await this.reqSvc.createRequest(payload);
-//       console.log('✅ Request created id:', id);
-
-//       this.sent = true;
-//       this.form.reset({ acceptedPolicy: false } as any);
-//     } catch (e: any) {
-//       this.logFirebaseError(e);
-//       this.error = e?.message ?? 'حدث خطأ أثناء إرسال الطلب';
-//     } finally {
-//       this.sending = false;
-//     }
-//   }
-// }
-
 // src/app/public/consultation-booking/consultation-booking.component.ts
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { SessionRequestsService } from 'src/app/core/services/session-requests.service';
+import emailjs from '@emailjs/browser';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-consultation-booking',
@@ -250,6 +147,13 @@ export class ConsultationBookingComponent {
       const id = await this.reqSvc.createRequest(payload);
       console.log('✅ Request created id:', id);
 
+      try {
+        await this.sendEmailNotification(payload);
+        console.log('✅ EmailJS notification sent');
+      } catch (emailErr) {
+        console.error('❌ EmailJS send failed:', emailErr);
+      }
+
       this.sent = true;
       this.form.reset({ acceptedPolicy: false } as any);
     } catch (e: any) {
@@ -258,5 +162,32 @@ export class ConsultationBookingComponent {
     } finally {
       this.sending = false;
     }
+  }
+
+  private async sendEmailNotification(payload: any) {
+    const templateParams = {
+      name: payload.name,
+      age: payload.age,
+      job: payload.job,
+      marital_status: payload.maritalStatus,
+      whatsapp: payload.whatsapp,
+      nationality:
+        payload.nationality === this.OTHER
+          ? payload.nationalityOther || 'غير محدد'
+          : payload.nationality,
+      nationality_other: payload.nationalityOther || '',
+      problem: payload.problem,
+      accepted_policy: payload.acceptedPolicy ? 'نعم' : 'لا',
+      currency: payload.currency,
+      price: payload.price,
+      submitted_at: new Date().toLocaleString('ar-EG'),
+    };
+
+    return emailjs.send(
+      environment.emailJs.serviceId,
+      environment.emailJs.templateId,
+      templateParams,
+      environment.emailJs.publicKey,
+    );
   }
 }
