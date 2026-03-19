@@ -158,7 +158,7 @@ export class DiplomaEditorComponent implements OnInit {
       // ✅ pricing plans
       pricingPlans: [
         {
-          name: 'Basic',
+          name: 'الخطة الأساسية',
           badge: '',
           priceText: '',
           note: '',
@@ -166,7 +166,7 @@ export class DiplomaEditorComponent implements OnInit {
           features: [''],
         },
         {
-          name: 'Group',
+          name: 'خطة المتابعة',
           badge: '',
           priceText: '',
           note: '',
@@ -174,7 +174,7 @@ export class DiplomaEditorComponent implements OnInit {
           features: [''],
         },
         {
-          name: 'Premium',
+          name: 'الخطة المميزة',
           badge: '',
           priceText: '',
           note: '',
