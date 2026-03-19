@@ -1,4 +1,3 @@
-// src/app/admin/diploma-editor/diploma-editor.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DiplomasAdminService } from '../services/diplomas-admin.service';
@@ -51,7 +50,6 @@ export class DiplomaEditorComponent implements OnInit {
 
   courses: { id: string; title?: string }[] = [];
 
-  // ✅ Data (initialized with full defaults to satisfy template checker)
   data: DiplomaEditorForm = this.buildDefaults();
 
   constructor(
@@ -78,25 +76,24 @@ export class DiplomaEditorComponent implements OnInit {
         const d = await this.diplomasAdmin.getDiploma(id);
         if (!d) throw new Error('الدبلومة غير موجودة');
 
-        // ✅ Merge stored data with safe defaults
         const defaults = this.buildDefaults();
 
         this.data = {
           ...defaults,
           ...d,
-
-          // always objects/arrays
           courseIds: d.courseIds ?? defaults.courseIds,
-          meta: { ...defaults.meta, ...(d as any).meta },
+          meta: { ...defaults.meta, ...((d as any).meta ?? {}) },
           specs: (d as any).specs ?? defaults.specs,
           testimonials: (d as any).testimonials ?? defaults.testimonials,
           pricingPlans: (d as any).pricingPlans ?? defaults.pricingPlans,
           communityPerks: (d as any).communityPerks ?? defaults.communityPerks,
-          offer: { ...defaults.offer, ...(d as any).offer },
-          bottomCta: { ...defaults.bottomCta, ...(d as any).bottomCta },
+          offer: { ...defaults.offer, ...((d as any).offer ?? {}) },
+          bottomCta: {
+            ...defaults.bottomCta,
+            ...((d as any).bottomCta ?? {}),
+          },
         };
       } else {
-        // new diploma -> ensure defaults
         this.data = this.buildDefaults();
       }
 
@@ -109,9 +106,6 @@ export class DiplomaEditorComponent implements OnInit {
     }
   }
 
-  // =========================
-  // Helpers
-  // =========================
   private buildDefaults(): DiplomaEditorForm {
     return {
       title: '',
@@ -125,7 +119,6 @@ export class DiplomaEditorComponent implements OnInit {
       programDuration: '',
       targetAudience: '',
 
-      // legacy fields if exist in model
       goalTitle: '',
       goalDescription: '',
       expectedStudyTimeTitle: '',
@@ -134,28 +127,23 @@ export class DiplomaEditorComponent implements OnInit {
       prerequisitesDescription: '',
       introVideoUrl: '',
 
-      // ✅ courses
       courseIds: {},
 
-      // ✅ meta
       meta: {
         level: '',
         totalCourses: 0,
         totalLessons: 0,
       },
 
-      // ✅ arrays
       specs: [''],
       communityPerks: [''],
 
-      // ✅ testimonials
       testimonials: [
         { name: '', tag: '', rating: 5, text: '' },
         { name: '', tag: '', rating: 5, text: '' },
         { name: '', tag: '', rating: 5, text: '' },
       ],
 
-      // ✅ pricing plans
       pricingPlans: [
         {
           name: 'الخطة الأساسية',
@@ -166,7 +154,7 @@ export class DiplomaEditorComponent implements OnInit {
           features: [''],
         },
         {
-          name: 'خطة المتابعة',
+          name: 'خطة المتابعة الجماعية',
           badge: '',
           priceText: '',
           note: '',
@@ -174,7 +162,7 @@ export class DiplomaEditorComponent implements OnInit {
           features: [''],
         },
         {
-          name: 'الخطة المميزة',
+          name: 'الخطة المميّزة',
           badge: '',
           priceText: '',
           note: '',
@@ -183,7 +171,6 @@ export class DiplomaEditorComponent implements OnInit {
         },
       ],
 
-      // ✅ offer + bottom CTA
       offer: {
         percent: 30,
         heading: '',
@@ -199,17 +186,19 @@ export class DiplomaEditorComponent implements OnInit {
   }
 
   private ensureDefaults(): void {
-    // meta
-    if (!this.data.meta)
-      this.data.meta = { level: '', totalCourses: 0, totalLessons: 0 };
+    if (!this.data.meta) {
+      this.data.meta = {
+        level: '',
+        totalCourses: 0,
+        totalLessons: 0,
+      };
+    }
 
-    // arrays
     if (!Array.isArray(this.data.specs)) this.data.specs = [];
     if (!Array.isArray(this.data.communityPerks)) this.data.communityPerks = [];
     if (!Array.isArray(this.data.testimonials)) this.data.testimonials = [];
     if (!Array.isArray(this.data.pricingPlans)) this.data.pricingPlans = [];
 
-    // Testimonials: ensure at least 3
     while (this.data.testimonials.length < 3) {
       this.data.testimonials.push({
         name: '',
@@ -220,7 +209,6 @@ export class DiplomaEditorComponent implements OnInit {
     }
     this.data.testimonials = this.data.testimonials.slice(0, 3);
 
-    // Pricing plans: ensure 3
     if (this.data.pricingPlans.length === 0) {
       this.data.pricingPlans = [
         {
@@ -257,6 +245,7 @@ export class DiplomaEditorComponent implements OnInit {
     }
 
     this.data.pricingPlans = this.data.pricingPlans.slice(0, 3);
+
     while (this.data.pricingPlans.length < 3) {
       this.data.pricingPlans.push({
         name: '',
@@ -268,13 +257,11 @@ export class DiplomaEditorComponent implements OnInit {
       });
     }
 
-    // ensure features arrays exist
     this.data.pricingPlans = this.data.pricingPlans.map((p) => ({
       ...p,
       features: Array.isArray(p.features) ? p.features : [],
     }));
 
-    // offer + bottomCta
     if (!this.data.offer) {
       this.data.offer = {
         percent: 30,
@@ -293,15 +280,20 @@ export class DiplomaEditorComponent implements OnInit {
     }
 
     if (!this.data.bottomCta) {
-      this.data.bottomCta = { text: '', buttonText: 'اشترك الآن' };
+      this.data.bottomCta = {
+        text: 'لو لسه مشتركتش… متضيعش الفرصة',
+        buttonText: 'اشترك الآن',
+      };
     } else {
-      this.data.bottomCta.text = this.data.bottomCta.text ?? '';
+      this.data.bottomCta.text =
+        this.data.bottomCta.text ?? 'لو لسه مشتركتش… متضيعش الفرصة';
       this.data.bottomCta.buttonText =
         this.data.bottomCta.buttonText ?? 'اشترك الآن';
     }
 
-    // courseIds always object
-    if (!this.data.courseIds) this.data.courseIds = {};
+    if (!this.data.courseIds) {
+      this.data.courseIds = {};
+    }
   }
 
   private recalcMeta(): void {
@@ -309,13 +301,15 @@ export class DiplomaEditorComponent implements OnInit {
     this.data.meta.totalCourses = totalCourses;
   }
 
-  // =========================
-  // Courses inside diploma
-  // =========================
   toggleCourse(courseId: string, checked: boolean): void {
     if (!this.data.courseIds) this.data.courseIds = {};
-    if (checked) this.data.courseIds[courseId] = true;
-    else delete this.data.courseIds[courseId];
+
+    if (checked) {
+      this.data.courseIds[courseId] = true;
+    } else {
+      delete this.data.courseIds[courseId];
+    }
+
     this.recalcMeta();
   }
 
@@ -323,9 +317,6 @@ export class DiplomaEditorComponent implements OnInit {
     return !!this.data.courseIds?.[courseId];
   }
 
-  // =========================
-  // List controls
-  // =========================
   addSpec(): void {
     this.data.specs = [...(this.data.specs ?? []), ''];
   }
@@ -347,34 +338,34 @@ export class DiplomaEditorComponent implements OnInit {
   addFeature(planIndex: number): void {
     const p = this.data.pricingPlans?.[planIndex];
     if (!p) return;
+
     p.features = [...(p.features ?? []), ''];
   }
 
   removeFeature(planIndex: number, featureIndex: number): void {
     const p = this.data.pricingPlans?.[planIndex];
     if (!p) return;
+
     p.features = (p.features ?? []).filter((_, idx) => idx !== featureIndex);
   }
 
-  // =========================
-  // Save
-  // =========================
   async save(): Promise<void> {
     this.error = undefined;
     this.loading = true;
 
     try {
-      if (!this.data.title?.trim()) throw new Error('اكتب عنوان الدبلومة');
+      if (!this.data.title?.trim()) {
+        throw new Error('اكتب عنوان الدبلومة');
+      }
 
-      // clean arrays (remove empty items)
       this.data.specs = (this.data.specs ?? [])
         .map((x) => (x ?? '').trim())
         .filter(Boolean);
+
       this.data.communityPerks = (this.data.communityPerks ?? [])
         .map((x) => (x ?? '').trim())
         .filter(Boolean);
 
-      // testimonials
       this.data.testimonials = (this.data.testimonials ?? [])
         .slice(0, 3)
         .map((t) => ({
@@ -386,7 +377,6 @@ export class DiplomaEditorComponent implements OnInit {
         }))
         .filter((t) => t.name && t.text);
 
-      // pricing plans
       this.data.pricingPlans = (this.data.pricingPlans ?? [])
         .slice(0, 3)
         .map((p: DiplomaPricingPlan) => ({
@@ -401,7 +391,6 @@ export class DiplomaEditorComponent implements OnInit {
           highlighted: !!p.highlighted,
         }));
 
-      // meta totalCourses auto
       this.recalcMeta();
 
       if (this.diplomaId) {
