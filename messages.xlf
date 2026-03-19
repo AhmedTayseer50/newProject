@@ -621,7 +621,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="home_course_join" datatype="html">
-        <source> انضم الآن </source>
+        <source> اشترك الآن </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/home/home.component.html</context>
           <context context-type="linenumber">122,124</context>

@@ -1,6 +1,9 @@
 <!-- HERO -->
 <section id="hero" class="hero">
-  <div class="hero-bg" [style.background-image]="'url(' + heroBgUrl + ')'"></div>
+  <div
+    class="hero-bg"
+    [style.background-image]="'url(' + heroBgUrl + ')'"
+  ></div>
   <div class="hero-overlay"></div>
 
   <div class="hero-content-wrapper">
@@ -133,7 +136,7 @@
               (click)="joinNow(c)"
               i18n="@@home_course_join"
             >
-              انضم الآن
+              اشترك الآن
             </button>
           </ng-template>
         </div>
@@ -185,7 +188,11 @@
           >
         </div>
 
-        <button class="btn btn-primary" i18n="@@home_consult_cta" routerLink="/book-session">
+        <button
+          class="btn btn-primary"
+          i18n="@@home_consult_cta"
+          routerLink="/book-session"
+        >
           احجز موعدًا الآن
         </button>
       </div>
@@ -255,97 +262,6 @@
         <p class="why-text" i18n="@@home_why_card_4_text">
           كل ما تشاركه يظل في مساحة آمنة ومحترمة، تحفظ خصوصيتك وكرامتك.
         </p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section class="section" id="testimonials">
-  <div class="page-container">
-    <div class="section-header">
-      <div class="section-eyebrow" i18n="@@home_testimonials_eyebrow">
-        آراء المتدربين
-      </div>
-      <h2 class="section-title" i18n="@@home_testimonials_title">
-        تجارب حقيقية من نبضات حية
-      </h2>
-      <p class="section-subtitle" i18n="@@home_testimonials_subtitle">
-        جزء من قصص المتدربين الذين اختاروا البدء في رحلة الشفاء مع نبضة حياة.
-      </p>
-    </div>
-
-    <div class="testimonials-row">
-      <article class="testimonial-card">
-        <div class="testimonial-header">
-          <div class="testimonial-user">
-            <div class="avatar" i18n="@@home_testimonial_1_avatar">ن</div>
-            <div>
-              <div class="testimonial-name" i18n="@@home_testimonial_1_name">
-                نورة
-              </div>
-              <div class="testimonial-tag" i18n="@@home_testimonial_1_tag">
-                متدربة في صدمات الطفولة
-              </div>
-            </div>
-          </div>
-          <div class="testimonial-stars" aria-label="5 نجوم">★★★★★</div>
-        </div>
-        <p class="testimonial-text" i18n="@@home_testimonial_1_text">
-          لأول مرة أحس إن في حد فاهم الجذر الحقيقي لألمي. الكورس فتح لي أبواب ما
-          كنت أتوقعها، وتعاملي مع نفسي ومع أهلي اختلف تمامًا.
-        </p>
-        <div class="testimonial-label" i18n="@@home_testimonial_1_label">
-          تغيير عميق من الداخل
-        </div>
-      </article>
-
-      <article class="testimonial-card">
-        <div class="testimonial-header">
-          <div class="testimonial-user">
-            <div class="avatar" i18n="@@home_testimonial_2_avatar">ر</div>
-            <div>
-              <div class="testimonial-name" i18n="@@home_testimonial_2_name">
-                ريم
-              </div>
-              <div class="testimonial-tag" i18n="@@home_testimonial_2_tag">
-                جلسات استشارة شخصية
-              </div>
-            </div>
-          </div>
-          <div class="testimonial-stars" aria-label="5 نجوم">★★★★★</div>
-        </div>
-        <p class="testimonial-text" i18n="@@home_testimonial_2_text">
-          الجلسات كانت مساحة آمنة جدًا. قدرت أتكلم بدون خوف من الحكم، وطلعت
-          بأفكار وخطوات عملية ساعدتني في قرارات مهمة.
-        </p>
-        <div class="testimonial-label" i18n="@@home_testimonial_2_label">
-          مساحة آمنة ومٌحتوية
-        </div>
-      </article>
-
-      <article class="testimonial-card">
-        <div class="testimonial-header">
-          <div class="testimonial-user">
-            <div class="avatar" i18n="@@home_testimonial_3_avatar">س</div>
-            <div>
-              <div class="testimonial-name" i18n="@@home_testimonial_3_name">
-                سارة
-              </div>
-              <div class="testimonial-tag" i18n="@@home_testimonial_3_tag">
-                كورس أعماق النفس البشرية
-              </div>
-            </div>
-          </div>
-          <div class="testimonial-stars" aria-label="5 نجوم">★★★★★</div>
-        </div>
-        <p class="testimonial-text" i18n="@@home_testimonial_3_text">
-          البرنامج ساعدني أفهم ليه أكرر نفس العلاقات ونفس الأخطاء. حسيت إني
-          أتعرفت على نفسي من جديد.
-        </p>
-        <div class="testimonial-label" i18n="@@home_testimonial_3_label">
-          وعي مختلف بالحياة
-        </div>
       </article>
     </div>
   </div>

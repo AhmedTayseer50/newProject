@@ -241,8 +241,8 @@ Nabdah Hayah<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt
       </trans-unit>
 
       <trans-unit id="home_course_join" datatype="html">
-        <source> انضم الآن </source>
-        <target> Join Now </target>
+        <source> اشترك الآن </source>
+        <target>Enroll now</target>
       </trans-unit>
 
       <trans-unit id="title_home" datatype="html">

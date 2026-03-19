@@ -112,48 +112,44 @@
     </button>
   </div>
 
-  <div
-    *ngIf="canViewLessons"
-      class="alert alert-light border d-flex align-items-center justify-content-between flex-wrap gap-2"
-  >
-    <div>
-      <div class="fw-semibold mb-1">
-        {{
-          isEnglish ? "Telegram community access" : "الدخول إلى جروب التليجرام"
-        }}
-      </div>
-
-      <div class="small text-muted" *ngIf="telegramEligible">
-        {{
-          isEnglish
-            ? "Your Telegram access is ready. This button can only be used once."
-            : "تم تجهيز صلاحية دخولك إلى جروب التليجرام. هذا الزر يعمل مرة واحدة فقط."
-        }}
-      </div>
-
-      <div class="small text-muted" *ngIf="telegramUsed">
-        {{ telegramMessage }}
-      </div>
+<div
+  *ngIf="canViewLessons && !telegramUsed"
+  class="alert alert-light border d-flex align-items-center justify-content-between flex-wrap gap-2"
+>
+  <div>
+    <div class="fw-semibold mb-1">
+      {{
+        isEnglish ? "Telegram community access" : "الدخول إلى جروب التليجرام"
+      }}
     </div>
 
-    <button
-      *ngIf="telegramEligible"
-      class="btn btn-success btn-sm"
-      type="button"
-      [disabled]="telegramBusy"
-      (click)="joinTelegramGroup()"
-    >
+    <div class="small text-muted" *ngIf="telegramEligible">
       {{
-        telegramBusy
-          ? isEnglish
-            ? "Opening..."
-            : "جارٍ الفتح..."
-          : isEnglish
-            ? "Join Telegram group"
-            : "الانضمام إلى جروب التليجرام"
+        isEnglish
+          ? "Your Telegram access is ready. This button can only be used once."
+          : "تم تجهيز صلاحية دخولك إلى جروب التليجرام. هذا الزر يعمل مرة واحدة فقط."
       }}
-    </button>
+    </div>
   </div>
+
+  <button
+    *ngIf="telegramEligible"
+    class="btn btn-success btn-sm"
+    type="button"
+    [disabled]="telegramBusy"
+    (click)="joinTelegramGroup()"
+  >
+    {{
+      telegramBusy
+        ? isEnglish
+          ? "Opening..."
+          : "جارٍ الفتح..."
+        : isEnglish
+          ? "Join Telegram group"
+          : "الانضمام إلى جروب التليجرام"
+    }}
+  </button>
+</div>
 
   <div *ngIf="!canViewLessons" class="alert alert-warning">
     {{ defaultNoAccess }}
@@ -245,7 +241,7 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="!loading && !error && course && course.outcomes?.length"
 >
   <div class="container">
     <div class="section-header">
@@ -259,25 +255,18 @@
       </p>
     </div>
 
-    <div
-      class="simple-list-card"
-      *ngIf="course.outcomes?.length; else noOutcomes"
-    >
+    <div class="simple-list-card">
       <ul class="check-list">
         <li *ngFor="let item of course.outcomes">{{ item }}</li>
       </ul>
     </div>
-
-    <ng-template #noOutcomes>
-      <div class="empty-state">{{ defaultOutcomesEmpty }}</div>
-    </ng-template>
   </div>
 </section>
 
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="!loading && !error && course && course.audienceItems?.length"
 >
   <div class="container">
     <div class="section-header">
@@ -291,18 +280,11 @@
       </p>
     </div>
 
-    <div
-      class="simple-list-card"
-      *ngIf="course.audienceItems?.length; else noAudience"
-    >
+    <div class="simple-list-card">
       <ul class="check-list">
         <li *ngFor="let item of course.audienceItems">{{ item }}</li>
       </ul>
     </div>
-
-    <ng-template #noAudience>
-      <div class="empty-state">{{ defaultAudienceEmpty }}</div>
-    </ng-template>
   </div>
 </section>
 
@@ -348,7 +330,12 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="
+    !loading &&
+    !error &&
+    course &&
+    (course.curriculum?.length || lectureNames.length)
+  "
 >
   <div class="container">
     <div class="section-header">
@@ -384,10 +371,7 @@
     </div>
 
     <ng-template #noCurriculum>
-      <div
-        class="simple-list-card"
-        *ngIf="lectureNames.length; else noCurriculumAtAll"
-      >
+      <div class="simple-list-card">
         <ul class="check-list">
           <li *ngFor="let name of lectureNames; let i = index">
             {{ lessonLabel(i) }} —
@@ -395,10 +379,6 @@
           </li>
         </ul>
       </div>
-    </ng-template>
-
-    <ng-template #noCurriculumAtAll>
-      <div class="empty-state">{{ defaultCurriculumEmpty }}</div>
     </ng-template>
   </div>
 </section>
@@ -437,16 +417,6 @@
         </div>
       </article>
     </div>
-  </div>
-</section>
-
-<section
-  class="section"
-  [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course && !course.testimonials?.length"
->
-  <div class="container">
-    <div class="empty-state">{{ defaultTestimonialsEmpty }}</div>
   </div>
 </section>
 
