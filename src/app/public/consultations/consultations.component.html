@@ -1,51 +1,59 @@
-<section id="consultations" class="section consultations-page">
+<section
+  id="consultations"
+  class="section consultations-page"
+  [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'"
+>
   <div class="page-container">
     <div class="section-header">
-      <div class="section-eyebrow">الاستشارات النفسية</div>
-      <h2 class="section-title">جلسات فردية بخصوصية تامة</h2>
-      <p class="section-subtitle">
+      <div class="section-eyebrow" i18n="@@consultations_eyebrow">
+        الاستشارات النفسية
+      </div>
+      <h2 class="section-title" i18n="@@consultations_title">
+        جلسات فردية بخصوصية تامة
+      </h2>
+      <p class="section-subtitle" i18n="@@consultations_subtitle">
         استشارات نفسية مع دكتورة استشاري صحة نفسية، لمساعدتك على فهم ما تمر به،
         ووضع خطة علاجية تناسبك.
       </p>
     </div>
 
-    <!-- Bootstrap layout wrapper -->
     <div class="row align-items-center g-4">
-      <!-- Card -->
       <div class="col-12 col-lg-7">
         <div class="consult-card h-100">
-          <div class="consult-label">جلسات أونلاين</div>
+          <div class="consult-label" i18n="@@consultations_label">جلسات أونلاين</div>
 
-          <h3 class="consult-title">جلسة استشارة نفسية فردية</h3>
+          <h3 class="consult-title" i18n="@@consultations_card_title">
+            جلسة استشارة نفسية فردية
+          </h3>
 
-          <p class="consult-desc">
+          <p class="consult-desc" i18n="@@consultations_desc">
             مساحة آمنة للحديث عن كل ما يثقل قلبك وعقلك، مع توجيه مهني يساعدك على
             رؤية أعمق لذاتك، واتخاذ قرارات أكثر وعيًا.
           </p>
 
           <div class="consult-meta-row">
-            <span class="consult-meta-pill">مدة الجلسة: 50 دقيقة</span>
-            <span class="consult-meta-pill">أونلاين عبر منصات آمنة</span>
-            <span class="consult-meta-pill">خصوصية وسرية تامة</span>
+            <span class="consult-meta-pill" i18n="@@consultations_meta_1">مدة الجلسة: 50 دقيقة</span>
+            <span class="consult-meta-pill" i18n="@@consultations_meta_2">أونلاين عبر منصات آمنة</span>
+            <span class="consult-meta-pill" i18n="@@consultations_meta_3">خصوصية وسرية تامة</span>
           </div>
 
           <div class="d-flex flex-wrap gap-2">
-            <button class="btnn btn-primary" routerLink="/book-session">
+            <button class="btnn btn-primary" routerLink="/book-session" i18n="@@consultations_cta_book">
               احجز موعدًا الآن
             </button>
 
-            <button class="hero-btn" routerLink="/courses">
+            <button class="hero-btn" routerLink="/courses" i18n="@@consultations_cta_programs">
               تصفّح البرامج
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Image -->
       <div class="col-12 col-lg-5">
         <div class="consult-image">
           <img
             src="https://images.pexels.com/photos/4101143/pexels-photo-4101143.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            i18n-alt="@@consultations_image_alt"
             alt="جلسة استشارة نفسية"
             loading="lazy"
           />

@@ -2263,6 +2263,44 @@
           <context context-type="linenumber">262,264</context>
         </context-group>
       <target>Everything you share remains in a safe and respectful space that protects your privacy and dignity.</target></trans-unit>
+
+      <trans-unit id="consultations_eyebrow" datatype="html">
+        <source>الاستشارات النفسية</source>
+      <target>Psychological consultations</target></trans-unit>
+      <trans-unit id="consultations_title" datatype="html">
+        <source>جلسات فردية بخصوصية تامة</source>
+      <target>Private one-on-one sessions with complete confidentiality</target></trans-unit>
+      <trans-unit id="consultations_subtitle" datatype="html">
+        <source>استشارات نفسية مع دكتورة استشاري صحة نفسية، لمساعدتك على فهم ما تمر به، ووضع خطة علاجية تناسبك.</source>
+      <target>Psychological consultations with a mental health consultant doctor to help you understand what you are going through and create a treatment plan that suits you.</target></trans-unit>
+      <trans-unit id="consultations_label" datatype="html">
+        <source>جلسات أونلاين</source>
+      <target>Online sessions</target></trans-unit>
+      <trans-unit id="consultations_card_title" datatype="html">
+        <source>جلسة استشارة نفسية فردية</source>
+      <target>Individual psychological consultation session</target></trans-unit>
+      <trans-unit id="consultations_desc" datatype="html">
+        <source>مساحة آمنة للحديث عن كل ما يثقل قلبك وعقلك، مع توجيه مهني يساعدك على رؤية أعمق لذاتك، واتخاذ قرارات أكثر وعيًا.</source>
+      <target>A safe space to talk about everything weighing on your heart and mind, with professional guidance that helps you see yourself more deeply and make more mindful decisions.</target></trans-unit>
+      <trans-unit id="consultations_meta_1" datatype="html">
+        <source>مدة الجلسة: 50 دقيقة</source>
+      <target>Session length: 50 minutes</target></trans-unit>
+      <trans-unit id="consultations_meta_2" datatype="html">
+        <source>أونلاين عبر منصات آمنة</source>
+      <target>Online via secure platforms</target></trans-unit>
+      <trans-unit id="consultations_meta_3" datatype="html">
+        <source>خصوصية وسرية تامة</source>
+      <target>Complete privacy and confidentiality</target></trans-unit>
+      <trans-unit id="consultations_cta_book" datatype="html">
+        <source>احجز موعدًا الآن</source>
+      <target>Book an appointment now</target></trans-unit>
+      <trans-unit id="consultations_cta_programs" datatype="html">
+        <source>تصفّح البرامج</source>
+      <target>Browse programs</target></trans-unit>
+      <trans-unit id="consultations_image_alt" datatype="html">
+        <source>جلسة استشارة نفسية</source>
+      <target>Psychological consultation session</target></trans-unit>
+
     </body>
   </file>
 </xliff>
