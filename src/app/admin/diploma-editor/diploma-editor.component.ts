@@ -85,6 +85,43 @@ export class DiplomaEditorComponent implements OnInit {
     this.activeLang = lang;
   }
 
+  get isArabic(): boolean {
+    return this.activeLang === 'ar';
+  }
+
+  get isEnglish(): boolean {
+    return this.activeLang === 'en';
+  }
+
+  async deleteDiplomaItem(id: string): Promise<void> {
+    const ok = window.confirm('هل تريد حذف هذه الدبلومة نهائيًا؟');
+    if (!ok) return;
+
+    this.loading = true;
+    this.error = undefined;
+
+    try {
+      await this.diplomasAdmin.deleteDiploma(id);
+      await this.loadReferenceData();
+
+      if (this.diplomaId === id) {
+        this.diplomaId = undefined;
+        this.data = this.buildDefaults();
+        this.ensureArrays();
+        await this.router.navigate(['/admin/diploma-editor']);
+      }
+    } catch (e: any) {
+      this.error = e?.message ?? 'تعذر حذف الدبلومة';
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async deleteCurrentDiploma(): Promise<void> {
+    if (!this.diplomaId) return;
+    await this.deleteDiplomaItem(this.diplomaId);
+  }
+
   private async loadReferenceData(): Promise<void> {
     const [courses, diplomas] = await Promise.all([
       this.adminCourses.listCourses(),

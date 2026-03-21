@@ -10,24 +10,35 @@
       {{ diplomaId ? '✏️ تعديل دبلومة' : '➕ إضافة دبلومة جديدة' }}
     </h3>
 
-    <div class="btn-group" role="group">
+    <div class="d-flex flex-wrap gap-2">
+      <div class="btn-group" role="group">
+        <button
+          type="button"
+          class="btn"
+          [class.btn-primary]="activeLang === 'ar'"
+          [class.btn-outline-primary]="activeLang !== 'ar'"
+          (click)="setLang('ar')"
+        >
+          العربية
+        </button>
+        <button
+          type="button"
+          class="btn"
+          [class.btn-primary]="activeLang === 'en'"
+          [class.btn-outline-primary]="activeLang !== 'en'"
+          (click)="setLang('en')"
+        >
+          English
+        </button>
+      </div>
+
       <button
+        *ngIf="diplomaId"
         type="button"
-        class="btn"
-        [class.btn-primary]="activeLang === 'ar'"
-        [class.btn-outline-primary]="activeLang !== 'ar'"
-        (click)="setLang('ar')"
+        class="btn btn-outline-danger"
+        (click)="deleteCurrentDiploma()"
       >
-        العربية
-      </button>
-      <button
-        type="button"
-        class="btn"
-        [class.btn-primary]="activeLang === 'en'"
-        [class.btn-outline-primary]="activeLang !== 'en'"
-        (click)="setLang('en')"
-      >
-        English
+        حذف الدبلومة الحالية
       </button>
     </div>
   </div>
@@ -41,7 +52,10 @@
         class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"
       >
         <h5 class="m-0">الدبلومات المرفوعة</h5>
-        <a routerLink="/admin/diploma-editor" class="btn btn-sm btn-outline-primary">
+        <a
+          routerLink="/admin/diploma-editor"
+          class="btn btn-sm btn-outline-primary"
+        >
           إضافة دبلومة جديدة
         </a>
       </div>
@@ -76,13 +90,22 @@
                 }}
               </td>
               <td class="text-center">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-dark"
-                  (click)="editDiploma(item.id)"
-                >
-                  تعديل
-                </button>
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-dark"
+                    (click)="editDiploma(item.id)"
+                  >
+                    تعديل
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="deleteDiplomaItem(item.id)"
+                  >
+                    حذف
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -97,33 +120,33 @@
 
   <form *ngIf="!loading" (ngSubmit)="save()">
     <div class="alert alert-secondary">
-      أنت الآن تُدخل بيانات الدبلومة بنفس منطق الكورسات:
+      أنت الآن تُدخل بيانات الدبلومة للغة:
       <strong>{{ activeLang === 'ar' ? 'العربية' : 'English' }}</strong>
     </div>
 
     <h5 class="mb-3">البيانات الأساسية</h5>
     <div class="row g-3">
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isArabic">
         <label class="form-label">العنوان (عربي)</label>
         <input class="form-control" [(ngModel)]="$any(data).title.ar" name="titleAr" />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isEnglish">
         <label class="form-label">Title (English)</label>
         <input class="form-control" [(ngModel)]="$any(data).title.en" name="titleEn" />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isArabic">
         <label class="form-label">التصنيف (عربي)</label>
         <input class="form-control" [(ngModel)]="$any(data).categoryId.ar" name="categoryAr" />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isEnglish">
         <label class="form-label">Category (English)</label>
         <input class="form-control" [(ngModel)]="$any(data).categoryId.en" name="categoryEn" />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isArabic">
         <label class="form-label">الوصف (عربي)</label>
         <textarea
           class="form-control"
@@ -133,7 +156,7 @@
         ></textarea>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isEnglish">
         <label class="form-label">Description (English)</label>
         <textarea
           class="form-control"
@@ -171,17 +194,17 @@
 
     <h5 class="mb-3">Hero</h5>
     <div class="row g-3">
-      <div class="col-md-4">
+      <div class="col-md-12" *ngIf="isArabic">
         <label class="form-label">Hero Eyebrow (AR)</label>
         <input class="form-control" [(ngModel)]="$any(data).heroEyebrow.ar" name="heroEyebrowAr" />
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-12" *ngIf="isEnglish">
         <label class="form-label">Hero Eyebrow (EN)</label>
         <input class="form-control" [(ngModel)]="$any(data).heroEyebrow.en" name="heroEyebrowEn" />
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-12" *ngIf="isArabic">
         <label class="form-label">Hero Title Highlight (AR)</label>
         <input
           class="form-control"
@@ -190,7 +213,7 @@
         />
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-12" *ngIf="isEnglish">
         <label class="form-label">Hero Title Highlight (EN)</label>
         <input
           class="form-control"
@@ -199,17 +222,17 @@
         />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isArabic">
         <label class="form-label">Hero Tagline (AR)</label>
         <input class="form-control" [(ngModel)]="$any(data).heroTagline.ar" name="heroTaglineAr" />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isEnglish">
         <label class="form-label">Hero Tagline (EN)</label>
         <input class="form-control" [(ngModel)]="$any(data).heroTagline.en" name="heroTaglineEn" />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isArabic">
         <label class="form-label">مدة البرنامج (عربي)</label>
         <input
           class="form-control"
@@ -218,7 +241,7 @@
         />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isEnglish">
         <label class="form-label">Program Duration (EN)</label>
         <input
           class="form-control"
@@ -227,7 +250,7 @@
         />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isArabic">
         <label class="form-label">الفئة المستهدفة (عربي)</label>
         <input
           class="form-control"
@@ -236,7 +259,7 @@
         />
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-12" *ngIf="isEnglish">
         <label class="form-label">Target Audience (EN)</label>
         <input
           class="form-control"
@@ -255,17 +278,17 @@
 
     <h5 class="mb-3">بطاقات المعلومات</h5>
     <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">الهدف - عنوان (AR)</label>
+      <div class="col-md-12" *ngIf="isArabic">
+        <label class="form-label">الهدف - عنوان</label>
         <input class="form-control" [(ngModel)]="$any(data).goalTitle.ar" name="goalTitleAr" />
       </div>
-      <div class="col-md-6">
-        <label class="form-label">Goal - Title (EN)</label>
+      <div class="col-md-12" *ngIf="isEnglish">
+        <label class="form-label">Goal - Title</label>
         <input class="form-control" [(ngModel)]="$any(data).goalTitle.en" name="goalTitleEn" />
       </div>
 
-      <div class="col-md-6">
-        <label class="form-label">الهدف - وصف (AR)</label>
+      <div class="col-md-12" *ngIf="isArabic">
+        <label class="form-label">الهدف - وصف</label>
         <textarea
           class="form-control"
           rows="2"
@@ -273,8 +296,8 @@
           name="goalDescriptionAr"
         ></textarea>
       </div>
-      <div class="col-md-6">
-        <label class="form-label">Goal - Description (EN)</label>
+      <div class="col-md-12" *ngIf="isEnglish">
+        <label class="form-label">Goal - Description</label>
         <textarea
           class="form-control"
           rows="2"
@@ -283,16 +306,16 @@
         ></textarea>
       </div>
 
-      <div class="col-md-6">
-        <label class="form-label">المدة المتوقعة - عنوان (AR)</label>
+      <div class="col-md-12" *ngIf="isArabic">
+        <label class="form-label">المدة المتوقعة - عنوان</label>
         <input
           class="form-control"
           [(ngModel)]="$any(data).expectedStudyTimeTitle.ar"
           name="expectedStudyTimeTitleAr"
         />
       </div>
-      <div class="col-md-6">
-        <label class="form-label">Expected Study Time - Title (EN)</label>
+      <div class="col-md-12" *ngIf="isEnglish">
+        <label class="form-label">Expected Study Time - Title</label>
         <input
           class="form-control"
           [(ngModel)]="$any(data).expectedStudyTimeTitle.en"
@@ -300,8 +323,8 @@
         />
       </div>
 
-      <div class="col-md-6">
-        <label class="form-label">المدة المتوقعة - وصف (AR)</label>
+      <div class="col-md-12" *ngIf="isArabic">
+        <label class="form-label">المدة المتوقعة - وصف</label>
         <textarea
           class="form-control"
           rows="2"
@@ -309,8 +332,8 @@
           name="expectedStudyTimeDescriptionAr"
         ></textarea>
       </div>
-      <div class="col-md-6">
-        <label class="form-label">Expected Study Time - Description (EN)</label>
+      <div class="col-md-12" *ngIf="isEnglish">
+        <label class="form-label">Expected Study Time - Description</label>
         <textarea
           class="form-control"
           rows="2"
@@ -319,16 +342,16 @@
         ></textarea>
       </div>
 
-      <div class="col-md-6">
-        <label class="form-label">الخبرات السابقة - عنوان (AR)</label>
+      <div class="col-md-12" *ngIf="isArabic">
+        <label class="form-label">الخبرات السابقة - عنوان</label>
         <input
           class="form-control"
           [(ngModel)]="$any(data).prerequisitesTitle.ar"
           name="prerequisitesTitleAr"
         />
       </div>
-      <div class="col-md-6">
-        <label class="form-label">Prerequisites - Title (EN)</label>
+      <div class="col-md-12" *ngIf="isEnglish">
+        <label class="form-label">Prerequisites - Title</label>
         <input
           class="form-control"
           [(ngModel)]="$any(data).prerequisitesTitle.en"
@@ -336,8 +359,8 @@
         />
       </div>
 
-      <div class="col-md-6">
-        <label class="form-label">الخبرات السابقة - وصف (AR)</label>
+      <div class="col-md-12" *ngIf="isArabic">
+        <label class="form-label">الخبرات السابقة - وصف</label>
         <textarea
           class="form-control"
           rows="2"
@@ -345,8 +368,8 @@
           name="prerequisitesDescriptionAr"
         ></textarea>
       </div>
-      <div class="col-md-6">
-        <label class="form-label">Prerequisites - Description (EN)</label>
+      <div class="col-md-12" *ngIf="isEnglish">
+        <label class="form-label">Prerequisites - Description</label>
         <textarea
           class="form-control"
           rows="2"
@@ -393,11 +416,11 @@
           + إضافة عنصر
         </button>
       </div>
-      <div class="row g-2 mb-2" *ngFor="let item of lectureNames.ar; let i = index; trackBy: trackByIndex">
-        <div class="col-md-5">
+      <div class="row g-2 mb-2" *ngFor="let item of (isArabic ? lectureNames.ar : lectureNames.en); let i = index; trackBy: trackByIndex">
+        <div class="col-md-10" *ngIf="isArabic">
           <input class="form-control" [(ngModel)]="lectureNames.ar[i]" name="lectureNameAr{{ i }}" placeholder="Lecture name (AR)" />
         </div>
-        <div class="col-md-5">
+        <div class="col-md-10" *ngIf="isEnglish">
           <input class="form-control" [(ngModel)]="lectureNames.en[i]" name="lectureNameEn{{ i }}" placeholder="Lecture name (EN)" />
         </div>
         <div class="col-md-2 d-grid">
@@ -418,20 +441,26 @@
     </div>
     <div class="card mb-2" *ngFor="let item of data.meta; let i = index">
       <div class="card-body">
-        <div class="row g-2">
-          <div class="col-md-3">
+        <div class="row g-2" *ngIf="isArabic">
+          <div class="col-md-5">
             <input class="form-control" [(ngModel)]="$any(data.meta)[i].label.ar" name="metaLabelAr{{ i }}" placeholder="Label (AR)" />
           </div>
-          <div class="col-md-3">
-            <input class="form-control" [(ngModel)]="$any(data.meta)[i].label.en" name="metaLabelEn{{ i }}" placeholder="Label (EN)" />
-          </div>
-          <div class="col-md-3">
+          <div class="col-md-5">
             <input class="form-control" [(ngModel)]="$any(data.meta)[i].value.ar" name="metaValueAr{{ i }}" placeholder="Value (AR)" />
           </div>
-          <div class="col-md-2">
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeMetaItem(i)">×</button>
+          </div>
+        </div>
+
+        <div class="row g-2" *ngIf="isEnglish">
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.meta)[i].label.en" name="metaLabelEn{{ i }}" placeholder="Label (EN)" />
+          </div>
+          <div class="col-md-5">
             <input class="form-control" [(ngModel)]="$any(data.meta)[i].value.en" name="metaValueEn{{ i }}" placeholder="Value (EN)" />
           </div>
-          <div class="col-md-1 d-grid">
+          <div class="col-md-2 d-grid">
             <button type="button" class="btn btn-outline-danger" (click)="removeMetaItem(i)">×</button>
           </div>
         </div>
@@ -447,11 +476,11 @@
           + إضافة عنصر
         </button>
       </div>
-      <div class="row g-2 mb-2" *ngFor="let item of outcomes.ar; let i = index; trackBy: trackByIndex">
-        <div class="col-md-5">
+      <div class="row g-2 mb-2" *ngFor="let item of (isArabic ? outcomes.ar : outcomes.en); let i = index; trackBy: trackByIndex">
+        <div class="col-md-10" *ngIf="isArabic">
           <input class="form-control" [(ngModel)]="outcomes.ar[i]" name="outcomeAr{{ i }}" placeholder="Outcome (AR)" />
         </div>
-        <div class="col-md-5">
+        <div class="col-md-10" *ngIf="isEnglish">
           <input class="form-control" [(ngModel)]="outcomes.en[i]" name="outcomeEn{{ i }}" placeholder="Outcome (EN)" />
         </div>
         <div class="col-md-2 d-grid">
@@ -469,11 +498,11 @@
           + إضافة عنصر
         </button>
       </div>
-      <div class="row g-2 mb-2" *ngFor="let item of audienceItems.ar; let i = index; trackBy: trackByIndex">
-        <div class="col-md-5">
+      <div class="row g-2 mb-2" *ngFor="let item of (isArabic ? audienceItems.ar : audienceItems.en); let i = index; trackBy: trackByIndex">
+        <div class="col-md-10" *ngIf="isArabic">
           <input class="form-control" [(ngModel)]="audienceItems.ar[i]" name="audienceItemAr{{ i }}" placeholder="Audience item (AR)" />
         </div>
-        <div class="col-md-5">
+        <div class="col-md-10" *ngIf="isEnglish">
           <input class="form-control" [(ngModel)]="audienceItems.en[i]" name="audienceItemEn{{ i }}" placeholder="Audience item (EN)" />
         </div>
         <div class="col-md-2 d-grid">
@@ -492,21 +521,27 @@
     </div>
     <div class="card mb-2" *ngFor="let item of data.sectionCards; let i = index">
       <div class="card-body">
-        <div class="row g-2">
-          <div class="col-md-5">
+        <div class="row g-2" *ngIf="isArabic">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.sectionCards)[i].title.ar" name="sectionCardTitleAr{{ i }}" placeholder="Title (AR)" />
           </div>
-          <div class="col-md-5">
-            <input class="form-control" [(ngModel)]="$any(data.sectionCards)[i].title.en" name="sectionCardTitleEn{{ i }}" placeholder="Title (EN)" />
+          <div class="col-md-10">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.sectionCards)[i].description.ar" name="sectionCardDescriptionAr{{ i }}" placeholder="Description (AR)"></textarea>
           </div>
           <div class="col-md-2 d-grid">
             <button type="button" class="btn btn-outline-danger" (click)="removeSectionCard(i)">حذف</button>
           </div>
-          <div class="col-md-6">
-            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.sectionCards)[i].description.ar" name="sectionCardDescriptionAr{{ i }}" placeholder="Description (AR)"></textarea>
+        </div>
+
+        <div class="row g-2" *ngIf="isEnglish">
+          <div class="col-md-10">
+            <input class="form-control" [(ngModel)]="$any(data.sectionCards)[i].title.en" name="sectionCardTitleEn{{ i }}" placeholder="Title (EN)" />
           </div>
-          <div class="col-md-6">
+          <div class="col-md-10">
             <textarea class="form-control" rows="2" [(ngModel)]="$any(data.sectionCards)[i].description.en" name="sectionCardDescriptionEn{{ i }}" placeholder="Description (EN)"></textarea>
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeSectionCard(i)">حذف</button>
           </div>
         </div>
       </div>
@@ -522,11 +557,17 @@
     </div>
     <div class="card mb-3" *ngFor="let item of data.curriculum; let i = index">
       <div class="card-body">
-        <div class="row g-2 mb-2">
-          <div class="col-md-5">
+        <div class="row g-2 mb-2" *ngIf="isArabic">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.curriculum)[i].title.ar" name="curriculumTitleAr{{ i }}" placeholder="Title (AR)" />
           </div>
-          <div class="col-md-5">
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeCurriculumItem(i)">حذف</button>
+          </div>
+        </div>
+
+        <div class="row g-2 mb-2" *ngIf="isEnglish">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.curriculum)[i].title.en" name="curriculumTitleEn{{ i }}" placeholder="Title (EN)" />
           </div>
           <div class="col-md-2 d-grid">
@@ -541,11 +582,11 @@
         </div>
 
         <ng-container *ngIf="$any(data.curriculum)[i].points as points">
-          <div class="row g-2 mb-2" *ngFor="let point of points.ar; let pi = index; trackBy: trackByIndex">
-            <div class="col-md-5">
+          <div class="row g-2 mb-2" *ngFor="let point of (isArabic ? points.ar : points.en); let pi = index; trackBy: trackByIndex">
+            <div class="col-md-10" *ngIf="isArabic">
               <input class="form-control" [(ngModel)]="points.ar[pi]" name="curriculumPointAr{{ i }}{{ pi }}" placeholder="Point (AR)" />
             </div>
-            <div class="col-md-5">
+            <div class="col-md-10" *ngIf="isEnglish">
               <input class="form-control" [(ngModel)]="points.en[pi]" name="curriculumPointEn{{ i }}{{ pi }}" placeholder="Point (EN)" />
             </div>
             <div class="col-md-2 d-grid">
@@ -566,21 +607,27 @@
     </div>
     <div class="card mb-2" *ngFor="let item of data.faqs; let i = index">
       <div class="card-body">
-        <div class="row g-2">
-          <div class="col-md-5">
+        <div class="row g-2" *ngIf="isArabic">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.faqs)[i].question.ar" name="faqQuestionAr{{ i }}" placeholder="Question (AR)" />
           </div>
-          <div class="col-md-5">
-            <input class="form-control" [(ngModel)]="$any(data.faqs)[i].question.en" name="faqQuestionEn{{ i }}" placeholder="Question (EN)" />
+          <div class="col-md-10">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.faqs)[i].answer.ar" name="faqAnswerAr{{ i }}" placeholder="Answer (AR)"></textarea>
           </div>
           <div class="col-md-2 d-grid">
             <button type="button" class="btn btn-outline-danger" (click)="removeFaq(i)">حذف</button>
           </div>
-          <div class="col-md-6">
-            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.faqs)[i].answer.ar" name="faqAnswerAr{{ i }}" placeholder="Answer (AR)"></textarea>
+        </div>
+
+        <div class="row g-2" *ngIf="isEnglish">
+          <div class="col-md-10">
+            <input class="form-control" [(ngModel)]="$any(data.faqs)[i].question.en" name="faqQuestionEn{{ i }}" placeholder="Question (EN)" />
           </div>
-          <div class="col-md-6">
+          <div class="col-md-10">
             <textarea class="form-control" rows="2" [(ngModel)]="$any(data.faqs)[i].answer.en" name="faqAnswerEn{{ i }}" placeholder="Answer (EN)"></textarea>
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeFaq(i)">حذف</button>
           </div>
         </div>
       </div>
@@ -595,11 +642,11 @@
           + إضافة عنصر
         </button>
       </div>
-      <div class="row g-2 mb-2" *ngFor="let item of communityPerks.ar; let i = index; trackBy: trackByIndex">
-        <div class="col-md-5">
+      <div class="row g-2 mb-2" *ngFor="let item of (isArabic ? communityPerks.ar : communityPerks.en); let i = index; trackBy: trackByIndex">
+        <div class="col-md-10" *ngIf="isArabic">
           <input class="form-control" [(ngModel)]="communityPerks.ar[i]" name="perkAr{{ i }}" placeholder="Perk (AR)" />
         </div>
-        <div class="col-md-5">
+        <div class="col-md-10" *ngIf="isEnglish">
           <input class="form-control" [(ngModel)]="communityPerks.en[i]" name="perkEn{{ i }}" placeholder="Perk (EN)" />
         </div>
         <div class="col-md-2 d-grid">
@@ -618,30 +665,39 @@
     </div>
     <div class="card mb-3" *ngFor="let item of data.testimonials; let i = index">
       <div class="card-body">
-        <div class="row g-2">
-          <div class="col-md-3">
+        <div class="row g-2" *ngIf="isArabic">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].name.ar" name="testimonialNameAr{{ i }}" placeholder="Name (AR)" />
           </div>
-          <div class="col-md-3">
-            <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].name.en" name="testimonialNameEn{{ i }}" placeholder="Name (EN)" />
-          </div>
-          <div class="col-md-2">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].tag.ar" name="testimonialTagAr{{ i }}" placeholder="Tag (AR)" />
           </div>
-          <div class="col-md-2">
-            <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].tag.en" name="testimonialTagEn{{ i }}" placeholder="Tag (EN)" />
-          </div>
-          <div class="col-md-1">
-            <input type="number" min="1" max="5" class="form-control" [(ngModel)]="$any(data.testimonials)[i].rating" name="testimonialRating{{ i }}" />
-          </div>
-          <div class="col-md-1 d-grid">
-            <button type="button" class="btn btn-outline-danger" (click)="removeTestimonial(i)">×</button>
-          </div>
-          <div class="col-md-6">
+          <div class="col-md-10">
             <textarea class="form-control" rows="2" [(ngModel)]="$any(data.testimonials)[i].text.ar" name="testimonialTextAr{{ i }}" placeholder="Text (AR)"></textarea>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-2">
+            <input type="number" min="1" max="5" class="form-control" [(ngModel)]="$any(data.testimonials)[i].rating" name="testimonialRatingAr{{ i }}" />
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeTestimonial(i)">×</button>
+          </div>
+        </div>
+
+        <div class="row g-2" *ngIf="isEnglish">
+          <div class="col-md-10">
+            <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].name.en" name="testimonialNameEn{{ i }}" placeholder="Name (EN)" />
+          </div>
+          <div class="col-md-10">
+            <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].tag.en" name="testimonialTagEn{{ i }}" placeholder="Tag (EN)" />
+          </div>
+          <div class="col-md-10">
             <textarea class="form-control" rows="2" [(ngModel)]="$any(data.testimonials)[i].text.en" name="testimonialTextEn{{ i }}" placeholder="Text (EN)"></textarea>
+          </div>
+          <div class="col-md-2">
+            <input type="number" min="1" max="5" class="form-control" [(ngModel)]="$any(data.testimonials)[i].rating" name="testimonialRatingEn{{ i }}" />
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeTestimonial(i)">×</button>
           </div>
         </div>
       </div>
@@ -657,73 +713,85 @@
     </div>
     <div class="card mb-3" *ngFor="let item of data.pricingPlans; let i = index">
       <div class="card-body">
-        <div class="row g-2">
-          <div class="col-md-5">
+        <div class="row g-2" *ngIf="isArabic">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].name.ar" name="pricingNameAr{{ i }}" placeholder="Plan Name (AR)" />
           </div>
-          <div class="col-md-5">
-            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].name.en" name="pricingNameEn{{ i }}" placeholder="Plan Name (EN)" />
+          <div class="col-md-10">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].badge.ar" name="pricingBadgeAr{{ i }}" placeholder="Badge (AR)" />
+          </div>
+          <div class="col-md-10">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].priceText.ar" name="pricingPriceTextAr{{ i }}" placeholder="Price text (AR)" />
+          </div>
+          <div class="col-md-10">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.pricingPlans)[i].note.ar" name="pricingNoteAr{{ i }}" placeholder="Note (AR)"></textarea>
+          </div>
+          <div class="col-md-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [(ngModel)]="$any(data.pricingPlans)[i].highlighted"
+              name="pricingHighlightedAr{{ i }}"
+              id="pricingHighlightedAr{{ i }}"
+            />
+            <label class="form-check-label ms-2" [for]="'pricingHighlightedAr' + i">
+              مميزة
+            </label>
           </div>
           <div class="col-md-2 d-grid">
             <button type="button" class="btn btn-outline-danger" (click)="removePricingPlan(i)">حذف</button>
           </div>
+        </div>
 
-          <div class="col-md-6">
-            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].badge.ar" name="pricingBadgeAr{{ i }}" placeholder="Badge (AR)" />
+        <div class="row g-2" *ngIf="isEnglish">
+          <div class="col-md-10">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].name.en" name="pricingNameEn{{ i }}" placeholder="Plan Name (EN)" />
           </div>
-          <div class="col-md-6">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].badge.en" name="pricingBadgeEn{{ i }}" placeholder="Badge (EN)" />
           </div>
-
-          <div class="col-md-6">
-            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].priceText.ar" name="pricingPriceTextAr{{ i }}" placeholder="Price text (AR)" />
-          </div>
-          <div class="col-md-6">
+          <div class="col-md-10">
             <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].priceText.en" name="pricingPriceTextEn{{ i }}" placeholder="Price text (EN)" />
           </div>
-
-          <div class="col-md-6">
-            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.pricingPlans)[i].note.ar" name="pricingNoteAr{{ i }}" placeholder="Note (AR)"></textarea>
-          </div>
-          <div class="col-md-6">
+          <div class="col-md-10">
             <textarea class="form-control" rows="2" [(ngModel)]="$any(data.pricingPlans)[i].note.en" name="pricingNoteEn{{ i }}" placeholder="Note (EN)"></textarea>
           </div>
-
-          <div class="col-12">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                [(ngModel)]="$any(data.pricingPlans)[i].highlighted"
-                name="pricingHighlighted{{ i }}"
-                id="pricingHighlighted{{ i }}"
-              />
-              <label class="form-check-label" [for]="'pricingHighlighted' + i">
-                الخطة المميزة
-              </label>
-            </div>
+          <div class="col-md-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [(ngModel)]="$any(data.pricingPlans)[i].highlighted"
+              name="pricingHighlightedEn{{ i }}"
+              id="pricingHighlightedEn{{ i }}"
+            />
+            <label class="form-check-label ms-2" [for]="'pricingHighlightedEn' + i">
+              Highlighted
+            </label>
           </div>
-
-          <div class="col-12">
-            <button type="button" class="btn btn-sm btn-outline-secondary mb-2" (click)="addPricingFeature(i)">
-              + إضافة ميزة
-            </button>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removePricingPlan(i)">حذف</button>
           </div>
-
-          <ng-container *ngIf="$any(data.pricingPlans)[i].features as features">
-            <div class="row g-2" *ngFor="let feature of features.ar; let fi = index; trackBy: trackByIndex">
-              <div class="col-md-5">
-                <input class="form-control" [(ngModel)]="features.ar[fi]" name="pricingFeatureAr{{ i }}{{ fi }}" placeholder="Feature (AR)" />
-              </div>
-              <div class="col-md-5">
-                <input class="form-control" [(ngModel)]="features.en[fi]" name="pricingFeatureEn{{ i }}{{ fi }}" placeholder="Feature (EN)" />
-              </div>
-              <div class="col-md-2 d-grid">
-                <button type="button" class="btn btn-outline-danger" (click)="removePricingFeature(i, fi)">حذف</button>
-              </div>
-            </div>
-          </ng-container>
         </div>
+
+        <div class="col-12 mt-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary mb-2" (click)="addPricingFeature(i)">
+            + إضافة ميزة
+          </button>
+        </div>
+
+        <ng-container *ngIf="$any(data.pricingPlans)[i].features as features">
+          <div class="row g-2" *ngFor="let feature of (isArabic ? features.ar : features.en); let fi = index; trackBy: trackByIndex">
+            <div class="col-md-10" *ngIf="isArabic">
+              <input class="form-control" [(ngModel)]="features.ar[fi]" name="pricingFeatureAr{{ i }}{{ fi }}" placeholder="Feature (AR)" />
+            </div>
+            <div class="col-md-10" *ngIf="isEnglish">
+              <input class="form-control" [(ngModel)]="features.en[fi]" name="pricingFeatureEn{{ i }}{{ fi }}" placeholder="Feature (EN)" />
+            </div>
+            <div class="col-md-2 d-grid">
+              <button type="button" class="btn btn-outline-danger" (click)="removePricingFeature(i, fi)">حذف</button>
+            </div>
+          </div>
+        </ng-container>
       </div>
     </div>
 
@@ -736,27 +804,30 @@
           <label class="form-label">Percent</label>
           <input type="number" class="form-control" [(ngModel)]="offer.percent" name="offerPercent" />
         </div>
-        <div class="col-md-5">
+
+        <div class="col-md-10" *ngIf="isArabic">
           <label class="form-label">Heading (AR)</label>
           <input class="form-control" [(ngModel)]="$any(offer).heading.ar" name="offerHeadingAr" />
         </div>
-        <div class="col-md-5">
+        <div class="col-md-10" *ngIf="isEnglish">
           <label class="form-label">Heading (EN)</label>
           <input class="form-control" [(ngModel)]="$any(offer).heading.en" name="offerHeadingEn" />
         </div>
-        <div class="col-md-6">
+
+        <div class="col-md-12" *ngIf="isArabic">
           <label class="form-label">Text (AR)</label>
           <textarea class="form-control" rows="2" [(ngModel)]="$any(offer).text.ar" name="offerTextAr"></textarea>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12" *ngIf="isEnglish">
           <label class="form-label">Text (EN)</label>
           <textarea class="form-control" rows="2" [(ngModel)]="$any(offer).text.en" name="offerTextEn"></textarea>
         </div>
-        <div class="col-md-6">
+
+        <div class="col-md-12" *ngIf="isArabic">
           <label class="form-label">CTA (AR)</label>
           <input class="form-control" [(ngModel)]="$any(offer).ctaText.ar" name="offerCtaAr" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12" *ngIf="isEnglish">
           <label class="form-label">CTA (EN)</label>
           <input class="form-control" [(ngModel)]="$any(offer).ctaText.en" name="offerCtaEn" />
         </div>
@@ -768,26 +839,27 @@
     <ng-container *ngIf="data.bottomCta as bottomCta">
       <h5 class="mb-3">Bottom CTA</h5>
       <div class="row g-3">
-        <div class="col-md-6">
+        <div class="col-md-12" *ngIf="isArabic">
           <label class="form-label">Text (AR)</label>
           <textarea class="form-control" rows="2" [(ngModel)]="$any(bottomCta).text.ar" name="bottomCtaTextAr"></textarea>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12" *ngIf="isEnglish">
           <label class="form-label">Text (EN)</label>
           <textarea class="form-control" rows="2" [(ngModel)]="$any(bottomCta).text.en" name="bottomCtaTextEn"></textarea>
         </div>
-        <div class="col-md-6">
+
+        <div class="col-md-12" *ngIf="isArabic">
           <label class="form-label">Button Text (AR)</label>
           <input class="form-control" [(ngModel)]="$any(bottomCta).buttonText.ar" name="bottomCtaButtonAr" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12" *ngIf="isEnglish">
           <label class="form-label">Button Text (EN)</label>
           <input class="form-control" [(ngModel)]="$any(bottomCta).buttonText.en" name="bottomCtaButtonEn" />
         </div>
       </div>
     </ng-container>
 
-    <div class="mt-4 d-flex gap-2">
+    <div class="mt-4 d-flex gap-2 flex-wrap">
       <button type="submit" class="btn btn-primary">
         {{ diplomaId ? 'حفظ التعديلات' : 'حفظ الدبلومة' }}
       </button>
@@ -795,6 +867,15 @@
       <a routerLink="/admin/dashboard" class="btn btn-outline-secondary">
         إلغاء
       </a>
+
+      <button
+        *ngIf="diplomaId"
+        type="button"
+        class="btn btn-outline-danger"
+        (click)="deleteCurrentDiploma()"
+      >
+        حذف الدبلومة
+      </button>
     </div>
   </form>
 </div>
