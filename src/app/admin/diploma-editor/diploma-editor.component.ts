@@ -52,7 +52,7 @@ export class DiplomaEditorComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private diplomasAdmin: DiplomasAdminService,
-    private adminCourses: AdminService,
+    private adminCourses: AdminService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -93,7 +93,7 @@ export class DiplomaEditorComponent implements OnInit {
 
     this.courses = courses;
     this.diplomas = diplomas.sort(
-      (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
+      (a, b) => (b.createdAt || 0) - (a.createdAt || 0)
     );
   }
 
@@ -157,7 +157,7 @@ export class DiplomaEditorComponent implements OnInit {
       goalDescription: this.normText(value.goalDescription),
       expectedStudyTimeTitle: this.normText(value.expectedStudyTimeTitle),
       expectedStudyTimeDescription: this.normText(
-        value.expectedStudyTimeDescription,
+        value.expectedStudyTimeDescription
       ),
       prerequisitesTitle: this.normText(value.prerequisitesTitle),
       prerequisitesDescription: this.normText(value.prerequisitesDescription),
@@ -283,7 +283,7 @@ export class DiplomaEditorComponent implements OnInit {
     const totalCourses = Object.keys(this.data.courseIds || {}).length;
     const totalCoursesIndex = this.findMetaIndex(
       'عدد الكورسات',
-      'Total courses',
+      'Total courses'
     );
 
     if (totalCoursesIndex >= 0) {
@@ -325,7 +325,7 @@ export class DiplomaEditorComponent implements OnInit {
   }
 
   addListItem(
-    key: 'lectureNames' | 'outcomes' | 'audienceItems' | 'communityPerks',
+    key: 'lectureNames' | 'outcomes' | 'audienceItems' | 'communityPerks'
   ): void {
     const normalized = this.normList(this.data[key]);
     normalized.ar.push('');
@@ -335,7 +335,7 @@ export class DiplomaEditorComponent implements OnInit {
 
   removeListItem(
     key: 'lectureNames' | 'outcomes' | 'audienceItems' | 'communityPerks',
-    index: number,
+    index: number
   ): void {
     const list = this.normList((this.data as any)[key]);
     list.ar = list.ar.filter((_, i) => i !== index);
@@ -357,7 +357,7 @@ export class DiplomaEditorComponent implements OnInit {
 
   removeSectionCard(index: number): void {
     this.data.sectionCards = (this.data.sectionCards || []).filter(
-      (_, i) => i !== index,
+      (_, i) => i !== index
     );
   }
 
@@ -367,7 +367,7 @@ export class DiplomaEditorComponent implements OnInit {
 
   removeCurriculumItem(index: number): void {
     this.data.curriculum = (this.data.curriculum || []).filter(
-      (_, i) => i !== index,
+      (_, i) => i !== index
     );
   }
 
@@ -404,7 +404,7 @@ export class DiplomaEditorComponent implements OnInit {
 
   removeTestimonial(index: number): void {
     this.data.testimonials = (this.data.testimonials || []).filter(
-      (_, i) => i !== index,
+      (_, i) => i !== index
     );
   }
 
@@ -417,7 +417,7 @@ export class DiplomaEditorComponent implements OnInit {
 
   removePricingPlan(index: number): void {
     this.data.pricingPlans = (this.data.pricingPlans || []).filter(
-      (_, i) => i !== index,
+      (_, i) => i !== index
     );
   }
 
@@ -463,11 +463,11 @@ export class DiplomaEditorComponent implements OnInit {
         goalDescription: this.normText(this.data.goalDescription),
         expectedStudyTimeTitle: this.normText(this.data.expectedStudyTimeTitle),
         expectedStudyTimeDescription: this.normText(
-          this.data.expectedStudyTimeDescription,
+          this.data.expectedStudyTimeDescription
         ),
         prerequisitesTitle: this.normText(this.data.prerequisitesTitle),
         prerequisitesDescription: this.normText(
-          this.data.prerequisitesDescription,
+          this.data.prerequisitesDescription
         ),
         lectureNames: this.cleanList(this.data.lectureNames),
         outcomes: this.cleanList(this.data.outcomes),
@@ -483,7 +483,7 @@ export class DiplomaEditorComponent implements OnInit {
               item.label.ar ||
               item.label.en ||
               item.value.ar ||
-              item.value.en,
+              item.value.en
           ),
         sectionCards: (this.data.sectionCards || [])
           .map((item) => ({
@@ -495,7 +495,7 @@ export class DiplomaEditorComponent implements OnInit {
               item.title.ar ||
               item.title.en ||
               item.description.ar ||
-              item.description.en,
+              item.description.en
           ),
         curriculum: (this.data.curriculum || [])
           .map((item) => ({
@@ -507,7 +507,7 @@ export class DiplomaEditorComponent implements OnInit {
               item.title.ar ||
               item.title.en ||
               item.points.ar.length ||
-              item.points.en.length,
+              item.points.en.length
           ),
         faqs: (this.data.faqs || [])
           .map((item) => ({
@@ -519,7 +519,7 @@ export class DiplomaEditorComponent implements OnInit {
               item.question.ar ||
               item.question.en ||
               item.answer.ar ||
-              item.answer.en,
+              item.answer.en
           ),
         testimonials: (this.data.testimonials || [])
           .map((item) => ({
@@ -533,7 +533,7 @@ export class DiplomaEditorComponent implements OnInit {
               item.name.ar ||
               item.name.en ||
               item.text.ar ||
-              item.text.en,
+              item.text.en
           ),
         pricingPlans: (this.data.pricingPlans || [])
           .map((item) => ({
@@ -551,7 +551,7 @@ export class DiplomaEditorComponent implements OnInit {
               item.priceText.ar ||
               item.priceText.en ||
               item.features.ar.length ||
-              item.features.en.length,
+              item.features.en.length
           ),
         offer: {
           percent: Number(this.data.offer?.percent || 0) || 30,
@@ -659,29 +659,36 @@ export class DiplomaEditorComponent implements OnInit {
   }
 
   private normList(
-    value?: Partial<LocalizedStringList> | null,
+    value?: Partial<LocalizedStringList> | null
   ): LocalizedStringList {
+    const ar = Array.isArray(value?.ar) ? [...value.ar] : [''];
+    const en = Array.isArray(value?.en) ? [...value.en] : [''];
+
     return {
-      ar: Array.isArray(value?.ar) ? [...value.ar] : [''],
-      en: Array.isArray(value?.en) ? [...value.en] : [''],
+      ar,
+      en,
     };
   }
 
   private cleanList(
-    value?: Partial<LocalizedStringList> | null,
+    value?: Partial<LocalizedStringList> | null
   ): LocalizedStringList {
+    const ar = Array.isArray(value?.ar)
+      ? value.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+      : [];
+
+    const en = Array.isArray(value?.en)
+      ? value.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+      : [];
+
     return {
-      ar: Array.isArray(value?.ar)
-        ? value?.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
-        : [],
-      en: Array.isArray(value?.en)
-        ? value?.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
-        : [],
+      ar,
+      en,
     };
   }
 
   private normalizeCourseIds(
-    value?: Record<string, boolean>,
+    value?: Record<string, boolean>
   ): Record<string, boolean> {
     if (!value || typeof value !== 'object') return {};
     return Object.keys(value).reduce((acc, key) => {

@@ -113,7 +113,7 @@ export class DiplomasAdminService {
   }
 
   async getDiploma(
-    id: string,
+    id: string
   ): Promise<({ id: string } & AdminDiploma) | null> {
     const snap = await get(ref(this.db, `diplomas/${id}`));
     return snap.exists() ? { id, ...(snap.val() as AdminDiploma) } : null;
@@ -121,7 +121,7 @@ export class DiplomasAdminService {
 
   async createDiploma(
     data: AdminDiploma,
-    opts?: { id?: string },
+    opts?: { id?: string }
   ): Promise<string> {
     const now = Date.now();
     let id = opts?.id?.trim();
@@ -146,14 +146,14 @@ export class DiplomasAdminService {
       programDuration: this.buildLocalizedText(data.programDuration),
       targetAudience: this.buildLocalizedText(data.targetAudience),
       expectedStudyTimeTitle: this.buildLocalizedText(
-        data.expectedStudyTimeTitle,
+        data.expectedStudyTimeTitle
       ),
       expectedStudyTimeDescription: this.buildLocalizedText(
-        data.expectedStudyTimeDescription,
+        data.expectedStudyTimeDescription
       ),
       prerequisitesTitle: this.buildLocalizedText(data.prerequisitesTitle),
       prerequisitesDescription: this.buildLocalizedText(
-        data.prerequisitesDescription,
+        data.prerequisitesDescription
       ),
       goalTitle: this.buildLocalizedText(data.goalTitle),
       goalDescription: this.buildLocalizedText(data.goalDescription),
@@ -238,7 +238,7 @@ export class DiplomasAdminService {
 
   async updateDiploma(
     id: string,
-    data: Partial<AdminDiploma>,
+    data: Partial<AdminDiploma>
   ): Promise<void> {
     await update(ref(this.db, `diplomas/${id}`), this.normalizeDiplomaPayload(data));
   }
@@ -255,20 +255,24 @@ export class DiplomasAdminService {
   }
 
   buildLocalizedList(
-    value?: Partial<LocalizedStringList> | null,
+    value?: Partial<LocalizedStringList> | null
   ): LocalizedStringList {
+    const ar = Array.isArray(value?.ar)
+      ? value.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+      : [];
+
+    const en = Array.isArray(value?.en)
+      ? value.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+      : [];
+
     return {
-      ar: Array.isArray(value?.ar)
-        ? value?.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
-        : [],
-      en: Array.isArray(value?.en)
-        ? value?.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
-        : [],
+      ar,
+      en,
     };
   }
 
   private normalizeDiplomaPayload(
-    data: Partial<AdminDiploma>,
+    data: Partial<AdminDiploma>
   ): Partial<AdminDiploma> {
     const payload: Partial<AdminDiploma> = {
       ...data,
@@ -305,22 +309,22 @@ export class DiplomasAdminService {
     }
     if (data.expectedStudyTimeTitle) {
       payload.expectedStudyTimeTitle = this.buildLocalizedText(
-        data.expectedStudyTimeTitle,
+        data.expectedStudyTimeTitle
       );
     }
     if (data.expectedStudyTimeDescription) {
       payload.expectedStudyTimeDescription = this.buildLocalizedText(
-        data.expectedStudyTimeDescription,
+        data.expectedStudyTimeDescription
       );
     }
     if (data.prerequisitesTitle) {
       payload.prerequisitesTitle = this.buildLocalizedText(
-        data.prerequisitesTitle,
+        data.prerequisitesTitle
       );
     }
     if (data.prerequisitesDescription) {
       payload.prerequisitesDescription = this.buildLocalizedText(
-        data.prerequisitesDescription,
+        data.prerequisitesDescription
       );
     }
     if (data.goalTitle) {
@@ -411,7 +415,7 @@ export class DiplomasAdminService {
   }
 
   private normalizeCourseIds(
-    value?: Record<string, boolean>,
+    value?: Record<string, boolean>
   ): Record<string, boolean> {
     if (!value || typeof value !== 'object') return {};
     return Object.keys(value).reduce((acc, key) => {
