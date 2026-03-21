@@ -1,30 +1,26 @@
-<!-- PAGE HERO -->
-<section class="page-hero">
+<section class="page-hero" [attr.dir]="pageDir">
   <div class="container">
-    <div class="page-hero-eyebrow">جميع الكورسات</div>
-    <h1 class="page-hero-title">برامج نبضة حياة النفسية</h1>
+    <div class="page-hero-eyebrow">{{ eyebrowText }}</div>
+    <h1 class="page-hero-title">{{ pageTitle }}</h1>
     <p class="page-hero-subtitle">
-      هنا تجد كل الكورسات المتاحة حاليًا، من صدمات الطفولة إلى أعماق النفس
-      البشرية، مرورًا بالفطرة، قوة التسامح، إعداد القادة من المهد، ودورات خاصة
-      بالمرأة والنجاح.
+      {{ pageSubtitle }}
     </p>
   </div>
 </section>
 
-<!-- SEARCH BAR -->
-<div class="container search-container">
-  <label class="sr-only" for="courseSearch">ابحث عن كورس</label>
+<div class="container search-container" [attr.dir]="pageDir">
+  <label class="sr-only" for="courseSearch">{{ searchLabel }}</label>
   <input
     id="courseSearch"
     type="text"
     class="search-input"
-    placeholder="ابحث عن كورس..."
+    [placeholder]="searchPlaceholder"
     [(ngModel)]="search"
   />
 </div>
 
-<div class="container py-4">
-  <div *ngIf="loading" class="alert alert-info">جارٍ التحميل…</div>
+<div class="container py-4" [attr.dir]="pageDir">
+  <div *ngIf="loading" class="alert alert-info">{{ loadingText }}</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
   <div *ngIf="!loading && !error" class="courses-grid">
@@ -32,7 +28,6 @@
       class="course-card"
       *ngFor="let c of courses | searchCourses: search"
     >
-      <!-- الصورة -->
       <div
         class="course-image"
         [style.background-image]="'url(' + c.thumbnail + ')'"
@@ -43,10 +38,9 @@
           class="sr-only-img"
           loading="lazy"
         />
-        <span class="course-tag">{{ c.categoryId || "عام" }}</span>
+        <span class="course-tag">{{ c.categoryId || categoryFallback }}</span>
       </div>
 
-      <!-- معلومات الكورس -->
       <div class="course-body">
         <h3 class="course-title">{{ c.title }}</h3>
         <p class="course-desc">{{ c.description }}</p>
@@ -60,23 +54,20 @@
         </div>
       </div>
 
-      <!-- الأزرار -->
       <div class="course-footer">
-        <!-- ✅ لو المستخدم مسجّل دخول + عنده صلاحية -->
         <ng-container *ngIf="hasAccess(c.id); else noAccessButtons">
           <button class="btn btn-open" [routerLink]="['/courses', c.id]">
-            فتح الكورس
+            {{ openCourseText }}
           </button>
         </ng-container>
 
-        <!-- ❌ لو مش مسجّل دخول أو ملوش صلاحية -->
         <ng-template #noAccessButtons>
           <button class="btn" [routerLink]="['/courses', c.id]">
-            عرض التفاصيل
+            {{ detailsText }}
           </button>
 
           <button class="btn btn-primary" type="button" (click)="joinNow(c)">
-            اشترك الآن
+            {{ enrollNowText }}
           </button>
         </ng-template>
       </div>

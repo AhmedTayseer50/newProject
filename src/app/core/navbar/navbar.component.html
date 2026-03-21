@@ -1,6 +1,5 @@
 <header [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'" class="site-header">
   <div class="page-container nav">
-    <!-- الشعار + اسم المنصّة -->
     <div class="nav-left">
       <div class="logo-circle">
         <a routerLink="/" fragment="hero">
@@ -14,7 +13,6 @@
       </div>
     </div>
 
-    <!-- زر القائمة للموبايل -->
     <button
       class="nav-menu-toggle"
       type="button"
@@ -26,7 +24,6 @@
       ☰
     </button>
 
-    <!-- روابط الديسكتوب -->
     <nav class="nav-links">
       <a
         [routerLink]="['/']"
@@ -58,13 +55,11 @@
       <a routerLink="/about" routerLinkActive="active" i18n>عن الدكتورة</a>
 
       <a routerLink="/contact" routerLinkActive="active" i18n>
-        التواصل و طرق الدفع
+        التواصل وطرق الدفع
       </a>
     </nav>
 
-    <!-- أزرار الديسكتوب -->
     <div class="nav-actions">
-      <!-- زر الثيم -->
       <button
         id="themeToggle"
         class="theme-toggle"
@@ -72,12 +67,11 @@
         (click)="toggleTheme()"
         i18n-aria-label
         aria-label="تغيير الوضع"
-        [attr.title]="isDarkTheme ? 'الوضع الفاتح' : 'الوضع الداكن'"
+        [attr.title]="isDarkTheme ? lightModeTitle : darkModeTitle"
       >
         {{ isDarkTheme ? '☀️' : '🌙' }}
       </button>
 
-      <!-- زر اللغة -->
       <button
         class="btn btn-ghost"
         type="button"
@@ -90,18 +84,21 @@
         {{ currentLang === 'ar' ? 'EN' : 'AR' }}
       </button>
 
-      <!-- غير مسجّل -->
       <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loggedIn">
         <button class="btn btn-ghost" type="button" routerLink="/login" i18n>
           دخول
         </button>
 
-        <button class="btn btn-primary" type="button" routerLink="/register" i18n>
+        <button
+          class="btn btn-primary"
+          type="button"
+          routerLink="/register"
+          i18n
+        >
           حساب جديد
         </button>
       </ng-container>
 
-      <!-- ✅ مسجّل (Dropdown) -->
       <ng-template #loggedIn>
         <div class="user-menu" [class.open]="isUserMenuOpen">
           <button
@@ -119,11 +116,21 @@
           </button>
 
           <div class="user-menu-panel">
-            <a class="user-menu-item" routerLink="/my-courses" (click)="closeUserMenu()" i18n>
+            <a
+              class="user-menu-item"
+              routerLink="/my-courses"
+              (click)="closeUserMenu()"
+              i18n
+            >
               كورساتي
             </a>
 
-            <a class="user-menu-item" routerLink="/profile" (click)="closeUserMenu()" i18n>
+            <a
+              class="user-menu-item"
+              routerLink="/profile"
+              (click)="closeUserMenu()"
+              i18n
+            >
               الملف الشخصي
             </a>
 
@@ -132,8 +139,9 @@
               class="user-menu-item"
               [routerLink]="isAdmin ? '/admin/cases' : '/staff/cases'"
               (click)="closeUserMenu()"
+              i18n
             >
-              <span i18n>Cases</span>
+              الحالات
             </a>
 
             <a
@@ -141,11 +149,17 @@
               class="user-menu-item"
               routerLink="/admin/dashboard"
               (click)="closeUserMenu()"
+              i18n
             >
-              <span i18n>Dashboard</span>
+              لوحة التحكم
             </a>
 
-            <button class="user-menu-item danger" type="button" (click)="onLogout()" i18n>
+            <button
+              class="user-menu-item danger"
+              type="button"
+              (click)="onLogout()"
+              i18n
+            >
               خروج
             </button>
           </div>
@@ -156,7 +170,6 @@
     </div>
   </div>
 
-  <!-- ✅ Mobile Panel -->
   <div class="mobile-panel" [class.open]="isMenuOpen">
     <div class="page-container mobile-inner">
       <nav class="mobile-links" (click)="isMenuOpen = false">
@@ -179,11 +192,10 @@
         <a routerLink="/diplomas" routerLinkActive="active" i18n>الدبلومات</a>
         <a routerLink="/consultations" routerLinkActive="active" i18n>الاستشارات</a>
         <a routerLink="/about" routerLinkActive="active" i18n>عن الدكتورة</a>
-        <a routerLink="/contact" routerLinkActive="active" i18n>التواصل و طرق الدفع</a>
+        <a routerLink="/contact" routerLinkActive="active" i18n>التواصل وطرق الدفع</a>
       </nav>
 
       <div class="mobile-actions" (click)="isMenuOpen = false">
-        <!-- زر اللغة (Mobile) -->
         <button
           class="btn btn-ghost w-100"
           type="button"
@@ -201,7 +213,12 @@
             دخول
           </button>
 
-          <button class="btn btn-primary w-100" type="button" routerLink="/register" i18n>
+          <button
+            class="btn btn-primary w-100"
+            type="button"
+            routerLink="/register"
+            i18n
+          >
             حساب جديد
           </button>
         </ng-container>
@@ -216,8 +233,9 @@
             class="btn btn-ghost w-100"
             type="button"
             [routerLink]="isAdmin ? '/admin/cases' : '/staff/cases'"
+            i18n
           >
-            <span i18n>Cases</span>
+            الحالات
           </button>
 
           <button
@@ -225,8 +243,9 @@
             class="btn btn-ghost btn-admin w-100"
             type="button"
             routerLink="/admin/dashboard"
+            i18n
           >
-            <span i18n>Dashboard</span>
+            لوحة التحكم
           </button>
 
           <button class="btn btn-ghost w-100" type="button" routerLink="/profile" i18n>

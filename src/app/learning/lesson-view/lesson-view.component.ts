@@ -1,4 +1,3 @@
-// src/app/learning/lesson-view/lesson-view.component.ts
 import {
   Component,
   OnDestroy,
@@ -41,10 +40,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   pdfDriveFileId?: string;
   pdfTitle?: string;
 
-  /** رابط داخلي مؤقت للاعب الفيديو (Vercel API) */
   playerUrl?: string;
-
-  /** ✅ لازم SafeResourceUrl للـ iframe */
   safeUrl?: SafeResourceUrl;
 
   loading = true;
@@ -55,7 +51,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
   private paramSub?: Subscription;
 
-  // ===== Presence Check =====
   presenceRequired = false;
   countdown = 30;
 
@@ -70,15 +65,11 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       if (!ev?.data || typeof ev.data !== 'object') return;
       const data: any = ev.data;
 
-      console.log('[lesson-view][postMessage] received:', data);
-
       if (data.type === 'PLAYER_STATE') {
         if (data.state === 'playing') {
           this.isPlaying = true;
           this.startRandomPresenceScheduler();
         } else if (data.state === 'paused') {
-          // ✅ مهم: لما نوقف الفيديو بسبب الـ presence prompt،
-          // ما نمسحش الرسالة (عشان ما تختفيش فورًا)
           this.isPlaying = false;
           this.stopRandomPresenceScheduler();
 
@@ -107,29 +98,99 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
   ) {}
 
+  get isEnglish(): boolean {
+    return window.location.pathname.startsWith('/en');
+  }
+
+  get pageDir(): 'rtl' | 'ltr' {
+    return this.isEnglish ? 'ltr' : 'rtl';
+  }
+
+  get backLabel(): string {
+    return this.isEnglish ? 'Back to course' : 'رجوع للكورس';
+  }
+
+  get lessonsCountLabel(): string {
+    return this.isEnglish
+      ? `Lessons count: ${this.totalLessons}`
+      : `عدد الدروس: ${this.totalLessons}`;
+  }
+
+  get prevText(): string {
+    return this.isEnglish ? 'Previous' : 'السابق';
+  }
+
+  get nextText(): string {
+    return this.isEnglish ? 'Next' : 'التالي';
+  }
+
+  get loadingText(): string {
+    return this.isEnglish ? 'Loading...' : 'جارِ التحميل…';
+  }
+
+  get materialButtonText(): string {
+    return this.pdfTitle || (this.isEnglish ? 'View study material' : 'عرض المادة العلمية');
+  }
+
+  get videoTitleText(): string {
+    return this.isEnglish ? 'Lesson video' : 'فيديو الدرس';
+  }
+
+  get presenceTitle(): string {
+    return this.isEnglish ? 'Do you want to continue the lesson?' : 'هل ترغب في متابعة الدرس؟';
+  }
+
+  get continueText(): string {
+    return this.isEnglish ? 'Continue' : 'متابعة';
+  }
+
+  get allLessonsText(): string {
+    return this.isEnglish ? 'All lessons' : 'كل الدروس';
+  }
+
+  get lessonWord(): string {
+    return this.isEnglish ? 'Lesson' : 'الدرس';
+  }
+
+  get untitledText(): string {
+    return this.isEnglish ? 'Untitled' : 'بدون عنوان';
+  }
+
+  get watchText(): string {
+    return this.isEnglish ? 'Watch' : 'مشاهدة';
+  }
+
+  get noLessonsText(): string {
+    return this.isEnglish ? 'No lessons yet.' : 'لا توجد دروس بعد.';
+  }
+
+  get presenceMessage(): string {
+    if (this.isEnglish) {
+      return this.countdown > 0
+        ? `To continue, press Continue within ${this.countdown} seconds.`
+        : 'Press Continue to keep watching.';
+    }
+
+    return this.countdown > 0
+      ? `للاستمرار، اضغط متابعة خلال ${this.countdown} ثانية.`
+      : 'اضغط متابعة للاستمرار.';
+  }
+
   ngOnInit() {
-    console.log('[lesson-view] ngOnInit ✅');
     window.addEventListener('message', this.onWindowMessage);
 
     this.paramSub = this.route.paramMap.subscribe(async (pm: ParamMap) => {
       const newCourseId = pm.get('courseId')!;
       const newLessonId = pm.get('lessonId')!;
 
-      console.log('[lesson-view] route paramMap changed:', {
-        newCourseId,
-        newLessonId,
-      });
-
       const courseChanged = newCourseId !== this.courseId;
 
       this.courseId = newCourseId;
       this.lessonId = newLessonId;
 
-      // reset state
       this.loading = true;
       this.error = undefined;
 
-      // ✅ مهم: صَفّر الـ urls عشان Angular يعيد binding من جديد
       this.playerUrl = undefined;
       this.safeUrl = undefined;
 
@@ -139,25 +200,15 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
       try {
         if (courseChanged || this.lessons.length === 0) {
-          console.log('[lesson-view] loading all lessons...');
           await this.loadAllLessons();
-          console.log(
-            '[lesson-view] lessons loaded ✅ count=',
-            this.lessons.length,
-          );
         }
 
         this.currentPos = this.lessons.findIndex((l) => l.id === this.lessonId);
-        console.log('[lesson-view] currentPos:', this.currentPos);
-
         await this.loadCurrentLesson();
-        console.log('[lesson-view] loadCurrentLesson finished ✅');
       } catch (e: any) {
-        console.error('[lesson-view] ERROR:', e);
-        this.error = e?.message ?? 'حدث خطأ';
+        this.error = e?.message ?? (this.isEnglish ? 'An error occurred' : 'حدث خطأ');
       } finally {
         this.loading = false;
-        console.log('[lesson-view] loading=false (finally)');
       }
     });
   }
@@ -170,11 +221,6 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   }
 
   private async loadAllLessons() {
-    console.log(
-      '[lesson-view] loadAllLessons() start:',
-      `lessons/${this.courseId}`,
-    );
-
     const allSnap = await get(ref(this.db, `lessons/${this.courseId}`));
     if (!allSnap.exists()) {
       this.lessons = [];
@@ -204,30 +250,20 @@ export class LessonViewComponent implements OnInit, OnDestroy {
         pdfTitle: (v?.pdfTitle ?? '').toString(),
       }))
       .sort((a, b) => (a.lessonIndex ?? 0) - (b.lessonIndex ?? 0));
-
-    console.log(
-      '[lesson-view] loadAllLessons() ✅ first item:',
-      this.lessons[0],
-    );
   }
 
   private async loadCurrentLesson() {
-    console.log(
-      '[lesson-view] loadCurrentLesson() start:',
-      `lessons/${this.courseId}/${this.lessonId}`,
-    );
-
     const snap = await get(
       ref(this.db, `lessons/${this.courseId}/${this.lessonId}`),
     );
-    if (!snap.exists()) throw new Error('الدرس غير موجود');
+    if (!snap.exists()) {
+      throw new Error(this.isEnglish ? 'Lesson not found' : 'الدرس غير موجود');
+    }
 
     const data = snap.val() as any;
 
     this.title = data.title ?? '';
-    this.videoProvider = (data.videoProvider ?? 'youtube') as
-      | 'youtube'
-      | 'gdrive';
+    this.videoProvider = (data.videoProvider ?? 'youtube') as 'youtube' | 'gdrive';
     this.videoRef = data.videoRef;
     this.pdfDriveFileId = data.pdfDriveFileId || '';
     this.pdfTitle = data.pdfTitle || '';
@@ -235,12 +271,21 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     if (!this.videoProvider || !this.videoRef) {
       this.playerUrl = undefined;
       this.safeUrl = undefined;
-      throw new Error('هذا الدرس لا يحتوي على فيديو بعد');
+      throw new Error(
+        this.isEnglish
+          ? 'This lesson does not contain a video yet'
+          : 'هذا الدرس لا يحتوي على فيديو بعد'
+      );
     }
 
-    // ===== create player session =====
     const idToken = await this.auth.currentUser?.getIdToken();
-    if (!idToken) throw new Error('يرجى تسجيل الدخول لمشاهدة الفيديو');
+    if (!idToken) {
+      throw new Error(
+        this.isEnglish
+          ? 'Please sign in to watch the video'
+          : 'يرجى تسجيل الدخول لمشاهدة الفيديو'
+      );
+    }
 
     const res = await firstValueFrom(
       this.playerSession.createSession({
@@ -252,34 +297,16 @@ export class LessonViewComponent implements OnInit, OnDestroy {
       }),
     );
 
-    // ✅ خليها absolute path على نفس الدومين (مهم جدًا)
     const raw = String(res?.playerUrl ?? '');
     const url = raw.startsWith('/') ? raw : `/${raw}`;
 
     this.playerUrl = url;
-
-    // ✅ ده اللي يمنع NG0904
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
-    console.log('[lesson-view] iframe url set ✅', {
-      playerUrl: this.playerUrl,
-    });
-
-    // Debug: اتأكد إن property src اتغير
-    setTimeout(() => {
-      const el = this.playerFrame?.nativeElement;
-      console.log('[lesson-view] iframe DOM check:', {
-        exists: !!el,
-        srcProp: el?.src,
-      });
-    }, 200);
   }
 
-  // ===== Presence =====
   private startRandomPresenceScheduler() {
     if (this.schedulerTimeoutId || this.presenceRequired) return;
 
-    // ✅ Random presence check between 10 and 30 minutes
     const delayMs = this.randomBetween(10 * 60_000, 30 * 60_000);
     this.schedulerTimeoutId = setTimeout(() => {
       this.schedulerTimeoutId = null;
@@ -357,9 +384,11 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   get totalLessons(): number {
     return this.lessons.length;
   }
+
   get hasPrev(): boolean {
     return this.currentPos > 0;
   }
+
   get hasNext(): boolean {
     return this.currentPos >= 0 && this.currentPos < this.lessons.length - 1;
   }
@@ -367,11 +396,13 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   goTo(lessonId: string) {
     this.router.navigate(['/lesson', this.courseId, lessonId]);
   }
+
   goPrev() {
     if (!this.hasPrev) return;
     const nextPos = this.currentPos - 1;
     this.router.navigate(['/lesson', this.courseId, this.lessons[nextPos].id]);
   }
+
   goNext() {
     if (!this.hasNext) return;
     const nextPos = this.currentPos + 1;

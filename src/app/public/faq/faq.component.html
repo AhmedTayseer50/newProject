@@ -1,9 +1,10 @@
-<section class="page-section" dir="rtl">
+<section class="page-section" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
   <div class="container py-5">
     <div class="text-center mx-auto" style="max-width: 720px">
-      <h1 class="mb-3">الأسئلة الشائعة</h1>
-      <p class="text-muted mb-4">
-        هذه الصفحة قيد الإعداد حاليًا، وسيتم إضافة الأسئلة الشائعة وإجاباتها قريبًا.
+      <h1 class="mb-3" i18n>الأسئلة الشائعة</h1>
+      <p class="text-muted mb-4" i18n>
+        هذه الصفحة قيد الإعداد حاليًا، وسيتم إضافة الأسئلة الشائعة وإجاباتها
+        قريبًا.
       </p>
     </div>
   </div>

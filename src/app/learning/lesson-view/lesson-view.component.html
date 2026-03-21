@@ -1,49 +1,33 @@
-<!-- src/app/learning/lesson-view/lesson-view.component.html -->
-
-<div class="lesson-page" dir="rtl">
-  <!-- Top Bar -->
+<div class="lesson-page" [attr.dir]="pageDir">
   <div class="lesson-topbar">
     <div class="container topbar-inner">
       <a [routerLink]="['/courses', courseId]" class="back-link">
-        <span class="back-icon">→</span>
-        رجوع للكورس
+        <span class="back-icon">{{ isEnglish ? '←' : '→' }}</span>
+        {{ backLabel }}
       </a>
 
       <div class="topbar-meta" *ngIf="!loading && !error">
-        <span class="lessons-count">عدد الدروس: {{ totalLessons }}</span>
+        <span class="lessons-count">{{ lessonsCountLabel }}</span>
 
         <div class="nav-buttons">
-          <button
-            class="nav-btn"
-            (click)="goPrev()"
-            [disabled]="!hasPrev"
-            type="button"
-          >
-            السابق
+          <button class="nav-btn" (click)="goPrev()" [disabled]="!hasPrev" type="button">
+            {{ prevText }}
           </button>
 
-          <button
-            class="nav-btn"
-            (click)="goNext()"
-            [disabled]="!hasNext"
-            type="button"
-          >
-            التالي
+          <button class="nav-btn" (click)="goNext()" [disabled]="!hasNext" type="button">
+            {{ nextText }}
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Content -->
   <div class="container py-4">
-    <div *ngIf="loading" class="alert alert-info">جارِ التحميل…</div>
+    <div *ngIf="loading" class="alert alert-info">{{ loadingText }}</div>
     <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
     <ng-container *ngIf="!loading && !error">
-      <div
-        class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3"
-      >
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
         <h2 class="lesson-title mb-0">{{ title }}</h2>
 
         <a
@@ -51,64 +35,51 @@
           class="btn btn-outline-primary"
           [routerLink]="['/lesson-material', courseId, lessonId]"
         >
-          {{ pdfTitle || "عرض المادة العلمية" }}
+          {{ materialButtonText }}
         </a>
       </div>
 
-      <!-- Video -->
       <div class="video-card" *ngIf="safeUrl">
         <div class="ratio ratio-16x9 position-relative">
           <iframe
             #playerFrame
             [src]="safeUrl"
             style="border: 0"
-            title="Lesson video"
+            [title]="videoTitleText"
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowfullscreen
             referrerpolicy="no-referrer"
           ></iframe>
 
-          <!-- Presence overlay (يظهر فقط أثناء تشغيل الفيديو) -->
           <div class="presence-overlay" *ngIf="presenceRequired">
             <div class="presence-modal">
-              <h3 class="m-0">هل ترغب في متابعة الدرس؟</h3>
-              <p class="mt-2 mb-3">
-                للاِستمرار، اضغط <b>متابعة</b>
-                <ng-container *ngIf="countdown > 0">
-                  خلال <b>{{ countdown }}</b> ثانية
-                </ng-container>
-                <ng-container *ngIf="countdown === 0">للإستمرار</ng-container>.
-              </p>
-              <button
-                class="btn btn-light"
-                (click)="confirmPresence()"
-                type="button"
-              >
-                متابعة
+              <h3 class="m-0">{{ presenceTitle }}</h3>
+              <p class="mt-2 mb-3">{{ presenceMessage }}</p>
+              <button class="btn btn-light" (click)="confirmPresence()" type="button">
+                {{ continueText }}
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Lessons List -->
       <div class="lessons-card">
-        <div class="lessons-card-header">كل الدروس</div>
+        <div class="lessons-card-header">{{ allLessonsText }}</div>
 
         <ul class="lessons-list">
           <li class="lesson-item" *ngFor="let l of lessons; let i = index">
             <div class="lesson-item-text">
-              <div class="lesson-item-index">الدرس {{ l.lessonIndex }}</div>
-              <div class="lesson-item-title">{{ l.title || "بدون عنوان" }}</div>
+              <div class="lesson-item-index">{{ lessonWord }} {{ l.lessonIndex }}</div>
+              <div class="lesson-item-title">{{ l.title || untitledText }}</div>
             </div>
 
             <button class="watch-btn" (click)="goTo(l.id)" type="button">
-              مشاهدة
+              {{ watchText }}
             </button>
           </li>
 
           <li class="lesson-empty" *ngIf="!lessons.length">
-            لا توجد دروس بعد.
+            {{ noLessonsText }}
           </li>
         </ul>
       </div>

@@ -17,50 +17,31 @@
           'alert-danger': result.status === 'failed'
         }"
       >
-        <h3 class="mb-2">
-          {{
-            result.status === 'paid'
-              ? (isEnglish ? 'Payment successful' : 'تم الدفع بنجاح')
-              : result.status === 'pending'
-                ? (isEnglish ? 'Payment is pending' : 'الدفع ما زال قيد المراجعة')
-                : (isEnglish ? 'Payment failed' : 'فشلت عملية الدفع')
-          }}
-        </h3>
-
-        <p class="mb-0">
-          {{
-            result.message ||
-            (result.status === 'paid'
-              ? (isEnglish
-                  ? 'Your access will be activated automatically.'
-                  : 'سيتم تفعيل وصولك تلقائيًا.')
-              : result.status === 'pending'
-                ? (isEnglish
-                    ? 'Please wait a little and refresh again.'
-                    : 'برجاء الانتظار قليلًا ثم إعادة المحاولة.')
-                : (isEnglish
-                    ? 'Please try again or contact support.'
-                    : 'يرجى المحاولة مرة أخرى أو التواصل مع الدعم.'))
-          }}
-        </p>
+        <h3 class="mb-2">{{ resultTitle }}</h3>
+        <p class="mb-0">{{ resultMessage }}</p>
       </div>
 
       <div class="card shadow-sm border-0">
         <div class="card-body">
-          <p><strong>{{ isEnglish ? 'Reference' : 'رقم المرجع' }}:</strong> {{ result.merchantOrderId }}</p>
-          <p><strong>{{ isEnglish ? 'Amount' : 'المبلغ' }}:</strong> {{ result.amount }} EGP</p>
-          <p><strong>{{ isEnglish ? 'Courses' : 'الكورسات' }}:</strong> {{ result.courseIds.length }}</p>
+          <p><strong>{{ referenceLabel }}:</strong> {{ result.merchantOrderId }}</p>
+          <p><strong>{{ amountLabel }}:</strong> {{ result.amount }} EGP</p>
+          <p><strong>{{ coursesLabel }}:</strong> {{ result.courseIds.length }}</p>
+
           <p *ngIf="result.transactionId">
-            <strong>{{ isEnglish ? 'Transaction ID' : 'رقم العملية' }}:</strong>
+            <strong>{{ transactionIdLabel }}:</strong>
             {{ result.transactionId }}
           </p>
 
-          <a routerLink="/my-courses" class="btn btn-primary me-2" *ngIf="result.status === 'paid'">
-            {{ isEnglish ? 'Go to my courses' : 'اذهب إلى كورساتي' }}
+          <a
+            routerLink="/my-courses"
+            class="btn btn-primary me-2"
+            *ngIf="result.status === 'paid'"
+          >
+            {{ goToMyCoursesText }}
           </a>
 
           <a routerLink="/courses" class="btn btn-outline-secondary">
-            {{ isEnglish ? 'Back to courses' : 'العودة للكورسات' }}
+            {{ backToCoursesText }}
           </a>
         </div>
       </div>

@@ -1,5 +1,4 @@
-// src/app/public/consultation-booking/consultation-booking.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { SessionRequestsService } from 'src/app/core/services/session-requests.service';
 import emailjs from '@emailjs/browser';
@@ -10,12 +9,12 @@ import { environment } from 'src/environments/environment';
   templateUrl: './consultation-booking.component.html',
   styleUrls: ['./consultation-booking.component.css'],
 })
-export class ConsultationBookingComponent {
+export class ConsultationBookingComponent implements OnInit {
   sending = false;
   sent = false;
   error?: string;
+  currentLang: 'ar' | 'en' = 'ar';
 
-  // ✅ constants
   readonly EGYPT = 'مصر';
   readonly OTHER = 'غير ذلك';
 
@@ -31,20 +30,16 @@ export class ConsultationBookingComponent {
       '',
       [Validators.required, Validators.pattern(/^\+?[0-9]{8,15}$/)],
     ],
-
-    // ✅ nationality select + "other" input
     nationality: ['', [Validators.required]],
     nationalityOther: [''],
-
     problem: ['', [Validators.required, Validators.minLength(10)]],
     acceptedPolicy: [false, [Validators.requiredTrue]],
   });
 
   constructor(
     private fb: FormBuilder,
-    private reqSvc: SessionRequestsService,
+    private reqSvc: SessionRequestsService
   ) {
-    // ✅ لو اختار "غير ذلك" نخلي nationalityOther required
     this.form.get('nationality')?.valueChanges.subscribe((val) => {
       const otherCtrl = this.form.get('nationalityOther');
       if (!otherCtrl) return;
@@ -55,11 +50,20 @@ export class ConsultationBookingComponent {
         otherCtrl.clearValidators();
         otherCtrl.setValue('');
       }
+
       otherCtrl.updateValueAndValidity({ emitEvent: false });
     });
   }
 
-  /** الجنسية الفعلية اللي هنستخدمها في التسعير وفي الـ backend */
+  ngOnInit(): void {
+    this.currentLang = this.detectLangFromPath();
+  }
+
+  private detectLangFromPath(): 'ar' | 'en' {
+    const seg = window.location.pathname.split('/')[1];
+    return seg === 'en' ? 'en' : 'ar';
+  }
+
   get effectiveNationality(): string {
     const n = (this.form.value.nationality || '').trim();
     if (n === this.OTHER) {
@@ -73,7 +77,117 @@ export class ConsultationBookingComponent {
   }
 
   get priceText(): string {
-    return this.isEgyptian ? '800 جنيه' : '25 دولار';
+    return this.isEgyptian
+      ? $localize`:@@consultation_price_egp:800 جنيه`
+      : $localize`:@@consultation_price_usd:25 دولار`;
+  }
+
+  get nameError(): string {
+    const c = this.form.get('name');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_name_required:الاسم مطلوب`;
+    }
+    if (c.errors['minlength']) {
+      return $localize`:@@consultation_name_min:الاسم يجب أن يكون 3 أحرف على الأقل`;
+    }
+    return '';
+  }
+
+  get ageError(): string {
+    const c = this.form.get('age');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_age_required:السن مطلوب`;
+    }
+    if (c.errors['min'] || c.errors['max']) {
+      return $localize`:@@consultation_age_invalid:أدخل سنًا صحيحًا بين 10 و120`;
+    }
+    return '';
+  }
+
+  get jobError(): string {
+    const c = this.form.get('job');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_job_required:الوظيفة مطلوبة`;
+    }
+    if (c.errors['minlength']) {
+      return $localize`:@@consultation_job_min:الوظيفة يجب أن تكون حرفين على الأقل`;
+    }
+    return '';
+  }
+
+  get maritalStatusError(): string {
+    const c = this.form.get('maritalStatus');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_marital_required:اختر الحالة الاجتماعية`;
+    }
+    return '';
+  }
+
+  get whatsappError(): string {
+    const c = this.form.get('whatsapp');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_whatsapp_required:رقم واتساب مطلوب`;
+    }
+    if (c.errors['pattern']) {
+      return $localize`:@@consultation_whatsapp_invalid:أدخل رقمًا صحيحًا من 8 إلى 15 رقمًا`;
+    }
+    return '';
+  }
+
+  get nationalityError(): string {
+    const c = this.form.get('nationality');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_nationality_required:اختر الجنسية`;
+    }
+    return '';
+  }
+
+  get nationalityOtherError(): string {
+    const c = this.form.get('nationalityOther');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_nationality_other_required:اكتب الجنسية`;
+    }
+    if (c.errors['minlength']) {
+      return $localize`:@@consultation_nationality_other_min:الجنسية يجب أن تكون حرفين على الأقل`;
+    }
+    return '';
+  }
+
+  get problemError(): string {
+    const c = this.form.get('problem');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_problem_required:وصف المشكلة مطلوب`;
+    }
+    if (c.errors['minlength']) {
+      return $localize`:@@consultation_problem_min:اكتب وصفًا لا يقل عن 10 أحرف`;
+    }
+    return '';
+  }
+
+  get policyError(): string {
+    const c = this.form.get('acceptedPolicy');
+    if (!c || !c.touched || !c.errors) return '';
+
+    if (c.errors['required']) {
+      return $localize`:@@consultation_policy_required:يجب الموافقة على السياسة`;
+    }
+    return '';
   }
 
   private buildPrice() {
@@ -82,7 +196,6 @@ export class ConsultationBookingComponent {
       : { currency: 'USD' as const, price: 25 };
   }
 
-  // ✅ Helper: console detailed error
   private logFirebaseError(err: any) {
     console.error('❌ Firebase Error FULL:', err);
     console.error('❌ code:', err?.code);
@@ -99,7 +212,6 @@ export class ConsultationBookingComponent {
       return;
     }
 
-    // ✅ حماية إضافية: لو اختار غير ذلك ولا كتب
     if (
       (this.form.value.nationality || '').trim() === this.OTHER &&
       !this.effectiveNationality
@@ -112,29 +224,23 @@ export class ConsultationBookingComponent {
     this.sending = true;
 
     const p = this.buildPrice();
-
     const nationalitySelected = (this.form.value.nationality || '').trim();
     const nationalityOther = (this.form.value.nationalityOther || '').trim();
 
-    // ✅ payload
     const payload: any = {
       name: this.form.value.name!.trim(),
       age: Number(this.form.value.age),
       job: this.form.value.job!.trim(),
       maritalStatus: this.form.value.maritalStatus!,
       whatsapp: this.form.value.whatsapp!.trim(),
-
       nationality: nationalitySelected,
-
       problem: this.form.value.problem!.trim(),
       acceptedPolicy: !!this.form.value.acceptedPolicy,
       acknowledged: !!this.form.value.acceptedPolicy,
-
       currency: p.currency,
       price: p.price,
     };
 
-    // ✅ مهم جدًا: أضف nationalityOther فقط لو "غير ذلك"
     if (nationalitySelected === this.OTHER) {
       payload.nationalityOther = nationalityOther;
     }
@@ -158,7 +264,9 @@ export class ConsultationBookingComponent {
       this.form.reset({ acceptedPolicy: false } as any);
     } catch (e: any) {
       this.logFirebaseError(e);
-      this.error = e?.message ?? 'حدث خطأ أثناء إرسال الطلب';
+      this.error =
+        e?.message ??
+        $localize`:@@consultation_submit_error:حدث خطأ أثناء إرسال الطلب`;
     } finally {
       this.sending = false;
     }
@@ -187,7 +295,7 @@ export class ConsultationBookingComponent {
       environment.emailJs.serviceId,
       environment.emailJs.templateId,
       templateParams,
-      environment.emailJs.publicKey,
+      environment.emailJs.publicKey
     );
   }
 }

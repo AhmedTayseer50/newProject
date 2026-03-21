@@ -1,29 +1,26 @@
-<!-- PAGE HERO -->
-<section class="page-hero">
+<section class="page-hero" [attr.dir]="pageDir">
   <div class="container">
-    <div class="page-hero-eyebrow">جميع الدبلومات</div>
-    <h1 class="page-hero-title">دبلومات نبضة حياة</h1>
+    <div class="page-hero-eyebrow">{{ eyebrowText }}</div>
+    <h1 class="page-hero-title">{{ pageTitle }}</h1>
     <p class="page-hero-subtitle">
-      هنا تجد الدبلومات المتاحة حاليًا — كل دبلومة عبارة عن مجموعة كورسات مرتبة
-      داخل مسار واحد.
+      {{ pageSubtitle }}
     </p>
   </div>
 </section>
 
-<!-- SEARCH BAR -->
-<div class="container search-container">
-  <label class="sr-only" for="diplomaSearch">ابحث عن دبلومة</label>
+<div class="container search-container" [attr.dir]="pageDir">
+  <label class="sr-only" for="diplomaSearch">{{ searchLabel }}</label>
   <input
     id="diplomaSearch"
     type="text"
     class="search-input"
-    placeholder="ابحث عن دبلومة..."
+    [placeholder]="searchPlaceholder"
     [(ngModel)]="search"
   />
 </div>
 
-<div class="container py-4" dir="rtl">
-  <div *ngIf="loading" class="alert alert-info">جارٍ التحميل…</div>
+<div class="container py-4" [attr.dir]="pageDir">
+  <div *ngIf="loading" class="alert alert-info">{{ loadingText }}</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
   <div *ngIf="!loading && !error" class="courses-grid">
@@ -38,7 +35,7 @@
           class="sr-only-img"
           loading="lazy"
         />
-        <span class="course-tag">{{ d.categoryId || "عام" }}</span>
+        <span class="course-tag">{{ d.categoryId || categoryFallback }}</span>
       </div>
 
       <div class="course-body">
@@ -48,13 +45,13 @@
         <div class="course-meta">
           <div class="d-flex flex-column gap-1">
             <span class="small text-muted" *ngIf="d.meta?.totalCourses">
-              يشمل {{ d.meta?.totalCourses || 0 }} كورس
+              {{ totalCoursesLabel(d.meta?.totalCourses) }}
             </span>
             <span class="small text-muted" *ngIf="d.programDuration">
-              مدة البرنامج: {{ d.programDuration }}
+              {{ programDurationLabel(d.programDuration) }}
             </span>
             <span class="small text-muted" *ngIf="d.meta?.level">
-              المستوى: {{ d.meta?.level || "—" }}
+              {{ levelLabel(d.meta?.level) }}
             </span>
           </div>
 
@@ -66,10 +63,10 @@
 
       <div class="course-footer">
         <button class="btn" [routerLink]="['/diplomas', d.id]">
-          عرض التفاصيل
+          {{ detailsText }}
         </button>
         <button class="btn btn-primary" type="button" (click)="joinNow(d)">
-          اشترك الآن
+          {{ enrollNowText }}
         </button>
       </div>
     </article>

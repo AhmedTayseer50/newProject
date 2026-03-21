@@ -1,4 +1,3 @@
-// src/app/core/navbar/navbar.component.ts
 import { Component, OnDestroy, OnInit, isDevMode } from '@angular/core';
 import { of, Subscription, switchMap, catchError, from } from 'rxjs';
 import { Router } from '@angular/router';
@@ -25,16 +24,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
   greetingName = '';
 
   isMenuOpen = false;
-
-  // ✅ Dropdown for logged-in user menu
   isUserMenuOpen = false;
 
-  // Theme
   isDarkTheme = false;
   private readonly THEME_KEY = 'theme';
 
-  // Language
   currentLang: 'ar' | 'en' = 'ar';
+
+  lightModeTitle = $localize`:@@navbar_theme_light:الوضع الفاتح`;
+  darkModeTitle = $localize`:@@navbar_theme_dark:الوضع الداكن`;
 
   private sub?: Subscription;
   private profileSub?: Subscription;
@@ -43,28 +41,38 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.initTheme();
     this.currentLang = this.detectLangFromPath();
 
-    this.sub = this.auth.user$.pipe(
-      switchMap(user => {
-        if (!user) return of({ isAdmin: false, isDisabled: false, isStaff: false });
+    this.sub = this.auth.user$
+      .pipe(
+        switchMap((user) => {
+          if (!user) {
+            return of({ isAdmin: false, isDisabled: false, isStaff: false });
+          }
 
-        return Promise.all([
-          this.userSvc.isAdmin(user.uid),
-          this.userSvc.isDisabled(user.uid),
-          this.userSvc.isStaff(user.uid)
-        ]).then(([isAdmin, isDisabled, isStaff]) => ({ isAdmin, isDisabled, isStaff }));
-      }),
-      catchError(() => of({ isAdmin: false, isDisabled: false, isStaff: false }))
-    ).subscribe(roles => {
-      this.isAdmin = roles.isAdmin;
-      this.isDisabled = roles.isDisabled;
-      this.isStaff = roles.isStaff;
-    });
+          return Promise.all([
+            this.userSvc.isAdmin(user.uid),
+            this.userSvc.isDisabled(user.uid),
+            this.userSvc.isStaff(user.uid)
+          ]).then(([isAdmin, isDisabled, isStaff]) => ({
+            isAdmin,
+            isDisabled,
+            isStaff
+          }));
+        }),
+        catchError(() => of({ isAdmin: false, isDisabled: false, isStaff: false }))
+      )
+      .subscribe((roles) => {
+        this.isAdmin = roles.isAdmin;
+        this.isDisabled = roles.isDisabled;
+        this.isStaff = roles.isStaff;
+      });
 
     this.profileSub = this.auth.user$
       .pipe(
         switchMap((user) => {
           if (!user) return of(null);
-          return from(this.userSvc.getUserProfile(user.uid)).pipe(catchError(() => of(null)));
+          return from(this.userSvc.getUserProfile(user.uid)).pipe(
+            catchError(() => of(null))
+          );
         })
       )
       .subscribe((p) => {
@@ -120,7 +128,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ Toggle logged-in dropdown
   toggleUserMenu(): void {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }
@@ -134,7 +141,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.profileSub?.unsubscribe();
   }
 
-  async onLogout() {
+  async onLogout(): Promise<void> {
     await this.auth.logout();
     this.isMenuOpen = false;
     this.isUserMenuOpen = false;

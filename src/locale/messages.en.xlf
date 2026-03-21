@@ -1,692 +1,2268 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<xliff version="1.2"
-  xmlns="urn:oasis:names:tc:xliff:document:1.2">
-  <file source-language="ar" target-language="en" datatype="plaintext" original="ng2.template">
+<?xml version='1.0' encoding='utf-8'?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="ar" datatype="plaintext" original="ng2.template">
     <body>
-
-      <trans-unit id="1152015693471194400" datatype="html">
-        <source>نبضة حياة</source>
-        <target>Nabdah Hayah</target>
-      </trans-unit>
-
-      <trans-unit id="7935153659626812438" datatype="html">
-        <source>منصة للصحة النفسية والتعليم</source>
-        <target>Mental Health and Education Platform</target>
-      </trans-unit>
-
-      <trans-unit id="6909046605963142271" datatype="html">
-        <source>القائمة</source>
-        <target>Menu</target>
-      </trans-unit>
-
-      <trans-unit id="5896476729491647130" datatype="html">
-        <source>الرئيسية</source>
-        <target>Home</target>
-      </trans-unit>
-
-      <trans-unit id="7738948830253305185" datatype="html">
-        <source>الكورسات</source>
-        <target>Courses</target>
-      </trans-unit>
-
-      <trans-unit id="6921251900815919748" datatype="html">
-        <source>الدبلومات</source>
-        <target>Diplomas</target>
-      </trans-unit>
-
-      <trans-unit id="7126736703579246278" datatype="html">
-        <source> الاستشارات </source>
-        <target>Consultations</target>
-      </trans-unit>
-
-      <trans-unit id="1290431441074778079" datatype="html">
-        <source>عن الدكتورة</source>
-        <target>About the Doctor</target>
-      </trans-unit>
-
-      <trans-unit id="1885903461072966202" datatype="html">
-        <source>تواصل</source>
-        <target>Contact</target>
-      </trans-unit>
-
-      <trans-unit id="7595438448549829066" datatype="html">
-        <source>تغيير الوضع</source>
-        <target>Toggle Theme</target>
-      </trans-unit>
-
-      <trans-unit id="460269749123164826" datatype="html">
-        <source> دخول </source>
-        <target>Login</target>
-      </trans-unit>
-
-      <trans-unit id="9148745601540834162" datatype="html">
-        <source> حساب جديد </source>
-        <target>Register</target>
-      </trans-unit>
-
-      <trans-unit id="1970019115624026220" datatype="html">
-        <source> مرحبًا،          <x id="INTERPOLATION" equiv-text="{{ u.email }}"/>
-        </source>
-        <target>Hello, <x id="INTERPOLATION" equiv-text="{{ u.email }}"/>
-        </target>
-      </trans-unit>
-
-      <trans-unit id="580349602669558247" datatype="html">
-        <source>حساب معطّل</source>
-        <target>Account Disabled</target>
-      </trans-unit>
-
-      <trans-unit id="22464362655476342" datatype="html">
-        <source> كورساتي </source>
-        <target>My Courses</target>
-      </trans-unit>
-
-      <trans-unit id="6821871031768267042" datatype="html">
-        <source> الملف الشخصي </source>
-        <target>Profile</target>
-      </trans-unit>
-
-      <trans-unit id="2414892305215743892" datatype="html">
-        <source> خروج </source>
-        <target>Logout</target>
-      </trans-unit>
-
-      <trans-unit id="7507085789803157481" datatype="html">
-        <source>الاستشارات</source>
-        <target>Consultations</target>
-      </trans-unit>
-
-      <!-- New translations added -->
-
-      <trans-unit id="9064979754952574225" datatype="html">
-        <source>إنشاء حساب</source>
-        <target>Create Account</target>
-      </trans-unit>
-
-      <trans-unit id="5505730230573298366" datatype="html">
-        <source>البريد الإلكتروني</source>
-        <target>Email</target>
-      </trans-unit>
-
-      <trans-unit id="4630260391192426648" datatype="html">
-        <source>كلمة المرور</source>
-        <target>Password</target>
-      </trans-unit>
-
-      <trans-unit id="429088543149366046" datatype="html">
-        <source>تسجيل</source>
-        <target>Register</target>
-      </trans-unit>
-
-      <trans-unit id="6223432864390216980" datatype="html">
-        <source>لديك حساب؟ دخول</source>
-        <target>Have an account? Login</target>
-      </trans-unit>
-
-      <trans-unit id="home_hero_pill" datatype="html">
-        <source>
-          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
-          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
-          منصة نفسية تعليمية مع دكتورة استشاري صحة نفسية
-        </source>
-        <target>
-          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
-          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
-          Educational psychological platform with a consultant psychiatrist
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_hero_title" datatype="html">
-        <source>رحلتك نحو الشفاء تبدأ من هنا</source>
-        <target>Your journey to healing starts here</target>
-      </trans-unit>
-
-      <!-- FIXED: STRONG placeholders must be <x .../> -->
-      <trans-unit id="home_hero_subtitle" datatype="html">
-        <source>
-          منصة          <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>
-نبضة حياة          <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
-          تقدم كورسات نفسية مسجلة وجلسات خاصة تُمكّنك من فهم ذاتك، معالجة جذور الألم، وبناء حياة أكثر سلاماً ووعيًا.
-        </source>
-        <target>
-          <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>
-Nabdah Hayah<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/>
-          platform offers recorded psychological courses and private sessions that enable you to understand yourself, treat the roots of pain, and build a more peaceful and conscious life.
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_hero_cta_consult" datatype="html">
-        <source> احجز جلسة استشارة </source>
-        <target> Book a consultation session </target>
-      </trans-unit>
-
-      <trans-unit id="home_hero_cta_courses" datatype="html">
-        <source> اكتشف الكورسات </source>
-        <target> Discover the courses </target>
-      </trans-unit>
-
-      <!-- FIXED: SPAN placeholders must be <x .../> -->
-      <trans-unit id="home_hero_meta_1" datatype="html">
-        <source>
-          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
-          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
-          محتوى علمي مبني على مدارس علم النفس الحديثة
-        </source>
-        <target>
-          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
-          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
-          Scientific content based on modern schools of psychology
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_hero_meta_2" datatype="html">
-        <source>
-          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
-          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
-          متابعة نفسية للحالات عبر برامج خاصة
-        </source>
-        <target>
-          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
-          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
-          Psychological follow-up for cases through special programs
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_hero_meta_3" datatype="html">
-        <source>
-          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
-          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
-          خصوصية وسرية تامة في كل خطوة
-        </source>
-        <target>
-          <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span&gt;"/>
-          <x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>
-          Complete privacy and confidentiality at every step
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_featured_eyebrow" datatype="html">
-        <source>أفضل البرامج</source>
-        <target>Best Programs</target>
-      </trans-unit>
-
-      <trans-unit id="home_featured_title" datatype="html">
-        <source>أكثر الكورسات طلبًا</source>
-        <target>Most Requested Courses</target>
-      </trans-unit>
-
-      <trans-unit id="home_featured_subtitle" datatype="html">
-        <source> مجموعة مختارة من أهم البرامج العلاجية والنفسية في منصة نبضة حياة. </source>
-        <target> A selected group of the most important therapeutic and psychological programs on the Nabdah Hayah platform. </target>
-      </trans-unit>
-
-      <trans-unit id="home_course_tag_default" datatype="html">
-        <source>
-          <x id="INTERPOLATION" equiv-text="{{ c.categoryId || &quot;عام&quot; }}"/>
-        </source>
-        <target>
-          <x id="INTERPOLATION" equiv-text="{{ c.categoryId || &quot;عام&quot; }}"/>
-        </target>
-      </trans-unit>
-
-
-      <trans-unit id="home_course_open" datatype="html">
-        <source> فتح الكورس </source>
-        <target> Open Course </target>
-      </trans-unit>
-
-      <trans-unit id="home_course_details" datatype="html">
-        <source> عرض التفاصيل </source>
-        <target> View Details </target>
-      </trans-unit>
-
-      <trans-unit id="home_course_join" datatype="html">
-        <source> اشترك الآن </source>
-        <target>Enroll now</target>
-      </trans-unit>
-
       <trans-unit id="title_home" datatype="html">
         <source>الرئيسية</source>
-        <target>Home</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      <target>Home</target></trans-unit>
       <trans-unit id="title_about" datatype="html">
         <source>عن الدكتورة</source>
-        <target>About the Doctor</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      <target>About the Doctor</target></trans-unit>
       <trans-unit id="title_courses" datatype="html">
         <source>الكورسات</source>
-        <target>Courses</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      <target>Courses</target></trans-unit>
       <trans-unit id="title_course_details" datatype="html">
         <source>تفاصيل الكورس</source>
-        <target>Course Details</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      <target>Course details</target></trans-unit>
       <trans-unit id="title_consultations" datatype="html">
         <source>الاستشارات</source>
-        <target>Consultations</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      <target>Consultations</target></trans-unit>
       <trans-unit id="title_contact" datatype="html">
         <source>تواصل</source>
-        <target>Contact</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      <target>Contact</target></trans-unit>
       <trans-unit id="title_book_session" datatype="html">
         <source>حجز جلسة</source>
-        <target>Book Session</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      <target>Book a session</target></trans-unit>
+      <trans-unit id="title_checkout" datatype="html">
+        <source>إتمام الشراء</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      <target>Checkout</target></trans-unit>
+      <trans-unit id="title_payment_result" datatype="html">
+        <source>نتيجة الدفع</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      <target>Payment result</target></trans-unit>
       <trans-unit id="title_lesson_view" datatype="html">
         <source>الدرس</source>
-        <target>Lesson</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+      <target>Lesson</target></trans-unit>
+      <trans-unit id="title_lesson_material" datatype="html">
+        <source>المادة العلمية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+      <target>Study material</target></trans-unit>
       <trans-unit id="title_my_courses" datatype="html">
         <source>كورساتي</source>
-        <target>My Courses</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+      <target>My courses</target></trans-unit>
       <trans-unit id="title_profile" datatype="html">
         <source>الملف الشخصي</source>
-        <target>Profile</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      <target>Profile</target></trans-unit>
       <trans-unit id="title_settings" datatype="html">
         <source>الإعدادات</source>
-        <target>Settings</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+      <target>Settings</target></trans-unit>
       <trans-unit id="title_diplomas" datatype="html">
         <source>الدبلومات</source>
-        <target>Diplomas</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+      <target>Diplomas</target></trans-unit>
       <trans-unit id="title_diploma_details" datatype="html">
         <source>تفاصيل الدبلومة</source>
-        <target>Diploma Details</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+      <target>Diploma details</target></trans-unit>
       <trans-unit id="title_staff_cases" datatype="html">
         <source>الحالات</source>
-        <target>Cases</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">142</context>
+        </context-group>
+      <target>Cases</target></trans-unit>
       <trans-unit id="title_admin_dashboard" datatype="html">
         <source>لوحة التحكم</source>
-        <target>Dashboard</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">151</context>
+        </context-group>
+      <target>Dashboard</target></trans-unit>
       <trans-unit id="title_admin_course_editor" datatype="html">
         <source>إدارة الكورسات</source>
-        <target>Course Management</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">156</context>
+        </context-group>
+      <target>Course management</target></trans-unit>
       <trans-unit id="title_admin_course_editor_edit" datatype="html">
         <source>تعديل الكورس</source>
-        <target>Edit Course</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">162</context>
+        </context-group>
+      <target>Edit course</target></trans-unit>
       <trans-unit id="title_admin_users" datatype="html">
         <source>المستخدمين</source>
-        <target>Users</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">168</context>
+        </context-group>
+      <target>Users</target></trans-unit>
       <trans-unit id="title_admin_cases" datatype="html">
         <source>الحالات</source>
-        <target>Cases</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">173</context>
+        </context-group>
+      <target>Cases</target></trans-unit>
       <trans-unit id="title_admin_access" datatype="html">
         <source>الصلاحيات</source>
-        <target>Permissions</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      <target>Permissions</target></trans-unit>
       <trans-unit id="title_admin_sales_analytics" datatype="html">
         <source>تحليلات المبيعات</source>
-        <target>Sales Analytics</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">184</context>
+        </context-group>
+      <target>Sales analytics</target></trans-unit>
       <trans-unit id="title_admin_diploma_editor" datatype="html">
         <source>إدارة الدبلومات</source>
-        <target>Diploma Management</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
+      <target>Diploma management</target></trans-unit>
       <trans-unit id="title_admin_diploma_editor_edit" datatype="html">
         <source>تعديل الدبلومة</source>
-        <target>Edit Diploma</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">198</context>
+        </context-group>
+      <target>Edit diploma</target></trans-unit>
       <trans-unit id="title_admin_session_requests" datatype="html">
         <source>طلبات الجلسات</source>
-        <target>Session Requests</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">205</context>
+        </context-group>
+      <target>Session requests</target></trans-unit>
       <trans-unit id="title_login" datatype="html">
         <source>دخول</source>
-        <target>Login</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">214</context>
+        </context-group>
+      <target>Login</target></trans-unit>
       <trans-unit id="title_register" datatype="html">
         <source>حساب جديد</source>
-        <target>New Account</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">219</context>
+        </context-group>
+      <target>Create account</target></trans-unit>
       <trans-unit id="title_forgot_password" datatype="html">
         <source>نسيت كلمة المرور</source>
-        <target>Forgot Password</target>
-      </trans-unit>
-
-      <trans-unit id="app_name" datatype="html">
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">224</context>
+        </context-group>
+      <target>Forgot password</target></trans-unit>
+      <trans-unit id="5186201933094794743" datatype="html">
+        <source>نسيت كلمة المرور</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+      <target>Forgot password</target></trans-unit>
+      <trans-unit id="3599749599570686774" datatype="html">
+        <source> أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">4,6</context>
+        </context-group>
+      <target>Enter your email address and we will send you a password reset link.</target></trans-unit>
+      <trans-unit id="5505730230573298366" datatype="html">
+        <source>البريد الإلكتروني</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      <target>Email</target></trans-unit>
+      <trans-unit id="4956922566012252777" datatype="html">
+        <source>name@example.com</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      <target>name@example.com</target></trans-unit>
+      <trans-unit id="2623938444081007032" datatype="html">
+        <source> إرسال رابط الاستعادة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">25,27</context>
+        </context-group>
+      <target>Send reset link</target></trans-unit>
+      <trans-unit id="4997788774990693323" datatype="html">
+        <source> تم إرسال رابط استعادة كلمة المرور إلى بريدك. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.html</context>
+          <context context-type="linenumber">30,32</context>
+        </context-group>
+      <target>A password reset link has been sent to your email.</target></trans-unit>
+      <trans-unit id="forgot_email_required" datatype="html">
+        <source>البريد الإلكتروني مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      <target>Email is required</target></trans-unit>
+      <trans-unit id="forgot_email_invalid" datatype="html">
+        <source>أدخل بريدًا إلكترونيًا صحيحًا</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      <target>Enter a valid email address</target></trans-unit>
+      <trans-unit id="forgot_error_default" datatype="html">
+        <source>تعذّر إرسال رابط الاستعادة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/forgot-password/forgot-password.component.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      <target>Unable to send the reset link</target></trans-unit>
+      <trans-unit id="3395221569412961342" datatype="html">
+        <source>مرحبًا بعودتك</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      <target>Welcome back</target></trans-unit>
+      <trans-unit id="3548596479562568472" datatype="html">
+        <source> سجّل دخولك لمتابعة الكورسات والحالات بسرعة. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+      <target>Sign in to continue to your courses and cases quickly.</target></trans-unit>
+      <trans-unit id="2190717683394833528" datatype="html">
+        <source>وصول سريع لمحتوى الكورسات</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      <target>Quick access to course content</target></trans-unit>
+      <trans-unit id="3872955065573341361" datatype="html">
+        <source>إدارة الحالات بسهولة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      <target>Manage cases easily</target></trans-unit>
+      <trans-unit id="4939835244025545733" datatype="html">
+        <source>تجربة متناسقة مع وضع الليل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      <target>A seamless dark mode experience</target></trans-unit>
+      <trans-unit id="1738863929441404820" datatype="html">
+        <source>ليس لديك حساب؟</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+      <target>Don't have an account?</target></trans-unit>
+      <trans-unit id="9064979754952574225" datatype="html">
+        <source>إنشاء حساب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      <target>Create account</target></trans-unit>
+      <trans-unit id="2256867068587592734" datatype="html">
+        <source>تسجيل الدخول</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      <target>Log in</target></trans-unit>
+      <trans-unit id="8719472349390831376" datatype="html">
+        <source>أدخل بيانات حسابك للدخول.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      <target>Enter your account details to sign in.</target></trans-unit>
+      <trans-unit id="4630260391192426648" datatype="html">
+        <source>كلمة المرور</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      <target>Password</target></trans-unit>
+      <trans-unit id="230913410964427686" datatype="html">
+        <source>••••••</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      <target>••••••</target></trans-unit>
+      <trans-unit id="28549862783662287" datatype="html">
+        <source> نسيت كلمة المرور؟ </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">63,65</context>
+        </context-group>
+      <target>Forgot password?</target></trans-unit>
+      <trans-unit id="6572653866953653089" datatype="html">
+        <source>دخول</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+      <target>Login</target></trans-unit>
+      <trans-unit id="7086222249955834793" datatype="html">
+        <source>جارٍ تسجيل الدخول...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+      <target>Signing in...</target></trans-unit>
+      <trans-unit id="4519744768722471780" datatype="html">
+        <source>أو</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      <target>Or</target></trans-unit>
+      <trans-unit id="3590805807378700861" datatype="html">
+        <source>Google</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      <target>Google</target></trans-unit>
+      <trans-unit id="6638875490890174262" datatype="html">
+        <source>تسجيل الدخول عبر Google</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.html</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      <target>Sign in with Google</target></trans-unit>
+      <trans-unit id="login_email_required" datatype="html">
+        <source>البريد الإلكتروني مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      <target>Email is required</target></trans-unit>
+      <trans-unit id="login_email_invalid" datatype="html">
+        <source>أدخل بريدًا إلكترونيًا صحيحًا</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      <target>Enter a valid email address</target></trans-unit>
+      <trans-unit id="login_password_required" datatype="html">
+        <source>كلمة المرور مطلوبة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      <target>Password is required</target></trans-unit>
+      <trans-unit id="login_password_minlength" datatype="html">
+        <source>كلمة المرور يجب أن تكون 6 أحرف على الأقل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      <target>Password must be at least 6 characters</target></trans-unit>
+      <trans-unit id="login_error_default" datatype="html">
+        <source>حدث خطأ أثناء تسجيل الدخول</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      <target>An error occurred while signing in</target></trans-unit>
+      <trans-unit id="login_google_popup_error" datatype="html">
+        <source>تعذر فتح نافذة تسجيل Google. جرّب السماح بالنوافذ المنبثقة ثم أعد المحاولة.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+      <target>Could not open the Google sign-in window. Please allow pop-ups and try again.</target></trans-unit>
+      <trans-unit id="login_google_error_default" datatype="html">
+        <source>حدث خطأ أثناء تسجيل الدخول عبر Google</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      <target>An error occurred while signing in with Google</target></trans-unit>
+      <trans-unit id="4402383327042805753" datatype="html">
+        <source>أهلاً بيك 👋</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      <target>Welcome 👋</target></trans-unit>
+      <trans-unit id="276204197085044182" datatype="html">
+        <source> أنشئ حسابك الآن علشان تقدر تدخل للكورسات وتتابع تقدمك بسهولة. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+      <target>Create your account now so you can access courses and track your progress easily.</target></trans-unit>
+      <trans-unit id="216366004933579394" datatype="html">
+        <source>بياناتك محفوظة وآمنة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      <target>Your data is safe and secure</target></trans-unit>
+      <trans-unit id="1352098275941297038" datatype="html">
+        <source>تقدر تعدل معلوماتك لاحقًا</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      <target>You can update your information later</target></trans-unit>
+      <trans-unit id="1938711525514402727" datatype="html">
+        <source>تجربة استخدام بسيطة وسريعة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      <target>A simple and fast experience</target></trans-unit>
+      <trans-unit id="9028663496123311240" datatype="html">
+        <source>لديك حساب بالفعل؟</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      <target>Already have an account?</target></trans-unit>
+      <trans-unit id="459530409832367752" datatype="html">
+        <source>املأ البيانات التالية لإنشاء حساب جديد.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      <target>Fill in the following details to create a new account.</target></trans-unit>
+      <trans-unit id="6394675950099518247" datatype="html">
+        <source>الاسم</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">201</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">244</context>
+        </context-group>
+      <target>Name</target></trans-unit>
+      <trans-unit id="9200825822188358407" datatype="html">
+        <source>مثال: أحمد محمد</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      <target>Example: Ahmed Mohamed</target></trans-unit>
+      <trans-unit id="858347277871022888" datatype="html">
+        <source> سيظهر هذا الاسم في شريط التنقّل. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">38,40</context>
+        </context-group>
+      <target>This name will appear in the navigation bar.</target></trans-unit>
+      <trans-unit id="3428775128220700929" datatype="html">
+        <source>رقم واتساب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      <target>WhatsApp number</target></trans-unit>
+      <trans-unit id="176374567440272751" datatype="html">
+        <source>مثال: +201234567890</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      <target>Example: +201234567890</target></trans-unit>
+      <trans-unit id="7686017794902421258" datatype="html">
+        <source>الأرقام فقط أو علامة + بدون مسافات.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      <target>Numbers only or a + sign, with no spaces.</target></trans-unit>
+      <trans-unit id="6322351706483851533" datatype="html">
+        <source>6 أحرف على الأقل.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">84</context>
+        </context-group>
+      <target>At least 6 characters.</target></trans-unit>
+      <trans-unit id="429088543149366046" datatype="html">
+        <source>تسجيل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      <target>Register</target></trans-unit>
+      <trans-unit id="2089713838251405760" datatype="html">
+        <source>جارٍ إنشاء الحساب...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      <target>Creating account...</target></trans-unit>
+      <trans-unit id="5437196796738225152" datatype="html">
+        <source>لديك حساب؟</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.html</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      <target>Already have an account?</target></trans-unit>
+      <trans-unit id="register_name_required" datatype="html">
+        <source>الاسم مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      <target>Name is required</target></trans-unit>
+      <trans-unit id="register_name_minlength" datatype="html">
+        <source>الاسم يجب أن يكون حرفين على الأقل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      <target>Name must be at least 2 characters</target></trans-unit>
+      <trans-unit id="register_name_maxlength" datatype="html">
+        <source>الاسم طويل جدًا</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      <target>The name is too long</target></trans-unit>
+      <trans-unit id="register_whatsapp_required" datatype="html">
+        <source>رقم واتساب مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      <target>WhatsApp number is required</target></trans-unit>
+      <trans-unit id="register_whatsapp_pattern" datatype="html">
+        <source>أدخل رقم واتساب صحيحًا بالأرقام أو علامة + فقط</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      <target>Enter a valid WhatsApp number using digits or + only</target></trans-unit>
+      <trans-unit id="register_email_required" datatype="html">
+        <source>البريد الإلكتروني مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      <target>Email is required</target></trans-unit>
+      <trans-unit id="register_email_invalid" datatype="html">
+        <source>أدخل بريدًا إلكترونيًا صحيحًا</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      <target>Enter a valid email address</target></trans-unit>
+      <trans-unit id="register_password_required" datatype="html">
+        <source>كلمة المرور مطلوبة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      <target>Password is required</target></trans-unit>
+      <trans-unit id="register_password_minlength" datatype="html">
+        <source>كلمة المرور يجب أن تكون 6 أحرف على الأقل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      <target>Password must be at least 6 characters</target></trans-unit>
+      <trans-unit id="register_error_default" datatype="html">
+        <source>حدث خطأ أثناء إنشاء الحساب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/auth/register/register.component.ts</context>
+          <context context-type="linenumber">134</context>
+        </context-group>
+      <target>An error occurred while creating the account</target></trans-unit>
+      <trans-unit id="1152015693471194400" datatype="html">
         <source>نبضة حياة</source>
-        <target>Nabdah Hayah</target>
-      </trans-unit>
-
-      <trans-unit id="4529372112865406379" datatype="html">
-        <source>Cases</source>
-        <target>Cases</target>
-      </trans-unit>
-
-      <trans-unit id="6570363013146073520" datatype="html">
-        <source>Dashboard</source>
-        <target>Dashboard</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">202</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">245</context>
+        </context-group>
+      <target>Nabdah Hayah</target></trans-unit>
+      <trans-unit id="7935153659626812438" datatype="html">
+        <source>منصة للصحة النفسية والتعليم</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      <target>A platform for mental health and education</target></trans-unit>
+      <trans-unit id="5518410710173382035" datatype="html">
+        <source> كورسات نفسية مسجلة وجلسات خاصة تساعدك على فهم ذاتك ومعالجة جذور الألم وبناء حياة أكثر سلامًا. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">15,18</context>
+        </context-group>
+      <target>Recorded psychology courses and private sessions that help you understand yourself, heal the roots of pain, and build a more peaceful life.</target></trans-unit>
       <trans-unit id="7582772216721712982" datatype="html">
         <source>روابط سريعة</source>
-        <target>Quick Links</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      <target>Quick links</target></trans-unit>
+      <trans-unit id="5896476729491647130" datatype="html">
+        <source>الرئيسية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      <target>Home</target></trans-unit>
+      <trans-unit id="7738948830253305185" datatype="html">
+        <source>الكورسات</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
+      <target>Courses</target></trans-unit>
+      <trans-unit id="7507085789803157481" datatype="html">
+        <source>الاستشارات</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">193</context>
+        </context-group>
+      <target>Consultations</target></trans-unit>
+      <trans-unit id="1290431441074778079" datatype="html">
+        <source>عن الدكتورة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">194</context>
+        </context-group>
+      <target>About the Doctor</target></trans-unit>
+      <trans-unit id="6516495321612659547" datatype="html">
+        <source>التواصل وطرق الدفع</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">195</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      <target>Contact &amp; payment methods</target></trans-unit>
       <trans-unit id="8260477600354468826" datatype="html">
         <source>الأسئلة الشائعة</source>
-        <target>FAQ</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/faq/faq.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      <target>FAQ</target></trans-unit>
+      <trans-unit id="1379669422659275874" datatype="html">
+        <source>الحساب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      <target>Account</target></trans-unit>
+      <trans-unit id="5863421941720814026" datatype="html">
+        <source>كورساتي</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      <target>My courses</target></trans-unit>
+      <trans-unit id="1035504139495845422" datatype="html">
+        <source>الملف الشخصي</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      <target>Profile</target></trans-unit>
       <trans-unit id="6740505671649764860" datatype="html">
         <source>تابعنا</source>
-        <target>Follow Us</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      <target>Follow us</target></trans-unit>
       <trans-unit id="8790918354594417962" datatype="html">
         <source>Facebook</source>
-        <target>Facebook</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      <target>Facebook</target></trans-unit>
       <trans-unit id="3080109816219994129" datatype="html">
         <source>Instagram</source>
-        <target>Instagram</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      <target>Instagram</target></trans-unit>
       <trans-unit id="8401085193044135025" datatype="html">
         <source>YouTube</source>
-        <target>YouTube</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      <target>YouTube</target></trans-unit>
       <trans-unit id="8307602980487099346" datatype="html">
         <source>TikTok</source>
-        <target>TikTok</target>
-      </trans-unit>
-
-      <!-- HOME: CONSULTATION SECTION -->
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      <target>TikTok</target></trans-unit>
+      <trans-unit id="3097375593111534342" datatype="html">
+        <source>© <x id="INTERPOLATION" equiv-text="{{ year }}" /> نبضة حياة — جميع الحقوق محفوظة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+      <target>© Nabdah Hayah — All rights reserved</target></trans-unit>
+      <trans-unit id="5849649398676927414" datatype="html">
+        <source>سياسة الخصوصية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">128</context>
+        </context-group>
+      <target>Privacy policy</target></trans-unit>
+      <trans-unit id="4840185509497122444" datatype="html">
+        <source>الشروط والأحكام</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/footer/footer.component.html</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+      <target>Terms and conditions</target></trans-unit>
+      <trans-unit id="6909046605963142271" datatype="html">
+        <source>القائمة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      <target>Menu</target></trans-unit>
+      <trans-unit id="1452278460085614909" datatype="html">
+        <source> الرئيسية </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">39,41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">187,189</context>
+        </context-group>
+      <target>Home</target></trans-unit>
+      <trans-unit id="6921251900815919748" datatype="html">
+        <source>الدبلومات</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">192</context>
+        </context-group>
+      <target>Diplomas</target></trans-unit>
+      <trans-unit id="7126736703579246278" datatype="html">
+        <source> الاستشارات </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">51,53</context>
+        </context-group>
+      <target>Consultations</target></trans-unit>
+      <trans-unit id="6421169409428213522" datatype="html">
+        <source> التواصل وطرق الدفع </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">57,59</context>
+        </context-group>
+      <target>Contact &amp; payment methods</target></trans-unit>
+      <trans-unit id="7595438448549829066" datatype="html">
+        <source>تغيير الوضع</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      <target>Change theme</target></trans-unit>
+      <trans-unit id="460269749123164826" datatype="html">
+        <source> دخول </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">88,90</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">212,214</context>
+        </context-group>
+      <target>Login</target></trans-unit>
+      <trans-unit id="9148745601540834162" datatype="html">
+        <source> حساب جديد </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">97,99</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">221,223</context>
+        </context-group>
+      <target>Create account</target></trans-unit>
+      <trans-unit id="711747997125238333" datatype="html">
+        <source>قائمة المستخدم</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      <target>User menu</target></trans-unit>
+      <trans-unit id="1970019115624026220" datatype="html">
+        <source> مرحبًا، <x id="INTERPOLATION" equiv-text="{{ greetingName || u.displayName || u.email }}" /> </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">112,114</context>
+        </context-group>
+      <target>Hello, </target></trans-unit>
+      <trans-unit id="22464362655476342" datatype="html">
+        <source> كورساتي </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">124,126</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">227,229</context>
+        </context-group>
+      <target>My courses</target></trans-unit>
+      <trans-unit id="6821871031768267042" datatype="html">
+        <source> الملف الشخصي </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">133,135</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">251,253</context>
+        </context-group>
+      <target>Profile</target></trans-unit>
+      <trans-unit id="3124742472654554190" datatype="html">
+        <source> الحالات </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">143,145</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">237,239</context>
+        </context-group>
+      <target>Cases</target></trans-unit>
+      <trans-unit id="8839173884170165257" datatype="html">
+        <source> لوحة التحكم </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">153,155</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">247,249</context>
+        </context-group>
+      <target>Dashboard</target></trans-unit>
+      <trans-unit id="2414892305215743892" datatype="html">
+        <source> خروج </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">162,164</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">255,257</context>
+        </context-group>
+      <target>Logout</target></trans-unit>
+      <trans-unit id="580349602669558247" datatype="html">
+        <source>حساب معطّل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.html</context>
+          <context context-type="linenumber">168</context>
+        </context-group>
+      <target>Disabled account</target></trans-unit>
+      <trans-unit id="navbar_theme_light" datatype="html">
+        <source>الوضع الفاتح</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      <target>Light mode</target></trans-unit>
+      <trans-unit id="navbar_theme_dark" datatype="html">
+        <source>الوضع الداكن</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/navbar/navbar.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      <target>Dark mode</target></trans-unit>
+      <trans-unit id="app_name" datatype="html">
+        <source>نبضة حياة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/services/page-title.service.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      <target>Nabdah Hayah</target></trans-unit>
+      <trans-unit id="8552151554085198864" datatype="html">
+        <source>الدكتورة إنعام عبدالله</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      <target>Dr. Enam Abdullah</target></trans-unit>
+      <trans-unit id="2401160855592249785" datatype="html">
+        <source> مستشار صحة نفسية وتنمية ذات </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">17,19</context>
+        </context-group>
+      <target>Mental health and self-development consultant</target></trans-unit>
+      <trans-unit id="8416048511321260052" datatype="html">
+        <source> مصمِّمة برامج نفسية وتعليمية متكاملة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">20,22</context>
+        </context-group>
+      <target>Designer of integrated psychological and educational programs</target></trans-unit>
+      <trans-unit id="1730333160745239294" datatype="html">
+        <source>دكتوراه مهنية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      <target>Professional doctorate</target></trans-unit>
+      <trans-unit id="3750651145073850047" datatype="html">
+        <source>صحة نفسية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      <target>Mental health</target></trans-unit>
+      <trans-unit id="4046261446558236091" datatype="html">
+        <source>ما وراء الإنسانية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      <target>Transhumanity</target></trans-unit>
+      <trans-unit id="5756005256123917852" datatype="html">
+        <source>تنمية ذات</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      <target>Self-development</target></trans-unit>
+      <trans-unit id="6031159787116629900" datatype="html">
+        <source>سنوات خبرة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      <target>Years of experience</target></trans-unit>
+      <trans-unit id="1286625637647543271" datatype="html">
+        <source>برنامج ودورة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      <target>Programs &amp; courses</target></trans-unit>
+      <trans-unit id="4434632007245608779" datatype="html">
+        <source>مستفيد/ة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      <target>Beneficiaries</target></trans-unit>
+      <trans-unit id="7015592579544216099" datatype="html">
+        <source>احجز استشارة فردية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      <target>Book a private consultation</target></trans-unit>
+      <trans-unit id="2536231793606524658" datatype="html">
+        <source> الجلسات تتم أونلاين مع خصوصية وسرية تامة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">56,58</context>
+        </context-group>
+      <target>Sessions are held online with complete privacy and confidentiality</target></trans-unit>
+      <trans-unit id="7044965471654813692" datatype="html">
+        <source>من نحن</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      <target>Who we are</target></trans-unit>
+      <trans-unit id="1894054218298294764" datatype="html">
+        <source>عن الدكتورة إنعام عبدالله</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      <target>About Dr. Enam Abdullah</target></trans-unit>
+      <trans-unit id="228584883681500977" datatype="html">
+        <source> رحلة علمية وعملية تهدف لفهم جذور الألم النفسي وبناء وعي صحي ينعكس على علاقاتك وحياتك. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">66,69</context>
+        </context-group>
+      <target>An academic and practical journey aimed at understanding the roots of psychological pain and building healthy awareness that reflects on your relationships and life.</target></trans-unit>
+      <trans-unit id="6704038511938204907" datatype="html">
+        <source>نبذة تعريفية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+      <target>Introduction</target></trans-unit>
+      <trans-unit id="3064669040884211078" datatype="html">
+        <source> رؤية عميقة للإنسان تتجاوز حدود العرض النفسي </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">78,80</context>
+        </context-group>
+      <target>A deep view of the human being that goes beyond symptoms</target></trans-unit>
+      <trans-unit id="8570810978968622744" datatype="html">
+        <source> تجمع الدكتورة إنعام عبدالله بين التكوين الأكاديمي المتخصص، والخبرة العملية مع الأفراد والأسر، في مجالات الصحة النفسية والتنمية الذاتية. تهتم بالوصول إلى جذور الألم النفسي بدل الاكتفاء بملاحقة الأعراض الظاهرة؛ لتساعد الإنسان على بناء وعي حقيقي بذاته، وترميم علاقته بنفسه وبمن حوله على أسس صحية وناضجة. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">82,88</context>
+        </context-group>
+      <target>Dr. Enam Abdullah combines specialized academic training with practical experience working with individuals and families in mental health and self-development. She focuses on reaching the roots of psychological pain rather than merely chasing visible symptoms, helping people build genuine self-awareness and restore healthier, more mature relationships with themselves and others.</target></trans-unit>
+      <trans-unit id="1164211192308276267" datatype="html">
+        <source> أؤمن أن كل إنسان يحمل داخله بذرة صحة نفسية وفطرة سليمة، ودوري أن أرافقه في رحلة اكتشاف هذه البذرة ورعايتها، حتى تتحول إلى نمط حياة أكثر وعيًا واتزانًا. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">92,96</context>
+        </context-group>
+      <target>I believe every person carries within them the seed of mental well-being and a sound fitrah, and my role is to accompany them in discovering and nurturing that seed until it grows into a more aware and balanced way of life.</target></trans-unit>
+      <trans-unit id="1504478957062728974" datatype="html">
+        <source>المؤهلات الأكاديمية والمهنية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      <target>Academic and professional qualifications</target></trans-unit>
+      <trans-unit id="4180785399718776099" datatype="html">
+        <source> دكتوراه مهنية في ما وراء الإنسانية والتنمية الذاتية </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">109,111</context>
+        </context-group>
+      <target>Professional doctorate in transhumanity and self-development</target></trans-unit>
+      <trans-unit id="3384101860474711184" datatype="html">
+        <source> تركّز على فهم الإنسان في أبعاده النفسية والفكرية والوجودية، مع تطبيقات عملية في العلاج والتغيير. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">112,115</context>
+        </context-group>
+      <target>Focused on understanding the human being in psychological, intellectual, and existential dimensions, with practical applications in healing and change.</target></trans-unit>
+      <trans-unit id="5039645193995401655" datatype="html">
+        <source>ماجستير في الصحة النفسية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      <target>Master's degree in mental health</target></trans-unit>
+      <trans-unit id="3016924731747842270" datatype="html">
+        <source> مع تعمّق في مدارس العلاج الحديثة وأساليب دعم الأفراد في التعامل مع القلق، الاكتئاب، واضطرابات العلاقات. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">121,124</context>
+        </context-group>
+      <target>With in-depth study of modern therapeutic approaches and methods of supporting individuals in dealing with anxiety, depression, and relationship disorders.</target></trans-unit>
+      <trans-unit id="6829447313582931692" datatype="html">
+        <source> ماجستير تطويري وتحفيزي في تنمية الإنسان </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">129,131</context>
+        </context-group>
+      <target>Developmental and motivational master's in human development</target></trans-unit>
+      <trans-unit id="3185651940185397038" datatype="html">
+        <source> يركّز على تمكين الإنسان من اكتشاف نقاط قوّته، وإعادة صياغة صورته عن ذاته، وبناء أهداف متّسقة مع قيمه. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">132,135</context>
+        </context-group>
+      <target>Focused on empowering individuals to discover their strengths, reshape their self-image, and build goals aligned with their values.</target></trans-unit>
+      <trans-unit id="49347681673321959" datatype="html">
+        <source> دورات متقدمة في الإرشاد والعلاج النفسي </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">140,142</context>
+        </context-group>
+      <target>Advanced courses in counseling and psychotherapy</target></trans-unit>
+      <trans-unit id="999263241306473919" datatype="html">
+        <source> تدريب في أساليب الإرشاد، الاستماع الفعّال، وإدارة الجلسات الفردية والجماعية باحترافية. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">143,146</context>
+        </context-group>
+      <target>Training in counseling methods, active listening, and the professional management of individual and group sessions.</target></trans-unit>
+      <trans-unit id="7225960937983143636" datatype="html">
+        <source>مجالات التخصص</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">154</context>
+        </context-group>
+      <target>Areas of specialization</target></trans-unit>
+      <trans-unit id="1683324169062231974" datatype="html">
+        <source>التعافي من صدمات الطفولة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">158</context>
+        </context-group>
+      <target>Healing from childhood trauma</target></trans-unit>
+      <trans-unit id="4605319644648834123" datatype="html">
+        <source>العلاقات الأسرية والزوجية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">159</context>
+        </context-group>
+      <target>Family and marital relationships</target></trans-unit>
+      <trans-unit id="6185836102674422054" datatype="html">
+        <source>إدارة القلق والاحتراق النفسي</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">160</context>
+        </context-group>
+      <target>Managing anxiety and burnout</target></trans-unit>
+      <trans-unit id="1960918940523008991" datatype="html">
+        <source>بناء صورة ذاتية صحية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">161</context>
+        </context-group>
+      <target>Building a healthy self-image</target></trans-unit>
+      <trans-unit id="2491883978559147821" datatype="html">
+        <source>إرشاد الأمهات والتربية الواعية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">162</context>
+        </context-group>
+      <target>Guidance for mothers and conscious parenting</target></trans-unit>
+      <trans-unit id="1090940535619853434" datatype="html">
+        <source>برامج المرأة والنجاح المتوازن</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+      <target>Women's programs and balanced success</target></trans-unit>
+      <trans-unit id="2090545752019348992" datatype="html">
+        <source> تنمية الوعي بالذات والرسائل الداخلية </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">164,166</context>
+        </context-group>
+      <target>Developing self-awareness and inner messages</target></trans-unit>
+      <trans-unit id="9153948269257336079" datatype="html">
+        <source>لمن هذه الجلسات والبرامج؟</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">173</context>
+        </context-group>
+      <target>Who are these sessions and programs for?</target></trans-unit>
+      <trans-unit id="3714470907225964101" datatype="html">
+        <source>لمن يحمل جرحًا لم يُسمَّ بعد</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      <target>For anyone carrying a wound that has not yet been named</target></trans-unit>
+      <trans-unit id="8822141371422464924" datatype="html">
+        <source> أشخاص يشعرون بألم داخلي متكرر، أو أنماط علاقات مؤذية، ولا يجدون تفسيرًا واضحًا لما يحدث معهم. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">179,182</context>
+        </context-group>
+      <target>People who feel recurring inner pain or harmful relationship patterns and cannot find a clear explanation for what is happening to them.</target></trans-unit>
+      <trans-unit id="5553105345870858533" datatype="html">
+        <source>للأمهات والمربين</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">186</context>
+        </context-group>
+      <target>For mothers and caregivers</target></trans-unit>
+      <trans-unit id="7135256422165285408" datatype="html">
+        <source> من يرغبون في تربية واعية، وإيقاف انتقال صدمات الطفولة بين الأجيال، وبناء علاقة آمنة مع الأبناء. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">187,190</context>
+        </context-group>
+      <target>For those who seek conscious parenting, want to stop the transmission of childhood trauma across generations, and build a secure relationship with their children.</target></trans-unit>
+      <trans-unit id="3970512737640520163" datatype="html">
+        <source>للنساء الساعيات للاتزان</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">194</context>
+        </context-group>
+      <target>For women seeking balance</target></trans-unit>
+      <trans-unit id="6533539276882984698" datatype="html">
+        <source> نساء يبحثن عن تحقيق النجاح دون أن يفقدن ذواتهن؛ بين الأدوار الأسرية والاجتماعية والمهنية. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">195,198</context>
+        </context-group>
+      <target>Women striving for success without losing themselves amid family, social, and professional roles.</target></trans-unit>
+      <trans-unit id="6640819506436859935" datatype="html">
+        <source>لمن يريد بداية مختلفة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">202</context>
+        </context-group>
+      <target>For anyone who wants a different beginning</target></trans-unit>
+      <trans-unit id="6355895611983111654" datatype="html">
+        <source> كل شخص قرّر أن يتوقف عن التكرار، ويبدأ رحلة جديدة مع ذاته، مبنية على الوعي والمسؤولية والرحمة. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">203,206</context>
+        </context-group>
+      <target>Anyone who has decided to stop repeating old patterns and begin a new journey with themselves, built on awareness, responsibility, and compassion.</target></trans-unit>
+      <trans-unit id="6520039666429888738" datatype="html">
+        <source>جاهز/ة تبدأ رحلة أهدأ؟</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">213</context>
+        </context-group>
+      <target>Ready to begin a calmer journey?</target></trans-unit>
+      <trans-unit id="5218269959445824116" datatype="html">
+        <source> احجز جلستك الآن وخد أول خطوة واضحة نحو فهم أعمق لذاتك وبناء خطة تناسبك. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">214,217</context>
+        </context-group>
+      <target>Book your session now and take the first clear step toward deeper self-understanding and a plan that suits you.</target></trans-unit>
+      <trans-unit id="8314292621694602462" datatype="html">
+        <source> احجز موعدًا الآن </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/about/about.component.html</context>
+          <context context-type="linenumber">222,224</context>
+        </context-group>
+      <target>Book an appointment now</target></trans-unit>
+      <trans-unit id="248116331402688344" datatype="html">
+        <source>حجز جلسة خاصة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      <target>Book a private session</target></trans-unit>
+      <trans-unit id="46108205630466101" datatype="html">
+        <source>طلب حجز جلسة مع الدكتورة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      <target>Request a session booking with the doctor</target></trans-unit>
+      <trans-unit id="8161758316152795786" datatype="html">
+        <source> املأ البيانات التالية وسيتم مراجعة طلبك والتواصل معك عبر واتساب. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+      <target>Fill in the following details. Your request will be reviewed and you will be contacted via WhatsApp.</target></trans-unit>
+      <trans-unit id="8405279578704724547" datatype="html">
+        <source> ✅ تم إرسال الطلب بنجاح. سيتم التواصل معك قريبًا. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">16,18</context>
+        </context-group>
+      <target>✅ Your request has been sent successfully. We will contact you soon.</target></trans-unit>
+      <trans-unit id="4469782239177167616" datatype="html">
+        <source>الاسم *</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      <target>Name *</target></trans-unit>
+      <trans-unit id="5252668060016533471" datatype="html">
+        <source>اكتب الاسم</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      <target>Enter your name</target></trans-unit>
+      <trans-unit id="3644424583909993384" datatype="html">
+        <source>السن *</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      <target>Age *</target></trans-unit>
+      <trans-unit id="6725002650489347140" datatype="html">
+        <source>مثال: 28</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      <target>Example: 28</target></trans-unit>
+      <trans-unit id="1467246112933382775" datatype="html">
+        <source>الوظيفة *</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      <target>Job *</target></trans-unit>
+      <trans-unit id="1245660546438898336" datatype="html">
+        <source>مثال: مهندس</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      <target>Example: Engineer</target></trans-unit>
+      <trans-unit id="3829306511101627043" datatype="html">
+        <source>الحالة الاجتماعية *</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      <target>Marital status *</target></trans-unit>
+      <trans-unit id="207759536361425622" datatype="html">
+        <source>— اختر —</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      <target>— Select —</target></trans-unit>
+      <trans-unit id="2721688768453856659" datatype="html">
+        <source>أعزب/عزباء</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      <target>Single</target></trans-unit>
+      <trans-unit id="6302829712954710461" datatype="html">
+        <source>متزوج/متزوجة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      <target>Married</target></trans-unit>
+      <trans-unit id="5781874467894764312" datatype="html">
+        <source>مطلق/مطلقة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      <target>Divorced</target></trans-unit>
+      <trans-unit id="4198590307539333840" datatype="html">
+        <source>أرمل/أرملة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      <target>Widowed</target></trans-unit>
+      <trans-unit id="497724360007165901" datatype="html">
+        <source>رقم واتساب *</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      <target>WhatsApp number *</target></trans-unit>
+      <trans-unit id="8265541984032726873" datatype="html">
+        <source>+2010xxxxxxx</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      <target>+2010xxxxxxx</target></trans-unit>
+      <trans-unit id="6670574655076383650" datatype="html">
+        <source>اكتب الرقم بصيغة دولية إن أمكن</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      <target>Enter the number in international format if possible</target></trans-unit>
+      <trans-unit id="2407538913263839917" datatype="html">
+        <source>الجنسية *</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      <target>Nationality *</target></trans-unit>
+      <trans-unit id="2927447812758100658" datatype="html">
+        <source>مصر</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      <target>Egypt</target></trans-unit>
+      <trans-unit id="2535263632491371122" datatype="html">
+        <source>السعودية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+      <target>Saudi Arabia</target></trans-unit>
+      <trans-unit id="8547699690061858717" datatype="html">
+        <source>الإمارات</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      <target>United Arab Emirates</target></trans-unit>
+      <trans-unit id="4052405459688892785" datatype="html">
+        <source>الكويت</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      <target>Kuwait</target></trans-unit>
+      <trans-unit id="5681189184500281223" datatype="html">
+        <source>قطر</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+      <target>Qatar</target></trans-unit>
+      <trans-unit id="4107887205963741739" datatype="html">
+        <source>الأردن</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      <target>Jordan</target></trans-unit>
+      <trans-unit id="2734878929387147303" datatype="html">
+        <source>فلسطين</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      <target>Palestine</target></trans-unit>
+      <trans-unit id="1545355758536653718" datatype="html">
+        <source>ليبيا</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+      <target>Libya</target></trans-unit>
+      <trans-unit id="6601133903916390736" datatype="html">
+        <source>المغرب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      <target>Morocco</target></trans-unit>
+      <trans-unit id="8079582402167443109" datatype="html">
+        <source>الجزائر</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+      <target>Algeria</target></trans-unit>
+      <trans-unit id="1288798714099615815" datatype="html">
+        <source>تونس</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      <target>Tunisia</target></trans-unit>
+      <trans-unit id="1354307875450153341" datatype="html">
+        <source>غير ذلك</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+      <target>Other</target></trans-unit>
+      <trans-unit id="8682091292775240259" datatype="html">
+        <source>اكتب جنسيتك</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      <target>Enter your nationality</target></trans-unit>
+      <trans-unit id="9029673090107648191" datatype="html">
+        <source>المشكلة الأساسية *</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      <target>Main issue *</target></trans-unit>
+      <trans-unit id="1368236932754890491" datatype="html">
+        <source>اكتب وصفًا مختصرًا...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">126</context>
+        </context-group>
+      <target>Write a brief description...</target></trans-unit>
+      <trans-unit id="1952505535770839719" datatype="html">
+        <source> أُقرّ بالاطلاع والموافقة على ضوابط الجلسات، والتي لا تشمل مناقشة موضوعات المازوخية أو الشذوذ الجنسي. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">134,137</context>
+        </context-group>
+      <target>I acknowledge that I have read and agree to the session guidelines, which do not include discussions of masochism or homosexuality.</target></trans-unit>
+      <trans-unit id="1498372750756819908" datatype="html">
+        <source>سعر الجلسة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">144</context>
+        </context-group>
+      <target>Session price</target></trans-unit>
+      <trans-unit id="7785980033558605427" datatype="html">
+        <source>إرسال الطلب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">149</context>
+        </context-group>
+      <target>Submit request</target></trans-unit>
+      <trans-unit id="6898384486053221027" datatype="html">
+        <source>جارٍ الإرسال…</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.html</context>
+          <context context-type="linenumber">150</context>
+        </context-group>
+      <target>Sending…</target></trans-unit>
+      <trans-unit id="consultation_price_egp" datatype="html">
+        <source>800 جنيه</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+      <target>800 EGP</target></trans-unit>
+      <trans-unit id="consultation_price_usd" datatype="html">
+        <source>25 دولار</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      <target>25 USD</target></trans-unit>
+      <trans-unit id="consultation_name_required" datatype="html">
+        <source>الاسم مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">90</context>
+        </context-group>
+      <target>Name is required</target></trans-unit>
+      <trans-unit id="consultation_name_min" datatype="html">
+        <source>الاسم يجب أن يكون 3 أحرف على الأقل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      <target>Name must be at least 3 characters</target></trans-unit>
+      <trans-unit id="consultation_age_required" datatype="html">
+        <source>السن مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      <target>Age is required</target></trans-unit>
+      <trans-unit id="consultation_age_invalid" datatype="html">
+        <source>أدخل سنًا صحيحًا بين 10 و120</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      <target>Enter a valid age between 10 and 120</target></trans-unit>
+      <trans-unit id="consultation_job_required" datatype="html">
+        <source>الوظيفة مطلوبة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+      <target>Job is required</target></trans-unit>
+      <trans-unit id="consultation_job_min" datatype="html">
+        <source>الوظيفة يجب أن تكون حرفين على الأقل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+      <target>Job must be at least 2 characters</target></trans-unit>
+      <trans-unit id="consultation_marital_required" datatype="html">
+        <source>اختر الحالة الاجتماعية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
+      <target>Select your marital status</target></trans-unit>
+      <trans-unit id="consultation_whatsapp_required" datatype="html">
+        <source>رقم واتساب مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+      <target>WhatsApp number is required</target></trans-unit>
+      <trans-unit id="consultation_whatsapp_invalid" datatype="html">
+        <source>أدخل رقمًا صحيحًا من 8 إلى 15 رقمًا</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">142</context>
+        </context-group>
+      <target>Enter a valid number between 8 and 15 digits</target></trans-unit>
+      <trans-unit id="consultation_nationality_required" datatype="html">
+        <source>اختر الجنسية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">152</context>
+        </context-group>
+      <target>Select your nationality</target></trans-unit>
+      <trans-unit id="consultation_nationality_other_required" datatype="html">
+        <source>اكتب الجنسية</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">162</context>
+        </context-group>
+      <target>Enter your nationality</target></trans-unit>
+      <trans-unit id="consultation_nationality_other_min" datatype="html">
+        <source>الجنسية يجب أن تكون حرفين على الأقل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">165</context>
+        </context-group>
+      <target>Nationality must be at least 2 characters</target></trans-unit>
+      <trans-unit id="consultation_problem_required" datatype="html">
+        <source>وصف المشكلة مطلوب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">175</context>
+        </context-group>
+      <target>A description of the issue is required</target></trans-unit>
+      <trans-unit id="consultation_problem_min" datatype="html">
+        <source>اكتب وصفًا لا يقل عن 10 أحرف</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      <target>Enter a description of at least 10 characters</target></trans-unit>
+      <trans-unit id="consultation_policy_required" datatype="html">
+        <source>يجب الموافقة على السياسة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">188</context>
+        </context-group>
+      <target>You must agree to the policy</target></trans-unit>
+      <trans-unit id="consultation_submit_error" datatype="html">
+        <source>حدث خطأ أثناء إرسال الطلب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/consultation-booking/consultation-booking.component.ts</context>
+          <context context-type="linenumber">269</context>
+        </context-group>
+      <target>An error occurred while submitting the request</target></trans-unit>
+      <trans-unit id="7747588561794577136" datatype="html">
+        <source>نحن هنا من أجلك</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      <target>We are here for you</target></trans-unit>
+      <trans-unit id="6483934302797240677" datatype="html">
+        <source> رحلتك للصحة النفسية تهمنا. تواصل معنا في أي وقت — نحن على بُعد رسالة واحدة. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+      <target>Your mental health journey matters to us. Contact us anytime — we are just one message away.</target></trans-unit>
+      <trans-unit id="3699542652460466003" datatype="html">
+        <source>تواصل معنا</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      <target>Contact us</target></trans-unit>
+      <trans-unit id="1620064804789355214" datatype="html">
+        <source>واتساب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">147</context>
+        </context-group>
+      <target>WhatsApp</target></trans-unit>
+      <trans-unit id="1486130457961250612" datatype="html">
+        <source>أسرع رد — تواصل مباشر</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      <target>Fastest response — direct contact</target></trans-unit>
+      <trans-unit id="8893968445342927944" datatype="html">
+        <source>تيليجرام</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">105</context>
+        </context-group>
+      <target>Telegram</target></trans-unit>
+      <trans-unit id="7207636159759996776" datatype="html">
+        <source>بديل ممتاز للتواصل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      <target>An excellent alternative for contact</target></trans-unit>
+      <trans-unit id="1346715649449121108" datatype="html">
+        <source>خط الدعم</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">143</context>
+        </context-group>
+      <target>Support line</target></trans-unit>
+      <trans-unit id="6240054983592415593" datatype="html">
+        <source>طرق الدفع</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">168</context>
+        </context-group>
+      <target>Payment methods</target></trans-unit>
+      <trans-unit id="5175263494880502532" datatype="html">
+        <source>فودافون كاش</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
+      <target>Vodafone Cash</target></trans-unit>
+      <trans-unit id="260439873747063996" datatype="html">
+        <source>محفظة موبايل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">192</context>
+        </context-group>
+      <target>Mobile wallet</target></trans-unit>
+      <trans-unit id="5130647236333242446" datatype="html">
+        <source>رقم التحويل</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">196</context>
+        </context-group>
+      <target>Transfer number</target></trans-unit>
+      <trans-unit id="4649983742739491760" datatype="html">
+        <source>إنستا باي</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">234</context>
+        </context-group>
+      <target>InstaPay</target></trans-unit>
+      <trans-unit id="7516919861426893032" datatype="html">
+        <source>تحويل لحظي</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">235</context>
+        </context-group>
+      <target>Instant transfer</target></trans-unit>
+      <trans-unit id="2778943498675103693" datatype="html">
+        <source>المعرف</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">239</context>
+        </context-group>
+      <target>Identifier</target></trans-unit>
+      <trans-unit id="5859651481208840486" datatype="html">
+        <source>تحويل بنكي</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">277</context>
+        </context-group>
+      <target>Bank transfer</target></trans-unit>
+      <trans-unit id="8776168390990733962" datatype="html">
+        <source>إيداع / تحويل مباشر</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">278</context>
+        </context-group>
+      <target>Deposit / direct transfer</target></trans-unit>
+      <trans-unit id="233943663993549170" datatype="html">
+        <source>البنك</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">282</context>
+        </context-group>
+      <target>Bank</target></trans-unit>
+      <trans-unit id="7549634773552526191" datatype="html">
+        <source>البنك الأهلي المصري</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">283</context>
+        </context-group>
+      <target>National Bank of Egypt</target></trans-unit>
+      <trans-unit id="8689013726294347482" datatype="html">
+        <source>رقم الحساب</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">287</context>
+        </context-group>
+      <target>Account number</target></trans-unit>
+      <trans-unit id="8799768821249628318" datatype="html">
+        <source>فيديو الشرح</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">318</context>
+        </context-group>
+      <target>Explainer video</target></trans-unit>
+      <trans-unit id="869748669759620233" datatype="html">
+        <source>شرح الدفع وحجز الكورس</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">326</context>
+        </context-group>
+      <target>Payment and course booking guide</target></trans-unit>
+      <trans-unit id="6870587658857547971" datatype="html">
+        <source>في هذا الفيديو ستتعلم:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">333</context>
+        </context-group>
+      <target>In this video you will learn:</target></trans-unit>
+      <trans-unit id="3576257466180582707" datatype="html">
+        <source>كيفية إتمام الدفع بشكل آمن</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">338</context>
+        </context-group>
+      <target>How to complete payment safely</target></trans-unit>
+      <trans-unit id="7189648761027368725" datatype="html">
+        <source>خطوات حجز الكورس أو الاستشارة</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">342</context>
+        </context-group>
+      <target>The steps to book the course or consultation</target></trans-unit>
+      <trans-unit id="7818325586341645250" datatype="html">
+        <source>كيف تتابع بعد الدفع وتأكيد الحجز</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/contact/contact.component.html</context>
+          <context context-type="linenumber">346</context>
+        </context-group>
+      <target>How to follow up after payment and booking confirmation</target></trans-unit>
+      <trans-unit id="9159246619312551247" datatype="html">
+        <source> هذه الصفحة قيد الإعداد حاليًا، وسيتم إضافة الأسئلة الشائعة وإجاباتها قريبًا. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/faq/faq.component.html</context>
+          <context context-type="linenumber">5,8</context>
+        </context-group>
+      <target>This page is currently being prepared, and FAQs with answers will be added soon.</target></trans-unit>
+      <trans-unit id="home_hero_pill" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="l-dot&quot;&gt;" /><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="م" /> منصة نفسية تعليمية مع دكتورة استشاري صحة نفسية </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">13,15</context>
+        </context-group>
+      <target>An educational mental health platform with a mental health consultant doctor</target></trans-unit>
+      <trans-unit id="home_hero_title" datatype="html">
+        <source> رحلتك نحو الشفاء تبدأ من هنا </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">17,19</context>
+        </context-group>
+      <target>Your healing journey starts here</target></trans-unit>
+      <trans-unit id="home_hero_subtitle" datatype="html">
+        <source> منصة <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;" />نبضة حياة<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;" /> تقدم كورسات نفسية مسجلة وجلسات خاصة تُمكّنك من فهم ذاتك، معالجة جذور الألم، وبناء حياة أكثر سلاماً ووعيًا. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">21,24</context>
+        </context-group>
+      <target>Nabdah Hayah offers recorded psychology courses and private sessions that empower you to understand yourself, heal the roots of pain, and build a more peaceful and mindful life.</target></trans-unit>
+      <trans-unit id="home_hero_cta_consult" datatype="html">
+        <source> احجز جلسة استشارة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">31,33</context>
+        </context-group>
+      <target>Book a consultation session</target></trans-unit>
+      <trans-unit id="home_hero_cta_courses" datatype="html">
+        <source> اكتشف الكورسات </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">39,41</context>
+        </context-group>
+      <target>Explore courses</target></trans-unit>
+      <trans-unit id="home_hero_meta_1" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="dot&quot;&gt;" /><x id="CLOSE_TAG_SPAN" ctype="x-span" /> محتوى علمي مبني على مدارس علم النفس الحديثة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">46,48</context>
+        </context-group>
+      <target>Evidence-based content built on modern schools of psychology</target></trans-unit>
+      <trans-unit id="home_hero_meta_2" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="dot&quot;&gt;" /><x id="CLOSE_TAG_SPAN" ctype="x-span" /> متابعة نفسية للحالات عبر برامج خاصة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">50,52</context>
+        </context-group>
+      <target>Psychological follow-up through dedicated programs</target></trans-unit>
+      <trans-unit id="home_hero_meta_3" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="dot&quot;&gt;" /><x id="CLOSE_TAG_SPAN" ctype="x-span" /> خصوصية وسرية تامة في كل خطوة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">54,56</context>
+        </context-group>
+      <target>Complete privacy and confidentiality at every step</target></trans-unit>
+      <trans-unit id="home_featured_eyebrow" datatype="html">
+        <source> أفضل البرامج </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">67,69</context>
+        </context-group>
+      <target>Top programs</target></trans-unit>
+      <trans-unit id="home_featured_title" datatype="html">
+        <source> أكثر الكورسات طلبًا </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">70,72</context>
+        </context-group>
+      <target>Most requested courses</target></trans-unit>
+      <trans-unit id="home_featured_subtitle" datatype="html">
+        <source> مجموعة مختارة من أهم البرامج العلاجية والنفسية في منصة نبضة حياة. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">73,75</context>
+        </context-group>
+      <target>A curated selection of the most important therapeutic and psychological programs on Nabdah Hayah.</target></trans-unit>
+      <trans-unit id="home_course_tag_default" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="{{ c.categoryId || &quot;عام&quot; }}" /> </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">92,94</context>
+        </context-group>
+      <target>  </target></trans-unit>
+      <trans-unit id="home_course_open" datatype="html">
+        <source> فتح الكورس </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">118,120</context>
+        </context-group>
+      <target>Open course</target></trans-unit>
+      <trans-unit id="home_course_details" datatype="html">
+        <source> عرض التفاصيل </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">129,131</context>
+        </context-group>
+      <target>View details</target></trans-unit>
+      <trans-unit id="home_course_join" datatype="html">
+        <source> اشترك الآن </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">138,140</context>
+        </context-group>
+      <target>Enroll now</target></trans-unit>
       <trans-unit id="home_consult_eyebrow" datatype="html">
-        <source>الاستشارات النفسية</source>
-        <target>Psychological Consultations</target>
-      </trans-unit>
-
+        <source> الاستشارات النفسية </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">152,154</context>
+        </context-group>
+      <target>Psychological consultations</target></trans-unit>
       <trans-unit id="home_consult_title" datatype="html">
-        <source>جلسات فردية بخصوصية تامة</source>
-        <target>Private 1-on-1 sessions with full confidentiality</target>
-      </trans-unit>
-
+        <source> جلسات فردية بخصوصية تامة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">155,157</context>
+        </context-group>
+      <target>Private one-on-one sessions with complete confidentiality</target></trans-unit>
       <trans-unit id="home_consult_subtitle" datatype="html">
-        <source>
-    استشارات نفسية مع دكتورة استشاري صحة نفسية، لمساعدتك على فهم ما تمر به،
-    ووضع خطة علاجية تناسبك.
-        </source>
-        <target>
-    Psychological consultations with a consultant psychiatrist to help you understand what you’re going through and set a treatment plan that suits you.
-        </target>
-      </trans-unit>
-
+        <source> استشارات نفسية مع دكتورة استشاري صحة نفسية، لمساعدتك على فهم ما تمر به، ووضع خطة علاجية تناسبك. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">158,161</context>
+        </context-group>
+      <target>Psychological consultations with a mental health consultant doctor to help you understand what you are going through and create a treatment plan that suits you.</target></trans-unit>
       <trans-unit id="home_consult_label" datatype="html">
-        <source>جلسات أونلاين</source>
-        <target>Online Sessions</target>
-      </trans-unit>
-
+        <source> جلسات أونلاين </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">166,168</context>
+        </context-group>
+      <target>Online sessions</target></trans-unit>
       <trans-unit id="home_consult_card_title" datatype="html">
-        <source>جلسة استشارة نفسية فردية</source>
-        <target>Individual psychological consultation session</target>
-      </trans-unit>
-
+        <source> جلسة استشارة نفسية فردية </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">170,172</context>
+        </context-group>
+      <target>Individual psychological consultation session</target></trans-unit>
       <trans-unit id="home_consult_desc" datatype="html">
-        <source>
-    مساحة آمنة للحديث عن كل ما يثقل قلبك وعقلك، مع توجيه مهني يساعدك على
-    رؤية أعمق لذاتك، واتخاذ قرارات أكثر وعيًا.
-        </source>
-        <target>
-    A safe space to talk about whatever weighs on your heart and mind, with professional guidance that helps you gain deeper insight into yourself and make more conscious decisions.
-        </target>
-      </trans-unit>
-
+        <source> مساحة آمنة للحديث عن كل ما يثقل قلبك وعقلك، مع توجيه مهني يساعدك على رؤية أعمق لذاتك، واتخاذ قرارات أكثر وعيًا. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">174,177</context>
+        </context-group>
+      <target>A safe space to talk about everything weighing on your heart and mind, with professional guidance that helps you see yourself more deeply and make more mindful decisions.</target></trans-unit>
       <trans-unit id="home_consult_meta_1" datatype="html">
         <source>مدة الجلسة: 50 دقيقة</source>
-        <target>Session duration: 50 minutes</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">181</context>
+        </context-group>
+      <target>Session length: 50 minutes</target></trans-unit>
       <trans-unit id="home_consult_meta_2" datatype="html">
         <source>أونلاين عبر منصات آمنة</source>
-        <target>Online via secure platforms</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">184</context>
+        </context-group>
+      <target>Online via secure platforms</target></trans-unit>
       <trans-unit id="home_consult_meta_3" datatype="html">
         <source>خصوصية وسرية تامة</source>
-        <target>Complete privacy and confidentiality</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">187</context>
+        </context-group>
+      <target>Complete privacy and confidentiality</target></trans-unit>
       <trans-unit id="home_consult_cta" datatype="html">
-        <source>احجز موعدًا الآن</source>
-        <target>Book an appointment now</target>
-      </trans-unit>
-
+        <source> احجز موعدًا الآن </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">195,197</context>
+        </context-group>
+      <target>Book an appointment now</target></trans-unit>
       <trans-unit id="home_consult_img_alt" datatype="html">
         <source>جلسة استشارة نفسية</source>
-        <target>Psychological consultation session</target>
-      </trans-unit>
-
-
-      <!-- HOME: WHY SECTION -->
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">203</context>
+        </context-group>
+      <target>Psychological consultation session</target></trans-unit>
       <trans-unit id="home_why_eyebrow" datatype="html">
-        <source>لماذا نبضة حياة؟</source>
-        <target>Why Nabdah Hayah?</target>
-      </trans-unit>
-
+        <source> لماذا نبضة حياة؟ </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">215,217</context>
+        </context-group>
+      <target>Why Nabdah Hayah?</target></trans-unit>
       <trans-unit id="home_why_title" datatype="html">
         <source>منصة نفسية متكاملة</source>
-        <target>A complete psychological platform</target>
-      </trans-unit>
-
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">218</context>
+        </context-group>
+      <target>An integrated mental health platform</target></trans-unit>
       <trans-unit id="home_why_subtitle" datatype="html">
-        <source>
-    ليست مجرد كورسات؛ بل منظومة نفسية متكاملة تجمع بين العلم، الإنسان،
-    والمتابعة العملية لحالتك النفسية.
-        </source>
-        <target>
-    Not just courses; a comprehensive psychological system that brings together science, the human side, and practical follow-up for your mental well-being.
-        </target>
-      </trans-unit>
-
+        <source> ليست مجرد كورسات؛ بل منظومة نفسية متكاملة تجمع بين العلم، الإنسان، والمتابعة العملية لحالتك النفسية. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">219,222</context>
+        </context-group>
+      <target>Not just courses, but an integrated mental health system that brings together knowledge, humanity, and practical follow-up for your psychological condition.</target></trans-unit>
       <trans-unit id="home_why_card_1_title" datatype="html">
-        <source>محتوى علمي موثوق</source>
-        <target>Trusted scientific content</target>
-      </trans-unit>
-
+        <source> محتوى علمي موثوق </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">228,230</context>
+        </context-group>
+      <target>Trusted scientific content</target></trans-unit>
       <trans-unit id="home_why_card_1_text" datatype="html">
-        <source>
-    كورسات مبنية على أسس علم النفس الإكلينيكي ومدارس العلاج الحديثة، بلغة
-    بسيطة وواعية.
-        </source>
-        <target>
-    Courses built on clinical psychology foundations and modern therapy approaches, delivered in a clear and mindful way.
-        </target>
-      </trans-unit>
-
+        <source> كورسات مبنية على أسس علم النفس الإكلينيكي ومدارس العلاج الحديثة، بلغة بسيطة وواعية. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">231,234</context>
+        </context-group>
+      <target>Courses built on the foundations of clinical psychology and modern therapeutic approaches, in clear and mindful language.</target></trans-unit>
       <trans-unit id="home_why_card_2_title" datatype="html">
-        <source>متابعة نفسية للحالات</source>
-        <target>Psychological follow-up</target>
-      </trans-unit>
-
+        <source> متابعة نفسية للحالات </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">239,241</context>
+        </context-group>
+      <target>Psychological follow-up for cases</target></trans-unit>
       <trans-unit id="home_why_card_2_text" datatype="html">
-        <source>
-    برامج موجهة لمرافقة حالتك النفسية، وليس مجرد معلومات نظرية.
-        </source>
-        <target>
-    Guided programs that accompany your psychological journey—not just theoretical information.
-        </target>
-      </trans-unit>
-
+        <source> برامج موجهة لمرافقة حالتك النفسية، وليس مجرد معلومات نظرية. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">242,244</context>
+        </context-group>
+      <target>Programs designed to accompany your psychological condition, not just provide theoretical information.</target></trans-unit>
       <trans-unit id="home_why_card_3_title" datatype="html">
-        <source>تركيز على التعافي والوعي</source>
-        <target>Focus on healing and awareness</target>
-      </trans-unit>
-
+        <source> تركيز على التعافي والوعي </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">249,251</context>
+        </context-group>
+      <target>A focus on healing and awareness</target></trans-unit>
       <trans-unit id="home_why_card_3_text" datatype="html">
-        <source>
-    الهدف هو مساعدتك على العيش بسلام داخلي أكبر، لا مجرد التخلص من العرض.
-        </source>
-        <target>
-    The goal is to help you live with deeper inner peace—not just to remove symptoms.
-        </target>
-      </trans-unit>
-
+        <source> الهدف هو مساعدتك على العيش بسلام داخلي أكبر، لا مجرد التخلص من العرض. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">252,254</context>
+        </context-group>
+      <target>The goal is to help you live with greater inner peace, not merely get rid of the symptom.</target></trans-unit>
       <trans-unit id="home_why_card_4_title" datatype="html">
-        <source>خصوصية وسرية تامة</source>
-        <target>Complete privacy and confidentiality</target>
-      </trans-unit>
-
+        <source> خصوصية وسرية تامة </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">259,261</context>
+        </context-group>
+      <target>Complete privacy and confidentiality</target></trans-unit>
       <trans-unit id="home_why_card_4_text" datatype="html">
-        <source>
-    كل ما تشاركه يظل في مساحة آمنة ومحترمة، تحفظ خصوصيتك وكرامتك.
-        </source>
-        <target>
-    Everything you share stays in a safe, respectful space that protects your privacy and dignity.
-        </target>
-      </trans-unit>
-
-
-      <!-- HOME: TESTIMONIALS -->
-      <trans-unit id="home_testimonials_eyebrow" datatype="html">
-        <source>آراء المتدربين</source>
-        <target>Trainees’ Reviews</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonials_title" datatype="html">
-        <source>تجارب حقيقية من نبضات حية</source>
-        <target>Real experiences from our community</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonials_subtitle" datatype="html">
-        <source>
-    جزء من قصص المتدربين الذين اختاروا البدء في رحلة الشفاء مع نبضة حياة.
-        </source>
-        <target>
-    A glimpse of stories from trainees who chose to begin their healing journey with Nabdah Hayah.
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_1_avatar" datatype="html">
-        <source>ن</source>
-        <target>N</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_1_name" datatype="html">
-        <source>نورة</source>
-        <target>Nora</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_1_tag" datatype="html">
-        <source>متدربة في صدمات الطفولة</source>
-        <target>Trainee in Childhood Trauma</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_1_text" datatype="html">
-        <source>
-    لأول مرة أحس إن في حد فاهم الجذر الحقيقي لألمي. الكورس فتح لي أبواب ما
-    كنت أتوقعها، وتعاملي مع نفسي ومع أهلي اختلف تمامًا.
-        </source>
-        <target>
-    For the first time, I felt someone truly understood the real root of my pain. The course opened doors I never expected, and my relationship with myself and my family changed completely.
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_1_label" datatype="html">
-        <source>تغيير عميق من الداخل</source>
-        <target>A deep inner transformation</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_2_avatar" datatype="html">
-        <source>ر</source>
-        <target>R</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_2_name" datatype="html">
-        <source>ريم</source>
-        <target>Reem</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_2_tag" datatype="html">
-        <source>جلسات استشارة شخصية</source>
-        <target>Personal consultation sessions</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_2_text" datatype="html">
-        <source>
-    الجلسات كانت مساحة آمنة جدًا. قدرت أتكلم بدون خوف من الحكم، وطلعت
-    بأفكار وخطوات عملية ساعدتني في قرارات مهمة.
-        </source>
-        <target>
-    The sessions were a very safe space. I could speak without fear of judgment, and I left with ideas and practical steps that helped me with important decisions.
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_2_label" datatype="html">
-        <source>مساحة آمنة ومٌحتوية</source>
-        <target>A safe and supportive space</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_3_avatar" datatype="html">
-        <source>س</source>
-        <target>S</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_3_name" datatype="html">
-        <source>سارة</source>
-        <target>Sara</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_3_tag" datatype="html">
-        <source>كورس أعماق النفس البشرية</source>
-        <target>Human Psyche Depths course</target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_3_text" datatype="html">
-        <source>
-    البرنامج ساعدني أفهم ليه أكرر نفس العلاقات ونفس الأخطاء. حسيت إني
-    أتعرفت على نفسي من جديد.
-        </source>
-        <target>
-    The program helped me understand why I repeat the same relationships and the same mistakes. I felt like I got to know myself all over again.
-        </target>
-      </trans-unit>
-
-      <trans-unit id="home_testimonial_3_label" datatype="html">
-        <source>وعي مختلف بالحياة</source>
-        <target>A new awareness of life</target>
-      </trans-unit>
-
-
+        <source> كل ما تشاركه يظل في مساحة آمنة ومحترمة، تحفظ خصوصيتك وكرامتك. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/home/home.component.html</context>
+          <context context-type="linenumber">262,264</context>
+        </context-group>
+      <target>Everything you share remains in a safe and respectful space that protects your privacy and dignity.</target></trans-unit>
     </body>
   </file>
 </xliff>

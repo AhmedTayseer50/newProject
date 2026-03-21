@@ -1,30 +1,28 @@
-<div class="hero-topbar">
-  <div class="container">
-    <a routerLink="/courses" class="back-link">
-      <span class="back-icon">←</span>
-      {{ backLabel }}
-    </a>
-  </div>
+<div class="hero-topbar" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
+  <a routerLink="/courses" class="back-link">
+    <span class="back-icon">{{ isEnglish ? '←' : '→' }}</span>
+    {{ backLabel }}
+  </a>
 </div>
 
-<div class="container mb-3" *ngIf="loading">
+<div class="container mb-3" *ngIf="loading" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
   <div class="alert alert-info">
-    {{ isEnglish ? "Loading course..." : "جارٍ تحميل بيانات الكورس..." }}
+    {{ isEnglish ? 'Loading...' : 'جارٍ التحميل…' }}
   </div>
 </div>
 
-<div class="container mb-3" *ngIf="error">
+<div class="container mb-3" *ngIf="error" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
   <div class="alert alert-danger">{{ error }}</div>
 </div>
 
 <section
   class="course-hero"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && course"
+  *ngIf="!loading && !error && course"
 >
   <div class="container">
     <div class="course-hero-inner">
-      <div class="course-hero-text">
+      <div class="course-hero-content">
         <div class="course-hero-eyebrow">
           {{ course.heroEyebrow || heroFallbackEyebrow }}
         </div>
@@ -89,7 +87,7 @@
         <div class="course-hero-poster">
           <img
             [src]="course.thumbnail || defaultThumbnail"
-            [alt]="course.title || 'Course poster'"
+            [alt]="course.title || (isEnglish ? 'Course poster' : 'بوستر الكورس')"
           />
         </div>
       </div>
@@ -97,7 +95,7 @@
   </div>
 </section>
 
-<div class="container mb-4" *ngIf="!loading && !error && course">
+<div class="container mb-4" *ngIf="!loading && !error && course" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
   <div
     *ngIf="canViewLessons && firstLessonId"
     class="alert alert-primary d-flex justify-content-between align-items-center flex-wrap gap-2"
@@ -112,44 +110,46 @@
     </button>
   </div>
 
-<div
-  *ngIf="canViewLessons && !telegramUsed"
-  class="alert alert-light border d-flex align-items-center justify-content-between flex-wrap gap-2"
->
-  <div>
-    <div class="fw-semibold mb-1">
-      {{
-        isEnglish ? "Telegram community access" : "الدخول إلى جروب التليجرام"
-      }}
-    </div>
-
-    <div class="small text-muted" *ngIf="telegramEligible">
-      {{
-        isEnglish
-          ? "Your Telegram access is ready. This button can only be used once."
-          : "تم تجهيز صلاحية دخولك إلى جروب التليجرام. هذا الزر يعمل مرة واحدة فقط."
-      }}
-    </div>
-  </div>
-
-  <button
-    *ngIf="telegramEligible"
-    class="btn btn-success btn-sm"
-    type="button"
-    [disabled]="telegramBusy"
-    (click)="joinTelegramGroup()"
+  <div
+    *ngIf="canViewLessons && (!telegramUsed || telegramMessage)"
+    class="alert alert-light border d-flex align-items-center justify-content-between flex-wrap gap-2"
   >
-    {{
-      telegramBusy
-        ? isEnglish
-          ? "Opening..."
-          : "جارٍ الفتح..."
-        : isEnglish
-          ? "Join Telegram group"
-          : "الانضمام إلى جروب التليجرام"
-    }}
-  </button>
-</div>
+    <div>
+      <div class="fw-semibold mb-1">
+        {{ isEnglish ? "Telegram community access" : "الدخول إلى جروب التليجرام" }}
+      </div>
+
+      <div class="small text-muted" *ngIf="telegramEligible && !telegramUsed">
+        {{
+          isEnglish
+            ? "Your Telegram access is ready. This button can only be used once."
+            : "تم تجهيز صلاحية دخولك إلى جروب التليجرام. هذا الزر يعمل مرة واحدة فقط."
+        }}
+      </div>
+
+      <div class="small text-muted" *ngIf="telegramMessage">
+        {{ telegramMessage }}
+      </div>
+    </div>
+
+    <button
+      *ngIf="telegramEligible && !telegramUsed"
+      class="btn btn-success btn-sm"
+      type="button"
+      [disabled]="telegramBusy"
+      (click)="joinTelegramGroup()"
+    >
+      {{
+        telegramBusy
+          ? isEnglish
+            ? "Opening..."
+            : "جارٍ الفتح..."
+          : isEnglish
+            ? "Join Telegram group"
+            : "الانضمام إلى جروب التليجرام"
+      }}
+    </button>
+  </div>
 
   <div *ngIf="!canViewLessons" class="alert alert-warning">
     {{ defaultNoAccess }}
@@ -241,7 +241,7 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course && course.outcomes?.length"
+  *ngIf="!loading && !error && course"
 >
   <div class="container">
     <div class="section-header">
@@ -255,18 +255,24 @@
       </p>
     </div>
 
-    <div class="simple-list-card">
+    <div class="simple-list-card" *ngIf="course.outcomes?.length; else noOutcomes">
       <ul class="check-list">
         <li *ngFor="let item of course.outcomes">{{ item }}</li>
       </ul>
     </div>
+
+    <ng-template #noOutcomes>
+      <div class="simple-list-card">
+        <p class="m-0">{{ defaultOutcomesEmpty }}</p>
+      </div>
+    </ng-template>
   </div>
 </section>
 
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course && course.audienceItems?.length"
+  *ngIf="!loading && !error && course"
 >
   <div class="container">
     <div class="section-header">
@@ -280,11 +286,17 @@
       </p>
     </div>
 
-    <div class="simple-list-card">
+    <div class="simple-list-card" *ngIf="course.audienceItems?.length; else noAudience">
       <ul class="check-list">
         <li *ngFor="let item of course.audienceItems">{{ item }}</li>
       </ul>
     </div>
+
+    <ng-template #noAudience>
+      <div class="simple-list-card">
+        <p class="m-0">{{ defaultAudienceEmpty }}</p>
+      </div>
+    </ng-template>
   </div>
 </section>
 
@@ -312,14 +324,7 @@
         <iframe
           [src]="introVideoSafeUrl"
           [title]="isEnglish ? 'Course intro video' : 'الفيديو التعريفي للكورس'"
-          allow="
-            accelerometer;
-            autoplay;
-            clipboard-write;
-            encrypted-media;
-            gyroscope;
-            picture-in-picture;
-          "
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"
           allowfullscreen
         ></iframe>
       </div>
@@ -330,12 +335,7 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="
-    !loading &&
-    !error &&
-    course &&
-    (course.curriculum?.length || lectureNames.length)
-  "
+  *ngIf="!loading && !error && course"
 >
   <div class="container">
     <div class="section-header">
@@ -371,14 +371,19 @@
     </div>
 
     <ng-template #noCurriculum>
-      <div class="simple-list-card">
+      <div class="simple-list-card" *ngIf="lectureNames.length; else curriculumEmpty">
         <ul class="check-list">
           <li *ngFor="let name of lectureNames; let i = index">
-            {{ lessonLabel(i) }} —
-            {{ name || (isEnglish ? "Untitled" : "بدون عنوان") }}
+            {{ lessonLabel(i) }} — {{ name || (isEnglish ? "Untitled" : "بدون عنوان") }}
           </li>
         </ul>
       </div>
+
+      <ng-template #curriculumEmpty>
+        <div class="simple-list-card">
+          <p class="m-0">{{ defaultCurriculumEmpty }}</p>
+        </div>
+      </ng-template>
     </ng-template>
   </div>
 </section>
@@ -386,7 +391,7 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course && course.testimonials?.length"
+  *ngIf="!loading && !error && course"
 >
   <div class="container">
     <div class="section-header">
@@ -400,7 +405,7 @@
       </p>
     </div>
 
-    <div class="testimonials-grid">
+    <div class="testimonials-grid" *ngIf="course.testimonials?.length; else noTestimonials">
       <article
         class="testimonial-card"
         *ngFor="let item of course.testimonials"
@@ -417,6 +422,12 @@
         </div>
       </article>
     </div>
+
+    <ng-template #noTestimonials>
+      <div class="simple-list-card">
+        <p class="m-0">{{ defaultTestimonialsEmpty }}</p>
+      </div>
+    </ng-template>
   </div>
 </section>
 
@@ -499,19 +510,25 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course && course.faqs?.length"
+  *ngIf="!loading && !error && course"
 >
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">{{ sectionTitleFaqs }}</h2>
     </div>
 
-    <div class="faq-list">
+    <div class="faq-list" *ngIf="course.faqs?.length; else noFaqs">
       <article class="faq-item" *ngFor="let item of course.faqs">
         <h3 class="faq-question">{{ item.question }}</h3>
         <p class="faq-answer">{{ item.answer }}</p>
       </article>
     </div>
+
+    <ng-template #noFaqs>
+      <div class="simple-list-card">
+        <p class="m-0">{{ defaultFaqEmpty }}</p>
+      </div>
+    </ng-template>
   </div>
 </section>
 

@@ -1,20 +1,18 @@
-<section class="cp-page" dir="rtl">
+<section class="cp-page" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
   <div class="page-container py-4 py-lg-5">
-    <!-- Header -->
     <div class="text-center mb-4 mb-lg-5">
       <div class="cp-pill mx-auto mb-3">
         <span class="cp-pill-dot"></span>
-        <span>نحن هنا من أجلك</span>
+        <span i18n>نحن هنا من أجلك</span>
       </div>
 
-      <h1 class="cp-title mb-2">التواصل وطرق الدفع</h1>
-      <p class="cp-subtitle mb-0">
+      <h1 class="cp-title mb-2" i18n>التواصل وطرق الدفع</h1>
+      <p class="cp-subtitle mb-0" i18n>
         رحلتك للصحة النفسية تهمنا. تواصل معنا في أي وقت — نحن على بُعد رسالة
         واحدة.
       </p>
     </div>
 
-    <!-- ===== تواصل معنا (3 كروت جنب بعض) ===== -->
     <div class="cp-section mb-4">
       <div class="cp-section-head mb-3">
         <span class="cp-section-icon">
@@ -33,11 +31,10 @@
             />
           </svg>
         </span>
-        <h2 class="cp-section-title m-0">تواصل معنا</h2>
+        <h2 class="cp-section-title m-0" i18n>تواصل معنا</h2>
       </div>
 
       <div class="row g-3">
-        <!-- WhatsApp -->
         <div class="col-12 col-lg-4">
           <a
             class="cp-tile cp-tile--wa h-100"
@@ -62,8 +59,8 @@
                 </svg>
               </span>
 
-              <div class="cp-tile-title">واتساب</div>
-              <div class="cp-tile-sub">أسرع رد — تواصل مباشر</div>
+              <div class="cp-tile-title" i18n>واتساب</div>
+              <div class="cp-tile-sub" i18n>أسرع رد — تواصل مباشر</div>
             </div>
 
             <span class="cp-tile-corner" aria-hidden="true">
@@ -80,7 +77,6 @@
           </a>
         </div>
 
-        <!-- Telegram -->
         <div class="col-12 col-lg-4">
           <a
             class="cp-tile h-100"
@@ -106,8 +102,8 @@
                 </svg>
               </span>
 
-              <div class="cp-tile-title">تيليجرام</div>
-              <div class="cp-tile-sub">بديل ممتاز للتواصل</div>
+              <div class="cp-tile-title" i18n>تيليجرام</div>
+              <div class="cp-tile-sub" i18n>بديل ممتاز للتواصل</div>
             </div>
 
             <span class="cp-tile-corner" aria-hidden="true">
@@ -124,7 +120,6 @@
           </a>
         </div>
 
-        <!-- Hotline -->
         <div class="col-12 col-lg-4">
           <div class="cp-tile h-100 cp-tile--static">
             <a
@@ -135,7 +130,6 @@
             >
               <div class="cp-tile-center">
                 <span class="cp-tile-ico cp-tile-ico--mint" aria-hidden="true">
-                  <!-- نفس SVG كما هو -->
                   <svg viewBox="0 0 24 24" fill="none">
                     <path
                       d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3 5.18 2 2 0 0 1 5.11 3h3a2 2 0 0 1 2 1.72c.12.86.33 1.7.62 2.5a2 2 0 0 1-.45 2.11L9.21 10.79a16 16 0 0 0 4 4l1.46-1.46a2 2 0 0 1 2.11-.45c.8.29 1.64.5 2.5.62A2 2 0 0 1 22 16.92Z"
@@ -146,18 +140,17 @@
                   </svg>
                 </span>
 
-                <div class="cp-tile-title">خط الدعم</div>
+                <div class="cp-tile-title" i18n>خط الدعم</div>
                 <div class="cp-tile-sub cp-ltr">01555614096</div>
               </div>
 
-              <span class="cp-tile-tag">واتساب</span>
+              <span class="cp-tile-tag" i18n>واتساب</span>
             </a>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ===== طرق الدفع (3 كروت جنب بعض) ===== -->
     <div class="cp-section mb-4">
       <div class="cp-section-head mb-3">
         <span class="cp-section-icon">
@@ -172,11 +165,10 @@
             />
           </svg>
         </span>
-        <h2 class="cp-section-title m-0">طرق الدفع</h2>
+        <h2 class="cp-section-title m-0" i18n>طرق الدفع</h2>
       </div>
 
       <div class="row g-3">
-        <!-- Vodafone -->
         <div class="col-12 col-lg-4">
           <div class="cp-pay-tile h-100">
             <div class="cp-pay-center">
@@ -196,24 +188,24 @@
                 </svg>
               </span>
 
-              <div class="cp-pay-title">فودافون كاش</div>
-              <div class="cp-pay-sub">محفظة موبايل</div>
+              <div class="cp-pay-title" i18n>فودافون كاش</div>
+              <div class="cp-pay-sub" i18n>محفظة موبايل</div>
 
               <div class="cp-pay-body">
                 <div class="cp-kv">
-                  <div class="cp-k">رقم التحويل</div>
+                  <div class="cp-k" i18n>رقم التحويل</div>
                   <div class="cp-v cp-ltr">0100 000 0000</div>
                 </div>
+
                 <div class="cp-kv">
-                  <div class="cp-k">الاسم</div>
-                  <div class="cp-v">نبدات حياة</div>
+                  <div class="cp-k" i18n>الاسم</div>
+                  <div class="cp-v" i18n>نبضة حياة</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- InstaPay -->
         <div class="col-12 col-lg-4">
           <div class="cp-pay-tile h-100">
             <div class="cp-pay-center">
@@ -239,24 +231,24 @@
                 </svg>
               </span>
 
-              <div class="cp-pay-title">إنستا باي</div>
-              <div class="cp-pay-sub">تحويل لحظي</div>
+              <div class="cp-pay-title" i18n>إنستا باي</div>
+              <div class="cp-pay-sub" i18n>تحويل لحظي</div>
 
               <div class="cp-pay-body">
                 <div class="cp-kv">
-                  <div class="cp-k">المعرف</div>
+                  <div class="cp-k" i18n>المعرف</div>
                   <div class="cp-v cp-ltr">mindfulpath@instapay</div>
                 </div>
+
                 <div class="cp-kv">
-                  <div class="cp-k">الاسم</div>
-                  <div class="cp-v">نبدات حياة</div>
+                  <div class="cp-k" i18n>الاسم</div>
+                  <div class="cp-v" i18n>نبضة حياة</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Bank -->
         <div class="col-12 col-lg-4">
           <div class="cp-pay-tile h-100">
             <div class="cp-pay-center">
@@ -282,18 +274,20 @@
                 </svg>
               </span>
 
-              <div class="cp-pay-title">تحويل بنكي</div>
-              <div class="cp-pay-sub">إيداع / تحويل مباشر</div>
+              <div class="cp-pay-title" i18n>تحويل بنكي</div>
+              <div class="cp-pay-sub" i18n>إيداع / تحويل مباشر</div>
 
               <div class="cp-pay-body">
                 <div class="cp-kv">
-                  <div class="cp-k">البنك</div>
-                  <div class="cp-v">البنك الأهلي المصري</div>
+                  <div class="cp-k" i18n>البنك</div>
+                  <div class="cp-v" i18n>البنك الأهلي المصري</div>
                 </div>
+
                 <div class="cp-kv">
-                  <div class="cp-k">رقم الحساب</div>
+                  <div class="cp-k" i18n>رقم الحساب</div>
                   <div class="cp-v cp-ltr">1234 5678 9012 3456</div>
                 </div>
+
                 <div class="cp-kv">
                   <div class="cp-k">IBAN</div>
                   <div class="cp-v cp-ltr">EG12 0012 3456 7890 1234 5678</div>
@@ -305,7 +299,6 @@
       </div>
     </div>
 
-    <!-- ===== قسم الفيديو (الشرح) ===== -->
     <div class="cp-section mb-4">
       <div class="cp-section-head mb-3">
         <span class="cp-section-icon cp-section-icon--mint">
@@ -322,39 +315,35 @@
             />
           </svg>
         </span>
-        <h2 class="cp-section-title m-0">فيديو الشرح</h2>
+        <h2 class="cp-section-title m-0" i18n>فيديو الشرح</h2>
       </div>
 
       <div class="cp-how">
         <div class="cp-video ratio ratio-16x9">
           <iframe
             src="https://www.youtube.com/embed/VIDEO_ID"
+            i18n-title
             title="شرح الدفع وحجز الكورس"
-            allow="
-              accelerometer;
-              autoplay;
-              clipboard-write;
-              encrypted-media;
-              gyroscope;
-              picture-in-picture;
-            "
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"
             allowfullscreen
           ></iframe>
         </div>
 
         <div class="cp-how-list">
-          <div class="cp-how-label mb-2">في هذا الفيديو ستتعلم:</div>
+          <div class="cp-how-label mb-2" i18n>في هذا الفيديو ستتعلم:</div>
 
           <ul class="cp-bullets m-0">
             <li>
-              <span class="cp-bullet-dot">1</span> كيفية إتمام الدفع بشكل آمن
+              <span class="cp-bullet-dot">1</span>
+              <span i18n>كيفية إتمام الدفع بشكل آمن</span>
             </li>
             <li>
-              <span class="cp-bullet-dot">2</span> خطوات حجز الكورس أو الاستشارة
+              <span class="cp-bullet-dot">2</span>
+              <span i18n>خطوات حجز الكورس أو الاستشارة</span>
             </li>
             <li>
-              <span class="cp-bullet-dot">3</span> كيف تتابع بعد الدفع وتأكيد
-              الحجز
+              <span class="cp-bullet-dot">3</span>
+              <span i18n>كيف تتابع بعد الدفع وتأكيد الحجز</span>
             </li>
           </ul>
         </div>

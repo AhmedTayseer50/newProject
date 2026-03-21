@@ -9,7 +9,9 @@
     "build:en": "ng build -c en --delete-output-path=false",
     "build:vercel": "npm run build:ar && npm run build:en",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "extract:i18n": "ng extract-i18n --output-path src/locale --out-file messages.xlf",
+    "extract:i18n:root": "ng extract-i18n --out-file messages.xlf"
   },
   "private": true,
   "dependencies": {

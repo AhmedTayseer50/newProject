@@ -1,7 +1,6 @@
-<footer class="site-footer" dir="rtl">
+<footer class="site-footer" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
   <div class="page-container">
     <div class="footer-grid">
-      <!-- Brand -->
       <div class="footer-brand">
         <div class="brand-row">
           <div class="brand-logo">
@@ -13,28 +12,25 @@
           </div>
         </div>
 
-        <p class="brand-desc">
+        <p class="brand-desc" i18n>
           كورسات نفسية مسجلة وجلسات خاصة تساعدك على فهم ذاتك ومعالجة جذور الألم
           وبناء حياة أكثر سلامًا.
         </p>
       </div>
 
-      <!-- Links -->
       <div class="footer-col">
         <div class="footer-col-title" i18n>روابط سريعة</div>
         <a routerLink="/" fragment="hero" class="footer-link" i18n>الرئيسية</a>
         <a routerLink="/courses" class="footer-link" i18n>الكورسات</a>
         <a routerLink="/consultations" class="footer-link" i18n>الاستشارات</a>
         <a routerLink="/about" class="footer-link" i18n>عن الدكتورة</a>
-        <a routerLink="/contact" class="footer-link" i18n>تواصل</a>
+        <a routerLink="/contact" class="footer-link" i18n>التواصل وطرق الدفع</a>
         <a routerLink="/faq" class="footer-link" i18n>الأسئلة الشائعة</a>
       </div>
 
-      <!-- Account -->
       <div class="footer-col">
         <div class="footer-col-title" i18n>الحساب</div>
 
-        <!-- ✅ Clean auth toggle (no repeated async) -->
         <ng-container *ngIf="auth.user$ | async as user; else guest">
           <a routerLink="/my-courses" class="footer-link" i18n>كورساتي</a>
           <a routerLink="/profile" class="footer-link" i18n>الملف الشخصي</a>
@@ -46,7 +42,6 @@
         </ng-template>
       </div>
 
-      <!-- Social -->
       <div class="footer-col">
         <div class="footer-col-title" i18n>تابعنا</div>
 
@@ -127,12 +122,12 @@
     </div>
 
     <div class="footer-bottom">
-      <div class="footer-copy">© {{ year }} نبضة حياة — جميع الحقوق محفوظة</div>
+      <div class="footer-copy" i18n>© {{ year }} نبضة حياة — جميع الحقوق محفوظة</div>
 
       <div class="footer-mini-links">
-        <a class="footer-mini-link" href="#">سياسة الخصوصية</a>
+        <a class="footer-mini-link" href="#" i18n>سياسة الخصوصية</a>
         <span class="dot">•</span>
-        <a class="footer-mini-link" href="#">الشروط والأحكام</a>
+        <a class="footer-mini-link" href="#" i18n>الشروط والأحكام</a>
       </div>
     </div>
   </div>

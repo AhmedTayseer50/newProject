@@ -1,7 +1,6 @@
-<div class="auth-page" dir="rtl">
+<div class="auth-page" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
   <div class="page-container">
     <div class="auth-grid card-ui">
-      <!-- Side / Brand -->
       <div class="auth-side">
         <div class="auth-badge" aria-hidden="true"></div>
 
@@ -22,21 +21,26 @@
         </div>
       </div>
 
-      <!-- Form -->
       <div class="auth-form">
         <h3 class="mb-2" i18n>إنشاء حساب</h3>
         <p class="text-muted mb-4" i18n>املأ البيانات التالية لإنشاء حساب جديد.</p>
 
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form-inner">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form-inner" novalidate>
           <div class="mb-3">
             <label class="form-label" i18n>الاسم</label>
             <input
               type="text"
               class="form-control auth-input"
               formControlName="displayName"
+              i18n-placeholder
               placeholder="مثال: أحمد محمد"
             />
-            <div class="form-text" i18n>سيظهر هذا الاسم في شريط التنقّل (الـ Navbar).</div>
+            <div class="form-text" i18n>
+              سيظهر هذا الاسم في شريط التنقّل.
+            </div>
+            <div *ngIf="displayNameError" class="form-text text-danger">
+              {{ displayNameError }}
+            </div>
           </div>
 
           <div class="mb-3">
@@ -45,9 +49,13 @@
               type="tel"
               class="form-control auth-input"
               formControlName="whatsapp"
+              i18n-placeholder
               placeholder="مثال: +201234567890"
             />
-            <div class="form-text" i18n>الأرقام فقط أو + (بدون مسافات).</div>
+            <div class="form-text" i18n>الأرقام فقط أو علامة + بدون مسافات.</div>
+            <div *ngIf="whatsappError" class="form-text text-danger">
+              {{ whatsappError }}
+            </div>
           </div>
 
           <div class="mb-3">
@@ -56,8 +64,12 @@
               type="email"
               class="form-control auth-input"
               formControlName="email"
+              i18n-placeholder
               placeholder="name@example.com"
             />
+            <div *ngIf="emailError" class="form-text text-danger">
+              {{ emailError }}
+            </div>
           </div>
 
           <div class="mb-3">
@@ -66,15 +78,20 @@
               type="password"
               class="form-control auth-input"
               formControlName="password"
+              i18n-placeholder
               placeholder="••••••"
             />
             <div class="form-text" i18n>6 أحرف على الأقل.</div>
+            <div *ngIf="passwordError" class="form-text text-danger">
+              {{ passwordError }}
+            </div>
           </div>
 
           <div *ngIf="error" class="alert alert-danger auth-alert">{{ error }}</div>
 
-          <button class="btn btn-primary w-100 auth-btn" [disabled]="loading" i18n>
-            {{ loading ? 'جارٍ إنشاء الحساب...' : 'تسجيل' }}
+          <button class="btn btn-primary w-100 auth-btn" [disabled]="loading" type="submit">
+            <span *ngIf="!loading" i18n>تسجيل</span>
+            <span *ngIf="loading" i18n>جارٍ إنشاء الحساب...</span>
           </button>
 
           <div class="auth-inline text-muted">

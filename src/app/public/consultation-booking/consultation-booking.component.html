@@ -1,198 +1,153 @@
-<!-- src/app/public/consultation-booking/consultation-booking.component.html -->
-<div class="container py-4" dir="rtl">
+<div class="container py-4" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
   <div class="book-shell">
     <div class="book-header">
       <div class="book-pill">
         <span class="book-dot"></span>
-        حجز جلسة خاصة
+        <span i18n>حجز جلسة خاصة</span>
       </div>
-      <h2 class="book-title">طلب حجز جلسة مع الدكتورة</h2>
-      <p class="book-sub">
+
+      <h2 class="book-title" i18n>طلب حجز جلسة مع الدكتورة</h2>
+
+      <p class="book-sub" i18n>
         املأ البيانات التالية وسيتم مراجعة طلبك والتواصل معك عبر واتساب.
       </p>
     </div>
 
-    <div class="alert alert-success" *ngIf="sent">
+    <div class="alert alert-success" *ngIf="sent" i18n>
       ✅ تم إرسال الطلب بنجاح. سيتم التواصل معك قريبًا.
     </div>
+
     <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
 
     <form class="book-card" [formGroup]="form" (ngSubmit)="submit()">
       <div class="grid">
         <div class="field">
-          <label>الاسم *</label>
+          <label i18n>الاسم *</label>
           <input
             class="form-control"
             formControlName="name"
+            i18n-placeholder
             placeholder="اكتب الاسم"
           />
-          <small
-            class="err"
-            *ngIf="form.get('name')?.touched && form.get('name')?.invalid"
-          >
-            الاسم مطلوب (3 أحرف على الأقل)
-          </small>
+          <small class="err" *ngIf="nameError">{{ nameError }}</small>
         </div>
 
         <div class="field">
-          <label>السن *</label>
+          <label i18n>السن *</label>
           <input
             class="form-control"
             type="number"
             formControlName="age"
+            i18n-placeholder
             placeholder="مثال: 28"
           />
-          <small
-            class="err"
-            *ngIf="form.get('age')?.touched && form.get('age')?.invalid"
-          >
-            أدخل سن صحيح
-          </small>
+          <small class="err" *ngIf="ageError">{{ ageError }}</small>
         </div>
 
         <div class="field">
-          <label>الوظيفة *</label>
+          <label i18n>الوظيفة *</label>
           <input
             class="form-control"
             formControlName="job"
+            i18n-placeholder
             placeholder="مثال: مهندس"
           />
-          <small
-            class="err"
-            *ngIf="form.get('job')?.touched && form.get('job')?.invalid"
-          >
-            الوظيفة مطلوبة
-          </small>
+          <small class="err" *ngIf="jobError">{{ jobError }}</small>
         </div>
 
         <div class="field">
-          <label>الحالة الاجتماعية *</label>
+          <label i18n>الحالة الاجتماعية *</label>
           <select class="form-select" formControlName="maritalStatus">
-            <option value="">— اختر —</option>
-            <option value="أعزب/عزباء">أعزب/عزباء</option>
-            <option value="متزوج/متزوجة">متزوج/متزوجة</option>
-            <option value="مطلق/مطلقة">مطلق/مطلقة</option>
-            <option value="أرمل/أرملة">أرمل/أرملة</option>
+            <option value="" i18n>— اختر —</option>
+            <option value="أعزب/عزباء" i18n>أعزب/عزباء</option>
+            <option value="متزوج/متزوجة" i18n>متزوج/متزوجة</option>
+            <option value="مطلق/مطلقة" i18n>مطلق/مطلقة</option>
+            <option value="أرمل/أرملة" i18n>أرمل/أرملة</option>
           </select>
-          <small
-            class="err"
-            *ngIf="
-              form.get('maritalStatus')?.touched &&
-              form.get('maritalStatus')?.invalid
-            "
-          >
-            اختر الحالة الاجتماعية
+          <small class="err" *ngIf="maritalStatusError">
+            {{ maritalStatusError }}
           </small>
         </div>
 
         <div class="field">
-          <label>رقم واتساب *</label>
+          <label i18n>رقم واتساب *</label>
           <input
             class="form-control"
             formControlName="whatsapp"
+            i18n-placeholder
             placeholder="+2010xxxxxxx"
           />
-          <small class="hint">اكتب الرقم بصيغة دولية إن أمكن</small>
-          <small
-            class="err"
-            *ngIf="
-              form.get('whatsapp')?.touched && form.get('whatsapp')?.invalid
-            "
-          >
-            أدخل رقم صحيح (8 إلى 15 رقم)
-          </small>
+          <small class="hint" i18n>اكتب الرقم بصيغة دولية إن أمكن</small>
+          <small class="err" *ngIf="whatsappError">{{ whatsappError }}</small>
         </div>
 
         <div class="field">
-          <label>الجنسية *</label>
+          <label i18n>الجنسية *</label>
           <select class="form-select" formControlName="nationality">
-            <option value="">— اختر —</option>
-            <option value="مصر">مصر</option>
-            <option value="السعودية">السعودية</option>
-            <option value="الإمارات">الإمارات</option>
-            <option value="الكويت">الكويت</option>
-            <option value="قطر">قطر</option>
-            <option value="الأردن">الأردن</option>
-            <option value="فلسطين">فلسطين</option>
-            <option value="ليبيا">ليبيا</option>
-            <option value="المغرب">المغرب</option>
-            <option value="الجزائر">الجزائر</option>
-            <option value="تونس">تونس</option>
-            <option value="غير ذلك">غير ذلك</option>
+            <option value="" i18n>— اختر —</option>
+            <option value="مصر" i18n>مصر</option>
+            <option value="السعودية" i18n>السعودية</option>
+            <option value="الإمارات" i18n>الإمارات</option>
+            <option value="الكويت" i18n>الكويت</option>
+            <option value="قطر" i18n>قطر</option>
+            <option value="الأردن" i18n>الأردن</option>
+            <option value="فلسطين" i18n>فلسطين</option>
+            <option value="ليبيا" i18n>ليبيا</option>
+            <option value="المغرب" i18n>المغرب</option>
+            <option value="الجزائر" i18n>الجزائر</option>
+            <option value="تونس" i18n>تونس</option>
+            <option value="غير ذلك" i18n>غير ذلك</option>
           </select>
-          <small
-            class="err"
-            *ngIf="
-              form.get('nationality')?.touched &&
-              form.get('nationality')?.invalid
-            "
-          >
-            اختر الجنسية
+          <small class="err" *ngIf="nationalityError">
+            {{ nationalityError }}
           </small>
 
-          <!-- ✅ يظهر فقط لو اختار "غير ذلك" -->
           <div class="mt-2" *ngIf="form.value.nationality === 'غير ذلك'">
             <input
               class="form-control"
               formControlName="nationalityOther"
+              i18n-placeholder
               placeholder="اكتب جنسيتك"
             />
-            <small
-              class="err"
-              *ngIf="
-                form.get('nationalityOther')?.touched &&
-                form.get('nationalityOther')?.invalid
-              "
-            >
-              اكتب الجنسية (حرفين على الأقل)
+            <small class="err" *ngIf="nationalityOtherError">
+              {{ nationalityOtherError }}
             </small>
           </div>
         </div>
       </div>
 
       <div class="field">
-        <label>المشكلة الأساسية *</label>
+        <label i18n>المشكلة الأساسية *</label>
         <textarea
           class="form-control"
           rows="4"
           formControlName="problem"
-          placeholder="اكتب وصف مختصر..."
+          i18n-placeholder
+          placeholder="اكتب وصفًا مختصرًا..."
         ></textarea>
-        <small
-          class="err"
-          *ngIf="form.get('problem')?.touched && form.get('problem')?.invalid"
-        >
-          اكتب وصف لا يقل عن 10 أحرف
-        </small>
+        <small class="err" *ngIf="problemError">{{ problemError }}</small>
       </div>
 
       <div class="policy">
         <label class="chk">
           <input type="checkbox" formControlName="acceptedPolicy" />
-          <span>
+          <span i18n>
             أُقرّ بالاطلاع والموافقة على ضوابط الجلسات، والتي لا تشمل مناقشة
             موضوعات المازوخية أو الشذوذ الجنسي.
           </span>
         </label>
-        <small
-          class="err"
-          *ngIf="
-            form.get('acceptedPolicy')?.touched &&
-            form.get('acceptedPolicy')?.invalid
-          "
-        >
-          يجب الموافقة على السياسة
-        </small>
+        <small class="err" *ngIf="policyError">{{ policyError }}</small>
       </div>
 
       <div class="bottom">
         <div class="price">
-          <div class="label">سعر الجلسة</div>
+          <div class="label" i18n>سعر الجلسة</div>
           <div class="val">{{ priceText }}</div>
         </div>
 
         <button class="btn btn-primary" type="submit" [disabled]="sending">
-          {{ sending ? "جارٍ الإرسال…" : "إرسال الطلب" }}
+          <span *ngIf="!sending" i18n>إرسال الطلب</span>
+          <span *ngIf="sending" i18n>جارٍ الإرسال…</span>
         </button>
       </div>
     </form>
