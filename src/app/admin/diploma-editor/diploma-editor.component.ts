@@ -661,30 +661,32 @@ export class DiplomaEditorComponent implements OnInit {
   private normList(
     value?: Partial<LocalizedStringList> | null
   ): LocalizedStringList {
-    const ar = Array.isArray(value?.ar) ? [...value.ar] : [''];
-    const en = Array.isArray(value?.en) ? [...value.en] : [''];
+    const safeValue = value ?? {};
+    const arSource = safeValue.ar;
+    const enSource = safeValue.en;
 
-    return {
-      ar,
-      en,
-    };
+    const ar = Array.isArray(arSource) ? [...arSource] : [''];
+    const en = Array.isArray(enSource) ? [...enSource] : [''];
+
+    return { ar, en };
   }
 
   private cleanList(
     value?: Partial<LocalizedStringList> | null
   ): LocalizedStringList {
-    const ar = Array.isArray(value?.ar)
-      ? value.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+    const safeValue = value ?? {};
+    const arSource = safeValue.ar;
+    const enSource = safeValue.en;
+
+    const ar = Array.isArray(arSource)
+      ? arSource.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
       : [];
 
-    const en = Array.isArray(value?.en)
-      ? value.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+    const en = Array.isArray(enSource)
+      ? enSource.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
       : [];
 
-    return {
-      ar,
-      en,
-    };
+    return { ar, en };
   }
 
   private normalizeCourseIds(

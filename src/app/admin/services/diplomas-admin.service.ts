@@ -257,18 +257,19 @@ export class DiplomasAdminService {
   buildLocalizedList(
     value?: Partial<LocalizedStringList> | null
   ): LocalizedStringList {
-    const ar = Array.isArray(value?.ar)
-      ? value.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+    const safeValue = value ?? {};
+    const arSource = safeValue.ar;
+    const enSource = safeValue.en;
+
+    const ar = Array.isArray(arSource)
+      ? arSource.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
       : [];
 
-    const en = Array.isArray(value?.en)
-      ? value.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+    const en = Array.isArray(enSource)
+      ? enSource.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
       : [];
 
-    return {
-      ar,
-      en,
-    };
+    return { ar, en };
   }
 
   private normalizeDiplomaPayload(
