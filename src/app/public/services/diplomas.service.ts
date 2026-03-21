@@ -1,11 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { Database, ref, objectVal } from '@angular/fire/database';
+import { Database, objectVal, ref } from '@angular/fire/database';
 import { map, Observable } from 'rxjs';
 import {
   Diploma,
   DiplomaBottomCta,
   DiplomaCurriculumItem,
   DiplomaLang,
+  DiplomaMeta,
   DiplomaMetaItem,
   DiplomaOffer,
   DiplomaPricingPlan,
@@ -51,6 +52,11 @@ type RawDiplomaFaq = {
   answer?: LocalizedText;
 };
 
+type RawDiplomaMetaItem = {
+  label?: LocalizedText;
+  value?: LocalizedText;
+};
+
 type RawDiploma = {
   title?: LocalizedText;
   description?: LocalizedText;
@@ -78,7 +84,8 @@ type RawDiploma = {
   goalDescription?: LocalizedText;
 
   lectureNames?: LocalizedStringList;
-  meta?: Array<{ label?: LocalizedText; value?: LocalizedText }> | any;
+  meta?: RawDiplomaMetaItem[] | { totalCourses?: number; totalLessons?: number; level?: string };
+  specs?: LocalizedStringList;
   outcomes?: LocalizedStringList;
   audienceItems?: LocalizedStringList;
   sectionCards?: RawDiplomaSectionCard[];
@@ -127,6 +134,29 @@ export class DiplomasService {
   private normalizeDiploma(id: string, raw: RawDiploma): { id: string } & Diploma {
     const lang = this.detectLang();
 
+    const metaItems: DiplomaMetaItem[] = Array.isArray(raw.meta)
+      ? raw.meta
+          .map((item) => ({
+            label: this.pickText(item?.label, lang, ''),
+            value: this.pickText(item?.value, lang, ''),
+          }))
+          .filter((item) => !!item.label || !!item.value)
+      : [];
+
+    const meta: DiplomaMeta = Array.isArray(raw.meta)
+      ? {
+          totalCourses: this.findMetaNumber(metaItems, ['عدد الكورسات', 'Total courses']),
+          totalLessons: this.findMetaNumber(metaItems, ['عدد الدروس', 'Total lessons']),
+          level: this.findMetaText(metaItems, ['المستوى', 'Level']),
+        }
+      : {
+          totalCourses:
+            typeof raw.meta?.totalCourses === 'number' ? raw.meta.totalCourses : undefined,
+          totalLessons:
+            typeof raw.meta?.totalLessons === 'number' ? raw.meta.totalLessons : undefined,
+          level: raw.meta?.level || undefined,
+        };
+
     const pricingPlans: DiplomaPricingPlan[] = (
       Array.isArray(raw.pricingPlans) ? raw.pricingPlans : []
     )
@@ -171,15 +201,6 @@ export class DiplomasService {
       }))
       .filter((card) => !!card.title || !!card.description);
 
-    const meta: DiplomaMetaItem[] = Array.isArray(raw.meta)
-      ? raw.meta
-          .map((item) => ({
-            label: this.pickText(item?.label, lang, ''),
-            value: this.pickText(item?.value, lang, ''),
-          }))
-          .filter((item) => !!item.label || !!item.value)
-      : [];
-
     const offer: DiplomaOffer | undefined = raw.offer
       ? {
           percent: Number(raw.offer.percent || 0) || undefined,
@@ -196,12 +217,16 @@ export class DiplomasService {
         }
       : undefined;
 
-    const selectedCourseIds = raw.courseIds && typeof raw.courseIds === 'object'
-      ? Object.keys(raw.courseIds).reduce((acc, key) => {
-          if (raw.courseIds?.[key]) acc[key] = true;
-          return acc;
-        }, {} as Record<string, boolean>)
-      : {};
+    const selectedCourseIds =
+      raw.courseIds && typeof raw.courseIds === 'object'
+        ? Object.keys(raw.courseIds).reduce((acc, key) => {
+            if (raw.courseIds?.[key]) acc[key] = true;
+            return acc;
+          }, {} as Record<string, boolean>)
+        : {};
+
+    const specs = this.pickList(raw.specs, lang);
+    const outcomes = this.pickList(raw.outcomes, lang);
 
     return {
       id,
@@ -241,7 +266,9 @@ export class DiplomasService {
 
       lectureNames: this.pickList(raw.lectureNames, lang),
       meta,
-      outcomes: this.pickList(raw.outcomes, lang),
+      metaItems,
+      specs: specs.length ? specs : outcomes,
+      outcomes,
       audienceItems: this.pickList(raw.audienceItems, lang),
       sectionCards,
       curriculum,
@@ -289,5 +316,21 @@ export class DiplomasService {
     }
 
     return [];
+  }
+
+  private findMetaNumber(
+    items: DiplomaMetaItem[],
+    labels: string[],
+  ): number | undefined {
+    const item = items.find((x) => labels.includes((x.label || '').trim()));
+    if (!item) return undefined;
+    const parsed = Number((item.value || '').trim());
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+
+  private findMetaText(items: DiplomaMetaItem[], labels: string[]): string | undefined {
+    const item = items.find((x) => labels.includes((x.label || '').trim()));
+    const value = (item?.value || '').trim();
+    return value || undefined;
   }
 }

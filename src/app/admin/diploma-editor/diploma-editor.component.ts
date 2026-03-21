@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdminService, LocalizedStringList, LocalizedText } from '../services/admin.service';
+import {
+  AdminService,
+  LocalizedStringList,
+  LocalizedText,
+} from '../services/admin.service';
 import {
   AdminDiploma,
   AdminDiplomaBottomCta,
@@ -88,7 +92,9 @@ export class DiplomaEditorComponent implements OnInit {
     ]);
 
     this.courses = courses;
-    this.diplomas = diplomas.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    this.diplomas = diplomas.sort(
+      (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
+    );
   }
 
   private buildDefaults(): AdminDiploma {
@@ -150,7 +156,9 @@ export class DiplomaEditorComponent implements OnInit {
       goalTitle: this.normText(value.goalTitle),
       goalDescription: this.normText(value.goalDescription),
       expectedStudyTimeTitle: this.normText(value.expectedStudyTimeTitle),
-      expectedStudyTimeDescription: this.normText(value.expectedStudyTimeDescription),
+      expectedStudyTimeDescription: this.normText(
+        value.expectedStudyTimeDescription,
+      ),
       prerequisitesTitle: this.normText(value.prerequisitesTitle),
       prerequisitesDescription: this.normText(value.prerequisitesDescription),
 
@@ -159,53 +167,59 @@ export class DiplomaEditorComponent implements OnInit {
       audienceItems: this.normList(value.audienceItems),
       communityPerks: this.normList(value.communityPerks),
 
-      meta: Array.isArray(value.meta) && value.meta.length
-        ? value.meta.map((item) => ({
-            label: this.normText(item?.label),
-            value: this.normText(item?.value),
-          }))
-        : defaults.meta,
+      meta:
+        Array.isArray(value.meta) && value.meta.length
+          ? value.meta.map((item) => ({
+              label: this.normText(item?.label),
+              value: this.normText(item?.value),
+            }))
+          : defaults.meta,
 
-      sectionCards: Array.isArray(value.sectionCards) && value.sectionCards.length
-        ? value.sectionCards.map((item) => ({
-            title: this.normText(item?.title),
-            description: this.normText(item?.description),
-          }))
-        : defaults.sectionCards,
+      sectionCards:
+        Array.isArray(value.sectionCards) && value.sectionCards.length
+          ? value.sectionCards.map((item) => ({
+              title: this.normText(item?.title),
+              description: this.normText(item?.description),
+            }))
+          : defaults.sectionCards,
 
-      curriculum: Array.isArray(value.curriculum) && value.curriculum.length
-        ? value.curriculum.map((item) => ({
-            title: this.normText(item?.title),
-            points: this.normList(item?.points),
-          }))
-        : defaults.curriculum,
+      curriculum:
+        Array.isArray(value.curriculum) && value.curriculum.length
+          ? value.curriculum.map((item) => ({
+              title: this.normText(item?.title),
+              points: this.normList(item?.points),
+            }))
+          : defaults.curriculum,
 
-      faqs: Array.isArray(value.faqs) && value.faqs.length
-        ? value.faqs.map((item) => ({
-            question: this.normText(item?.question),
-            answer: this.normText(item?.answer),
-          }))
-        : defaults.faqs,
+      faqs:
+        Array.isArray(value.faqs) && value.faqs.length
+          ? value.faqs.map((item) => ({
+              question: this.normText(item?.question),
+              answer: this.normText(item?.answer),
+            }))
+          : defaults.faqs,
 
-      testimonials: Array.isArray(value.testimonials) && value.testimonials.length
-        ? value.testimonials.map((item) => ({
-            name: this.normText(item?.name),
-            tag: this.normText(item?.tag),
-            rating: Number(item?.rating || 5) || 5,
-            text: this.normText(item?.text),
-          }))
-        : defaults.testimonials,
+      testimonials:
+        Array.isArray(value.testimonials) && value.testimonials.length
+          ? value.testimonials.map((item) => ({
+              name: this.normText(item?.name),
+              tag: this.normText(item?.tag),
+              rating: Number(item?.rating || 5) || 5,
+              text: this.normText(item?.text),
+            }))
+          : defaults.testimonials,
 
-      pricingPlans: Array.isArray(value.pricingPlans) && value.pricingPlans.length
-        ? value.pricingPlans.map((item) => ({
-            name: this.normText(item?.name),
-            badge: this.normText(item?.badge),
-            priceText: this.normText(item?.priceText),
-            note: this.normText(item?.note),
-            highlighted: !!item?.highlighted,
-            features: this.normList(item?.features),
-          }))
-        : defaults.pricingPlans,
+      pricingPlans:
+        Array.isArray(value.pricingPlans) && value.pricingPlans.length
+          ? value.pricingPlans.map((item) => ({
+              name: this.normText(item?.name),
+              badge: this.normText(item?.badge),
+              priceText: this.normText(item?.priceText),
+              note: this.normText(item?.note),
+              highlighted: !!item?.highlighted,
+              features: this.normList(item?.features),
+            }))
+          : defaults.pricingPlans,
 
       offer: {
         percent: Number(value.offer?.percent || defaults.offer?.percent || 30),
@@ -249,17 +263,29 @@ export class DiplomaEditorComponent implements OnInit {
     }
 
     if (!Array.isArray(this.data.testimonials) || !this.data.testimonials.length) {
-      this.data.testimonials = [this.testimonial(), this.testimonial(), this.testimonial()];
+      this.data.testimonials = [
+        this.testimonial(),
+        this.testimonial(),
+        this.testimonial(),
+      ];
     }
 
     if (!Array.isArray(this.data.pricingPlans) || !this.data.pricingPlans.length) {
-      this.data.pricingPlans = [this.pricingPlan(), this.pricingPlan(), this.pricingPlan()];
+      this.data.pricingPlans = [
+        this.pricingPlan(),
+        this.pricingPlan(),
+        this.pricingPlan(),
+      ];
     }
   }
 
   private syncMetaFromCourses(): void {
     const totalCourses = Object.keys(this.data.courseIds || {}).length;
-    const totalCoursesIndex = this.findMetaIndex('عدد الكورسات', 'Total courses');
+    const totalCoursesIndex = this.findMetaIndex(
+      'عدد الكورسات',
+      'Total courses',
+    );
+
     if (totalCoursesIndex >= 0) {
       this.data.meta![totalCoursesIndex].value = {
         ar: String(totalCourses),
@@ -301,8 +327,7 @@ export class DiplomaEditorComponent implements OnInit {
   addListItem(
     key: 'lectureNames' | 'outcomes' | 'audienceItems' | 'communityPerks',
   ): void {
-    const list = this.data[key] as LocalizedStringList | undefined;
-    const normalized = this.normList(list);
+    const normalized = this.normList(this.data[key]);
     normalized.ar.push('');
     normalized.en.push('');
     (this.data as any)[key] = normalized;
@@ -331,7 +356,9 @@ export class DiplomaEditorComponent implements OnInit {
   }
 
   removeSectionCard(index: number): void {
-    this.data.sectionCards = (this.data.sectionCards || []).filter((_, i) => i !== index);
+    this.data.sectionCards = (this.data.sectionCards || []).filter(
+      (_, i) => i !== index,
+    );
   }
 
   addCurriculumItem(): void {
@@ -339,7 +366,9 @@ export class DiplomaEditorComponent implements OnInit {
   }
 
   removeCurriculumItem(index: number): void {
-    this.data.curriculum = (this.data.curriculum || []).filter((_, i) => i !== index);
+    this.data.curriculum = (this.data.curriculum || []).filter(
+      (_, i) => i !== index,
+    );
   }
 
   addCurriculumPoint(itemIndex: number): void {
@@ -367,19 +396,29 @@ export class DiplomaEditorComponent implements OnInit {
   }
 
   addTestimonial(): void {
-    this.data.testimonials = [...(this.data.testimonials || []), this.testimonial()];
+    this.data.testimonials = [
+      ...(this.data.testimonials || []),
+      this.testimonial(),
+    ];
   }
 
   removeTestimonial(index: number): void {
-    this.data.testimonials = (this.data.testimonials || []).filter((_, i) => i !== index);
+    this.data.testimonials = (this.data.testimonials || []).filter(
+      (_, i) => i !== index,
+    );
   }
 
   addPricingPlan(): void {
-    this.data.pricingPlans = [...(this.data.pricingPlans || []), this.pricingPlan()];
+    this.data.pricingPlans = [
+      ...(this.data.pricingPlans || []),
+      this.pricingPlan(),
+    ];
   }
 
   removePricingPlan(index: number): void {
-    this.data.pricingPlans = (this.data.pricingPlans || []).filter((_, i) => i !== index);
+    this.data.pricingPlans = (this.data.pricingPlans || []).filter(
+      (_, i) => i !== index,
+    );
   }
 
   addPricingFeature(planIndex: number): void {
@@ -423,9 +462,13 @@ export class DiplomaEditorComponent implements OnInit {
         goalTitle: this.normText(this.data.goalTitle),
         goalDescription: this.normText(this.data.goalDescription),
         expectedStudyTimeTitle: this.normText(this.data.expectedStudyTimeTitle),
-        expectedStudyTimeDescription: this.normText(this.data.expectedStudyTimeDescription),
+        expectedStudyTimeDescription: this.normText(
+          this.data.expectedStudyTimeDescription,
+        ),
         prerequisitesTitle: this.normText(this.data.prerequisitesTitle),
-        prerequisitesDescription: this.normText(this.data.prerequisitesDescription),
+        prerequisitesDescription: this.normText(
+          this.data.prerequisitesDescription,
+        ),
         lectureNames: this.cleanList(this.data.lectureNames),
         outcomes: this.cleanList(this.data.outcomes),
         audienceItems: this.cleanList(this.data.audienceItems),
@@ -615,25 +658,31 @@ export class DiplomaEditorComponent implements OnInit {
     };
   }
 
-  private normList(value?: Partial<LocalizedStringList> | null): LocalizedStringList {
+  private normList(
+    value?: Partial<LocalizedStringList> | null,
+  ): LocalizedStringList {
     return {
-      ar: Array.isArray(value?.ar) ? [...value!.ar] : [''],
-      en: Array.isArray(value?.en) ? [...value!.en] : [''],
+      ar: Array.isArray(value?.ar) ? [...value.ar] : [''],
+      en: Array.isArray(value?.en) ? [...value.en] : [''],
     };
   }
 
-  private cleanList(value?: Partial<LocalizedStringList> | null): LocalizedStringList {
+  private cleanList(
+    value?: Partial<LocalizedStringList> | null,
+  ): LocalizedStringList {
     return {
       ar: Array.isArray(value?.ar)
-        ? value.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+        ? value?.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
         : [],
       en: Array.isArray(value?.en)
-        ? value.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+        ? value?.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
         : [],
     };
   }
 
-  private normalizeCourseIds(value?: Record<string, boolean>): Record<string, boolean> {
+  private normalizeCourseIds(
+    value?: Record<string, boolean>,
+  ): Record<string, boolean> {
     if (!value || typeof value !== 'object') return {};
     return Object.keys(value).reduce((acc, key) => {
       if (value[key]) acc[key] = true;

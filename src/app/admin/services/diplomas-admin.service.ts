@@ -127,9 +127,97 @@ export class DiplomasAdminService {
     let id = opts?.id?.trim();
 
     const payload: AdminDiploma = {
-      ...this.normalizeDiplomaPayload(data),
-      createdAt: now,
+      title: this.buildLocalizedText(data.title),
+      description: this.buildLocalizedText(data.description),
+      price: Number(data.price || 0) || 0,
+      thumbnail: (data.thumbnail || '').trim(),
+      categoryId: this.buildLocalizedText(data.categoryId),
       published: !!data.published,
+      createdAt: now,
+
+      courseIds: this.normalizeCourseIds(data.courseIds),
+
+      heroEyebrow: this.buildLocalizedText(data.heroEyebrow),
+      heroTagline: this.buildLocalizedText(data.heroTagline),
+      heroTitleHighlight: this.buildLocalizedText(data.heroTitleHighlight),
+
+      introVideoUrl: (data.introVideoUrl || '').trim(),
+
+      programDuration: this.buildLocalizedText(data.programDuration),
+      targetAudience: this.buildLocalizedText(data.targetAudience),
+      expectedStudyTimeTitle: this.buildLocalizedText(
+        data.expectedStudyTimeTitle,
+      ),
+      expectedStudyTimeDescription: this.buildLocalizedText(
+        data.expectedStudyTimeDescription,
+      ),
+      prerequisitesTitle: this.buildLocalizedText(data.prerequisitesTitle),
+      prerequisitesDescription: this.buildLocalizedText(
+        data.prerequisitesDescription,
+      ),
+      goalTitle: this.buildLocalizedText(data.goalTitle),
+      goalDescription: this.buildLocalizedText(data.goalDescription),
+
+      lectureNames: this.buildLocalizedList(data.lectureNames),
+      meta: Array.isArray(data.meta)
+        ? data.meta.map((item) => ({
+            label: this.buildLocalizedText(item?.label),
+            value: this.buildLocalizedText(item?.value),
+          }))
+        : [],
+      outcomes: this.buildLocalizedList(data.outcomes),
+      audienceItems: this.buildLocalizedList(data.audienceItems),
+      sectionCards: Array.isArray(data.sectionCards)
+        ? data.sectionCards.map((item) => ({
+            title: this.buildLocalizedText(item?.title),
+            description: this.buildLocalizedText(item?.description),
+          }))
+        : [],
+      curriculum: Array.isArray(data.curriculum)
+        ? data.curriculum.map((item) => ({
+            title: this.buildLocalizedText(item?.title),
+            points: this.buildLocalizedList(item?.points),
+          }))
+        : [],
+      faqs: Array.isArray(data.faqs)
+        ? data.faqs.map((item) => ({
+            question: this.buildLocalizedText(item?.question),
+            answer: this.buildLocalizedText(item?.answer),
+          }))
+        : [],
+      communityPerks: this.buildLocalizedList(data.communityPerks),
+      testimonials: Array.isArray(data.testimonials)
+        ? data.testimonials.map((item) => ({
+            name: this.buildLocalizedText(item?.name),
+            tag: this.buildLocalizedText(item?.tag),
+            rating: Number(item?.rating || 0) || 0,
+            text: this.buildLocalizedText(item?.text),
+          }))
+        : [],
+      pricingPlans: Array.isArray(data.pricingPlans)
+        ? data.pricingPlans.map((item) => ({
+            name: this.buildLocalizedText(item?.name),
+            badge: this.buildLocalizedText(item?.badge),
+            priceText: this.buildLocalizedText(item?.priceText),
+            note: this.buildLocalizedText(item?.note),
+            highlighted: !!item?.highlighted,
+            features: this.buildLocalizedList(item?.features),
+          }))
+        : [],
+      offer: data.offer
+        ? {
+            percent: Number(data.offer.percent || 0) || undefined,
+            heading: this.buildLocalizedText(data.offer.heading),
+            text: this.buildLocalizedText(data.offer.text),
+            ctaText: this.buildLocalizedText(data.offer.ctaText),
+          }
+        : undefined,
+      bottomCta: data.bottomCta
+        ? {
+            text: this.buildLocalizedText(data.bottomCta.text),
+            buttonText: this.buildLocalizedText(data.bottomCta.buttonText),
+          }
+        : undefined,
     };
 
     if (id) {
@@ -159,7 +247,7 @@ export class DiplomasAdminService {
     await remove(ref(this.db, `diplomas/${id}`));
   }
 
-  buildLocalizedText(value?: Partial<LocalizedText>): LocalizedText {
+  buildLocalizedText(value?: Partial<LocalizedText> | null): LocalizedText {
     return {
       ar: (value?.ar || '').trim(),
       en: (value?.en || '').trim(),
@@ -167,14 +255,14 @@ export class DiplomasAdminService {
   }
 
   buildLocalizedList(
-    value?: Partial<LocalizedStringList>,
+    value?: Partial<LocalizedStringList> | null,
   ): LocalizedStringList {
     return {
       ar: Array.isArray(value?.ar)
-        ? value.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+        ? value?.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
         : [],
       en: Array.isArray(value?.en)
-        ? value.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+        ? value?.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
         : [],
     };
   }
@@ -192,50 +280,68 @@ export class DiplomasAdminService {
     };
 
     if (data.title) payload.title = this.buildLocalizedText(data.title);
-    if (data.description)
+    if (data.description) {
       payload.description = this.buildLocalizedText(data.description);
-    if (data.categoryId)
+    }
+    if (data.categoryId) {
       payload.categoryId = this.buildLocalizedText(data.categoryId);
+    }
 
-    if (data.heroEyebrow)
+    if (data.heroEyebrow) {
       payload.heroEyebrow = this.buildLocalizedText(data.heroEyebrow);
-    if (data.heroTagline)
+    }
+    if (data.heroTagline) {
       payload.heroTagline = this.buildLocalizedText(data.heroTagline);
-    if (data.heroTitleHighlight)
+    }
+    if (data.heroTitleHighlight) {
       payload.heroTitleHighlight = this.buildLocalizedText(data.heroTitleHighlight);
+    }
 
-    if (data.programDuration)
+    if (data.programDuration) {
       payload.programDuration = this.buildLocalizedText(data.programDuration);
-    if (data.targetAudience)
+    }
+    if (data.targetAudience) {
       payload.targetAudience = this.buildLocalizedText(data.targetAudience);
-    if (data.expectedStudyTimeTitle)
+    }
+    if (data.expectedStudyTimeTitle) {
       payload.expectedStudyTimeTitle = this.buildLocalizedText(
         data.expectedStudyTimeTitle,
       );
-    if (data.expectedStudyTimeDescription)
+    }
+    if (data.expectedStudyTimeDescription) {
       payload.expectedStudyTimeDescription = this.buildLocalizedText(
         data.expectedStudyTimeDescription,
       );
-    if (data.prerequisitesTitle)
+    }
+    if (data.prerequisitesTitle) {
       payload.prerequisitesTitle = this.buildLocalizedText(
         data.prerequisitesTitle,
       );
-    if (data.prerequisitesDescription)
+    }
+    if (data.prerequisitesDescription) {
       payload.prerequisitesDescription = this.buildLocalizedText(
         data.prerequisitesDescription,
       );
-    if (data.goalTitle)
+    }
+    if (data.goalTitle) {
       payload.goalTitle = this.buildLocalizedText(data.goalTitle);
-    if (data.goalDescription)
+    }
+    if (data.goalDescription) {
       payload.goalDescription = this.buildLocalizedText(data.goalDescription);
+    }
 
-    if (data.lectureNames)
+    if (data.lectureNames) {
       payload.lectureNames = this.buildLocalizedList(data.lectureNames);
-    if (data.outcomes) payload.outcomes = this.buildLocalizedList(data.outcomes);
-    if (data.audienceItems)
+    }
+    if (data.outcomes) {
+      payload.outcomes = this.buildLocalizedList(data.outcomes);
+    }
+    if (data.audienceItems) {
       payload.audienceItems = this.buildLocalizedList(data.audienceItems);
-    if (data.communityPerks)
+    }
+    if (data.communityPerks) {
       payload.communityPerks = this.buildLocalizedList(data.communityPerks);
+    }
 
     if (Array.isArray(data.meta)) {
       payload.meta = data.meta.map((item) => ({

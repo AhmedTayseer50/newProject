@@ -79,7 +79,9 @@ export interface Diploma {
   goalDescription?: string;
 
   lectureNames?: string[];
-  meta?: DiplomaMetaItem[] | DiplomaMeta;
+  meta?: DiplomaMeta;
+  metaItems?: DiplomaMetaItem[];
+  specs?: string[];
   outcomes?: string[];
   audienceItems?: string[];
   sectionCards?: DiplomaSectionCard[];
