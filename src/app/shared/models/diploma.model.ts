@@ -1,26 +1,41 @@
-// src/app/shared/models/diploma.model.ts
+export type DiplomaLang = 'ar' | 'en';
+
+export interface DiplomaMetaItem {
+  label: string;
+  value: string;
+}
+
+export interface DiplomaSectionCard {
+  title: string;
+  description: string;
+}
+
+export interface DiplomaCurriculumItem {
+  title: string;
+  points: string[];
+}
 
 export interface DiplomaTestimonial {
   name: string;
-  tag?: string;        // مثال: "متدربة"
-  rating?: number;     // 1..5
+  tag?: string;
+  rating?: number;
   text: string;
 }
 
 export interface DiplomaPricingPlan {
-  name: string;          // اسم الخطة
-  badge?: string;        // سطر صغير تحت الاسم
-  priceText: string;     // "399 ر.س" أو "1200 EGP"
-  note?: string;         // "دفع لمرة واحدة..."
-  features: string[];    // مميزات الخطة
-  highlighted?: boolean; // الخطة المميزة
+  name: string;
+  badge?: string;
+  priceText: string;
+  note?: string;
+  highlighted?: boolean;
+  features: string[];
 }
 
 export interface DiplomaOffer {
-  percent?: number;    // 30
-  heading?: string;    // "عرض خاص..."
+  percent?: number;
+  heading?: string;
   text?: string;
-  ctaText?: string;    // نص زر الاشتراك
+  ctaText?: string;
 }
 
 export interface DiplomaBottomCta {
@@ -30,14 +45,14 @@ export interface DiplomaBottomCta {
 
 export interface DiplomaMeta {
   totalCourses?: number;
-  totalLessons?: number; // اختياري لو هتسجلها
+  totalLessons?: number;
   level?: string;
 }
 
 export interface Diploma {
   id?: string;
+  lang?: DiplomaLang;
 
-  // basics
   title: string;
   description?: string;
   price?: number;
@@ -46,44 +61,33 @@ export interface Diploma {
   published?: boolean;
   createdAt?: number;
 
-  // ✅ الدبلومة تحتوي كورسات
   courseIds?: Record<string, boolean>;
 
-  // hero
   heroEyebrow?: string;
   heroTagline?: string;
+  heroTitleHighlight?: string;
+
+  introVideoUrl?: string;
+
   programDuration?: string;
   targetAudience?: string;
-
-  // info cards
+  expectedStudyTimeTitle?: string;
+  expectedStudyTimeDescription?: string;
+  prerequisitesTitle?: string;
+  prerequisitesDescription?: string;
   goalTitle?: string;
   goalDescription?: string;
 
-  expectedStudyTimeTitle?: string;
-  expectedStudyTimeDescription?: string;
-
-  prerequisitesTitle?: string;
-  prerequisitesDescription?: string;
-
-  // video
-  introVideoUrl?: string;
-
-  // specs / technical info
-  specs?: string[];
-
-  // testimonials
-  testimonials?: DiplomaTestimonial[];
-
-  // pricing (3 plans)
-  pricingPlans?: DiplomaPricingPlan[];
-
-  // community perks
+  lectureNames?: string[];
+  meta?: DiplomaMetaItem[] | DiplomaMeta;
+  outcomes?: string[];
+  audienceItems?: string[];
+  sectionCards?: DiplomaSectionCard[];
+  curriculum?: DiplomaCurriculumItem[];
+  faqs?: Array<{ question: string; answer: string }>;
   communityPerks?: string[];
-
-  // offer popup + bottom cta
+  testimonials?: DiplomaTestimonial[];
+  pricingPlans?: DiplomaPricingPlan[];
   offer?: DiplomaOffer;
   bottomCta?: DiplomaBottomCta;
-
-  // list meta (اختياري)
-  meta?: DiplomaMeta;
 }

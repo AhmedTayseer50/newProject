@@ -1,45 +1,167 @@
-<!-- src/app/admin/diploma-editor/diploma-editor.component.html -->
-
 <div class="container py-4" dir="rtl">
-  <a routerLink="/admin/dashboard" class="btn btn-link ps-0 mb-3">&larr; رجوع للوحة التحكم</a>
-  <h3 class="mb-3">{{ diplomaId ? '✏️ تعديل دبلومة' : '➕ إضافة دبلومة جديدة' }}</h3>
+  <a routerLink="/admin/dashboard" class="btn btn-link ps-0 mb-3">
+    &larr; رجوع للوحة التحكم
+  </a>
+
+  <div
+    class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"
+  >
+    <h3 class="m-0">
+      {{ diplomaId ? '✏️ تعديل دبلومة' : '➕ إضافة دبلومة جديدة' }}
+    </h3>
+
+    <div class="btn-group" role="group">
+      <button
+        type="button"
+        class="btn"
+        [class.btn-primary]="activeLang === 'ar'"
+        [class.btn-outline-primary]="activeLang !== 'ar'"
+        (click)="setLang('ar')"
+      >
+        العربية
+      </button>
+      <button
+        type="button"
+        class="btn"
+        [class.btn-primary]="activeLang === 'en'"
+        [class.btn-outline-primary]="activeLang !== 'en'"
+        (click)="setLang('en')"
+      >
+        English
+      </button>
+    </div>
+  </div>
 
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
   <div *ngIf="loading" class="alert alert-info">جارٍ التحميل…</div>
 
-  <form *ngIf="!loading" (ngSubmit)="save()">
+  <div class="card mb-4" *ngIf="!loading">
+    <div class="card-body">
+      <div
+        class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"
+      >
+        <h5 class="m-0">الدبلومات المرفوعة</h5>
+        <a routerLink="/admin/diploma-editor" class="btn btn-sm btn-outline-primary">
+          إضافة دبلومة جديدة
+        </a>
+      </div>
 
-    <!-- ===== Basics ===== -->
-    <h5 class="mb-2">البيانات الأساسية</h5>
+      <div class="table-responsive" *ngIf="diplomas.length; else noDiplomas">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>العنوان</th>
+              <th>الحالة</th>
+              <th>تاريخ الإنشاء</th>
+              <th class="text-center">إجراء</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of diplomas">
+              <td>{{ item.title?.ar || item.title?.en || 'بدون عنوان' }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class.bg-success]="item.published"
+                  [class.bg-secondary]="!item.published"
+                >
+                  {{ item.published ? 'منشور' : 'غير منشور' }}
+                </span>
+              </td>
+              <td>
+                {{
+                  item.createdAt
+                    ? (item.createdAt | date : 'yyyy/MM/dd - h:mm a')
+                    : '—'
+                }}
+              </td>
+              <td class="text-center">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-dark"
+                  (click)="editDiploma(item.id)"
+                >
+                  تعديل
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #noDiplomas>
+        <div class="text-muted">لا توجد دبلومات مرفوعة بعد.</div>
+      </ng-template>
+    </div>
+  </div>
+
+  <form *ngIf="!loading" (ngSubmit)="save()">
+    <div class="alert alert-secondary">
+      أنت الآن تُدخل بيانات الدبلومة بنفس منطق الكورسات:
+      <strong>{{ activeLang === 'ar' ? 'العربية' : 'English' }}</strong>
+    </div>
+
+    <h5 class="mb-3">البيانات الأساسية</h5>
     <div class="row g-3">
       <div class="col-md-6">
-        <label class="form-label">العنوان</label>
-        <input class="form-control" [(ngModel)]="data.title" name="title" required />
+        <label class="form-label">العنوان (عربي)</label>
+        <input class="form-control" [(ngModel)]="$any(data).title.ar" name="titleAr" />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">التصنيف</label>
-        <input class="form-control" [(ngModel)]="data.categoryId" name="categoryId" />
+        <label class="form-label">Title (English)</label>
+        <input class="form-control" [(ngModel)]="$any(data).title.en" name="titleEn" />
       </div>
 
-      <div class="col-12">
-        <label class="form-label">الوصف</label>
-        <textarea class="form-control" rows="3" [(ngModel)]="data.description" name="description"></textarea>
+      <div class="col-md-6">
+        <label class="form-label">التصنيف (عربي)</label>
+        <input class="form-control" [(ngModel)]="$any(data).categoryId.ar" name="categoryAr" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Category (English)</label>
+        <input class="form-control" [(ngModel)]="$any(data).categoryId.en" name="categoryEn" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">الوصف (عربي)</label>
+        <textarea
+          class="form-control"
+          rows="3"
+          [(ngModel)]="$any(data).description.ar"
+          name="descriptionAr"
+        ></textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Description (English)</label>
+        <textarea
+          class="form-control"
+          rows="3"
+          [(ngModel)]="$any(data).description.en"
+          name="descriptionEn"
+        ></textarea>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">السعر (اختياري)</label>
+        <label class="form-label">السعر</label>
         <input type="number" class="form-control" [(ngModel)]="data.price" name="price" />
       </div>
 
       <div class="col-md-8">
-        <label class="form-label">الصورة (Thumbnail URL)</label>
+        <label class="form-label">Thumbnail URL</label>
         <input class="form-control" [(ngModel)]="data.thumbnail" name="thumbnail" />
       </div>
 
       <div class="col-12">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" [(ngModel)]="data.published" name="published" id="published" />
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [(ngModel)]="data.published"
+            name="published"
+            id="published"
+          />
           <label class="form-check-label" for="published">منشور</label>
         </div>
       </div>
@@ -47,124 +169,270 @@
 
     <hr class="my-4" />
 
-    <!-- ===== Hero fields ===== -->
-    <h5 class="mb-2">Hero (أعلى صفحة الدبلومة)</h5>
+    <h5 class="mb-3">Hero</h5>
     <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Eyebrow</label>
-        <input class="form-control" [(ngModel)]="data.heroEyebrow" name="heroEyebrow" />
+      <div class="col-md-4">
+        <label class="form-label">Hero Eyebrow (AR)</label>
+        <input class="form-control" [(ngModel)]="$any(data).heroEyebrow.ar" name="heroEyebrowAr" />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Hero Eyebrow (EN)</label>
+        <input class="form-control" [(ngModel)]="$any(data).heroEyebrow.en" name="heroEyebrowEn" />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Hero Title Highlight (AR)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).heroTitleHighlight.ar"
+          name="heroTitleHighlightAr"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Hero Title Highlight (EN)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).heroTitleHighlight.en"
+          name="heroTitleHighlightEn"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">Tagline</label>
-        <input class="form-control" [(ngModel)]="data.heroTagline" name="heroTagline" />
+        <label class="form-label">Hero Tagline (AR)</label>
+        <input class="form-control" [(ngModel)]="$any(data).heroTagline.ar" name="heroTaglineAr" />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">مدة البرنامج</label>
-        <input class="form-control" [(ngModel)]="data.programDuration" name="programDuration" />
+        <label class="form-label">Hero Tagline (EN)</label>
+        <input class="form-control" [(ngModel)]="$any(data).heroTagline.en" name="heroTaglineEn" />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">الفئة المستهدفة</label>
-        <input class="form-control" [(ngModel)]="data.targetAudience" name="targetAudience" />
+        <label class="form-label">مدة البرنامج (عربي)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).programDuration.ar"
+          name="programDurationAr"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">Level (اختياري)</label>
-        <input class="form-control" [(ngModel)]="data.meta.level" name="metaLevel" />
-      </div>
-    </div>
-
-    <hr class="my-4" />
-
-    <!-- ===== Info cards ===== -->
-    <h5 class="mb-2">بطاقات المعلومات (قبل الشراء)</h5>
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">الهدف من الدراسة - عنوان</label>
-        <input class="form-control" [(ngModel)]="data.goalTitle" name="goalTitle" />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">الهدف من الدراسة - وصف</label>
-        <input class="form-control" [(ngModel)]="data.goalDescription" name="goalDescription" />
+        <label class="form-label">Program Duration (EN)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).programDuration.en"
+          name="programDurationEn"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">المدة المتوقعة - عنوان</label>
-        <input class="form-control" [(ngModel)]="data.expectedStudyTimeTitle" name="expectedStudyTimeTitle" />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">المدة المتوقعة - وصف</label>
-        <input class="form-control" [(ngModel)]="data.expectedStudyTimeDescription" name="expectedStudyTimeDescription" />
+        <label class="form-label">الفئة المستهدفة (عربي)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).targetAudience.ar"
+          name="targetAudienceAr"
+        />
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">الخبرات السابقة - عنوان</label>
-        <input class="form-control" [(ngModel)]="data.prerequisitesTitle" name="prerequisitesTitle" />
+        <label class="form-label">Target Audience (EN)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).targetAudience.en"
+          name="targetAudienceEn"
+        />
       </div>
-      <div class="col-md-6">
-        <label class="form-label">الخبرات السابقة - وصف</label>
-        <input class="form-control" [(ngModel)]="data.prerequisitesDescription" name="prerequisitesDescription" />
-      </div>
-    </div>
 
-    <hr class="my-4" />
-
-    <!-- ===== Video ===== -->
-    <h5 class="mb-2">فيديو تعريفي</h5>
-    <div class="row g-3">
       <div class="col-12">
-        <label class="form-label">Intro Video URL (YouTube embed)</label>
+        <label class="form-label">Intro Video URL</label>
         <input class="form-control" [(ngModel)]="data.introVideoUrl" name="introVideoUrl" />
-        <div class="form-text">مثال: https://www.youtube.com/embed/XXXXXXXX</div>
       </div>
     </div>
 
     <hr class="my-4" />
 
-    <!-- ===== Specs ===== -->
-    <h5 class="mb-2">المواصفات الفنية / معلومات إضافية</h5>
-    <div class="mb-2 d-flex gap-2">
-      <button type="button" class="btn btn-outline-primary btn-sm" (click)="addSpec()">+ إضافة نقطة</button>
-      <span class="text-muted small align-self-center">اكتب نقاط قصيرة</span>
-    </div>
-
-    <div class="row g-2" *ngFor="let s of data.specs; let i = index">
-      <div class="col-11">
-        <input class="form-control" [(ngModel)]="data.specs[i]" name="spec{{i}}" placeholder="مثال: مدة كل محاضرة 20-30 دقيقة" />
+    <h5 class="mb-3">بطاقات المعلومات</h5>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">الهدف - عنوان (AR)</label>
+        <input class="form-control" [(ngModel)]="$any(data).goalTitle.ar" name="goalTitleAr" />
       </div>
-      <div class="col-1 d-grid">
-        <button type="button" class="btn btn-outline-danger" (click)="removeSpec(i)">×</button>
+      <div class="col-md-6">
+        <label class="form-label">Goal - Title (EN)</label>
+        <input class="form-control" [(ngModel)]="$any(data).goalTitle.en" name="goalTitleEn" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">الهدف - وصف (AR)</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          [(ngModel)]="$any(data).goalDescription.ar"
+          name="goalDescriptionAr"
+        ></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Goal - Description (EN)</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          [(ngModel)]="$any(data).goalDescription.en"
+          name="goalDescriptionEn"
+        ></textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">المدة المتوقعة - عنوان (AR)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).expectedStudyTimeTitle.ar"
+          name="expectedStudyTimeTitleAr"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Expected Study Time - Title (EN)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).expectedStudyTimeTitle.en"
+          name="expectedStudyTimeTitleEn"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">المدة المتوقعة - وصف (AR)</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          [(ngModel)]="$any(data).expectedStudyTimeDescription.ar"
+          name="expectedStudyTimeDescriptionAr"
+        ></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Expected Study Time - Description (EN)</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          [(ngModel)]="$any(data).expectedStudyTimeDescription.en"
+          name="expectedStudyTimeDescriptionEn"
+        ></textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">الخبرات السابقة - عنوان (AR)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).prerequisitesTitle.ar"
+          name="prerequisitesTitleAr"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Prerequisites - Title (EN)</label>
+        <input
+          class="form-control"
+          [(ngModel)]="$any(data).prerequisitesTitle.en"
+          name="prerequisitesTitleEn"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">الخبرات السابقة - وصف (AR)</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          [(ngModel)]="$any(data).prerequisitesDescription.ar"
+          name="prerequisitesDescriptionAr"
+        ></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Prerequisites - Description (EN)</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          [(ngModel)]="$any(data).prerequisitesDescription.en"
+          name="prerequisitesDescriptionEn"
+        ></textarea>
       </div>
     </div>
 
     <hr class="my-4" />
 
-    <!-- ===== Testimonials ===== -->
-    <h5 class="mb-2">آراء العملاء (على الأقل 3)</h5>
-
-    <div class="card mb-3" *ngFor="let t of data.testimonials; let i = index">
+    <h5 class="mb-3">الكورسات داخل الدبلومة</h5>
+    <div class="card mb-4">
       <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label">الاسم</label>
-            <input class="form-control" [(ngModel)]="data.testimonials[i].name" name="t_name{{i}}" />
+        <div class="row g-2" *ngIf="courses.length; else noCoursesInAdmin">
+          <div class="col-md-6" *ngFor="let c of courses">
+            <label class="form-check border rounded p-2 d-flex gap-2 align-items-start">
+              <input
+                class="form-check-input mt-1"
+                type="checkbox"
+                [checked]="isSelected(c.id)"
+                (change)="toggleCourse(c.id, $any($event.target).checked)"
+              />
+              <span>
+                <strong>{{ c.title?.ar || c.title?.en || 'بدون عنوان' }}</strong>
+                <small class="d-block text-muted">ID: {{ c.id }}</small>
+              </span>
+            </label>
           </div>
+        </div>
 
-          <div class="col-md-4">
-            <label class="form-label">الصفة (اختياري)</label>
-            <input class="form-control" [(ngModel)]="data.testimonials[i].tag" name="t_tag{{i}}" />
+        <ng-template #noCoursesInAdmin>
+          <div class="text-muted">لا توجد كورسات مرفوعة حاليًا.</div>
+        </ng-template>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <ng-container *ngIf="data.lectureNames as lectureNames">
+      <h5 class="mb-3">Lecture Names</h5>
+      <div class="mb-2">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addListItem('lectureNames')">
+          + إضافة عنصر
+        </button>
+      </div>
+      <div class="row g-2 mb-2" *ngFor="let item of lectureNames.ar; let i = index; trackBy: trackByIndex">
+        <div class="col-md-5">
+          <input class="form-control" [(ngModel)]="lectureNames.ar[i]" name="lectureNameAr{{ i }}" placeholder="Lecture name (AR)" />
+        </div>
+        <div class="col-md-5">
+          <input class="form-control" [(ngModel)]="lectureNames.en[i]" name="lectureNameEn{{ i }}" placeholder="Lecture name (EN)" />
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="button" class="btn btn-outline-danger" (click)="removeListItem('lectureNames', i)">
+            حذف
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <hr class="my-4" />
+
+    <h5 class="mb-3">Meta</h5>
+    <div class="mb-2">
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addMetaItem()">
+        + إضافة عنصر
+      </button>
+    </div>
+    <div class="card mb-2" *ngFor="let item of data.meta; let i = index">
+      <div class="card-body">
+        <div class="row g-2">
+          <div class="col-md-3">
+            <input class="form-control" [(ngModel)]="$any(data.meta)[i].label.ar" name="metaLabelAr{{ i }}" placeholder="Label (AR)" />
           </div>
-
-          <div class="col-md-4">
-            <label class="form-label">التقييم (1-5)</label>
-            <input type="number" min="1" max="5" class="form-control" [(ngModel)]="data.testimonials[i].rating" name="t_rating{{i}}" />
+          <div class="col-md-3">
+            <input class="form-control" [(ngModel)]="$any(data.meta)[i].label.en" name="metaLabelEn{{ i }}" placeholder="Label (EN)" />
           </div>
-
-          <div class="col-12">
-            <label class="form-label">النص</label>
-            <textarea class="form-control" rows="2" [(ngModel)]="data.testimonials[i].text" name="t_text{{i}}"></textarea>
+          <div class="col-md-3">
+            <input class="form-control" [(ngModel)]="$any(data.meta)[i].value.ar" name="metaValueAr{{ i }}" placeholder="Value (AR)" />
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" [(ngModel)]="$any(data.meta)[i].value.en" name="metaValueEn{{ i }}" placeholder="Value (EN)" />
+          </div>
+          <div class="col-md-1 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeMetaItem(i)">×</button>
           </div>
         </div>
       </div>
@@ -172,140 +440,361 @@
 
     <hr class="my-4" />
 
-    <!-- ===== Pricing (3 plans) ===== -->
-    <h5 class="mb-2">خطط الأسعار (3 خطط)</h5>
+    <ng-container *ngIf="data.outcomes as outcomes">
+      <h5 class="mb-3">Outcomes</h5>
+      <div class="mb-2">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addListItem('outcomes')">
+          + إضافة عنصر
+        </button>
+      </div>
+      <div class="row g-2 mb-2" *ngFor="let item of outcomes.ar; let i = index; trackBy: trackByIndex">
+        <div class="col-md-5">
+          <input class="form-control" [(ngModel)]="outcomes.ar[i]" name="outcomeAr{{ i }}" placeholder="Outcome (AR)" />
+        </div>
+        <div class="col-md-5">
+          <input class="form-control" [(ngModel)]="outcomes.en[i]" name="outcomeEn{{ i }}" placeholder="Outcome (EN)" />
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="button" class="btn btn-outline-danger" (click)="removeListItem('outcomes', i)">حذف</button>
+        </div>
+      </div>
+    </ng-container>
 
-    <div class="card mb-3" *ngFor="let p of data.pricingPlans; let pi = index">
+    <hr class="my-4" />
+
+    <ng-container *ngIf="data.audienceItems as audienceItems">
+      <h5 class="mb-3">Audience Items</h5>
+      <div class="mb-2">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addListItem('audienceItems')">
+          + إضافة عنصر
+        </button>
+      </div>
+      <div class="row g-2 mb-2" *ngFor="let item of audienceItems.ar; let i = index; trackBy: trackByIndex">
+        <div class="col-md-5">
+          <input class="form-control" [(ngModel)]="audienceItems.ar[i]" name="audienceItemAr{{ i }}" placeholder="Audience item (AR)" />
+        </div>
+        <div class="col-md-5">
+          <input class="form-control" [(ngModel)]="audienceItems.en[i]" name="audienceItemEn{{ i }}" placeholder="Audience item (EN)" />
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="button" class="btn btn-outline-danger" (click)="removeListItem('audienceItems', i)">حذف</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <hr class="my-4" />
+
+    <h5 class="mb-3">Section Cards</h5>
+    <div class="mb-2">
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addSectionCard()">
+        + إضافة بطاقة
+      </button>
+    </div>
+    <div class="card mb-2" *ngFor="let item of data.sectionCards; let i = index">
       <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label">اسم الخطة</label>
-            <input class="form-control" [(ngModel)]="data.pricingPlans[pi].name" name="p_name{{pi}}" />
+        <div class="row g-2">
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.sectionCards)[i].title.ar" name="sectionCardTitleAr{{ i }}" placeholder="Title (AR)" />
+          </div>
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.sectionCards)[i].title.en" name="sectionCardTitleEn{{ i }}" placeholder="Title (EN)" />
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeSectionCard(i)">حذف</button>
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.sectionCards)[i].description.ar" name="sectionCardDescriptionAr{{ i }}" placeholder="Description (AR)"></textarea>
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.sectionCards)[i].description.en" name="sectionCardDescriptionEn{{ i }}" placeholder="Description (EN)"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <h5 class="mb-3">Curriculum</h5>
+    <div class="mb-2">
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addCurriculumItem()">
+        + إضافة محور
+      </button>
+    </div>
+    <div class="card mb-3" *ngFor="let item of data.curriculum; let i = index">
+      <div class="card-body">
+        <div class="row g-2 mb-2">
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.curriculum)[i].title.ar" name="curriculumTitleAr{{ i }}" placeholder="Title (AR)" />
+          </div>
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.curriculum)[i].title.en" name="curriculumTitleEn{{ i }}" placeholder="Title (EN)" />
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeCurriculumItem(i)">حذف</button>
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addCurriculumPoint(i)">
+            + إضافة نقطة
+          </button>
+        </div>
+
+        <ng-container *ngIf="$any(data.curriculum)[i].points as points">
+          <div class="row g-2 mb-2" *ngFor="let point of points.ar; let pi = index; trackBy: trackByIndex">
+            <div class="col-md-5">
+              <input class="form-control" [(ngModel)]="points.ar[pi]" name="curriculumPointAr{{ i }}{{ pi }}" placeholder="Point (AR)" />
+            </div>
+            <div class="col-md-5">
+              <input class="form-control" [(ngModel)]="points.en[pi]" name="curriculumPointEn{{ i }}{{ pi }}" placeholder="Point (EN)" />
+            </div>
+            <div class="col-md-2 d-grid">
+              <button type="button" class="btn btn-outline-danger" (click)="removeCurriculumPoint(i, pi)">حذف</button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <h5 class="mb-3">FAQs</h5>
+    <div class="mb-2">
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addFaq()">
+        + إضافة سؤال
+      </button>
+    </div>
+    <div class="card mb-2" *ngFor="let item of data.faqs; let i = index">
+      <div class="card-body">
+        <div class="row g-2">
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.faqs)[i].question.ar" name="faqQuestionAr{{ i }}" placeholder="Question (AR)" />
+          </div>
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.faqs)[i].question.en" name="faqQuestionEn{{ i }}" placeholder="Question (EN)" />
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeFaq(i)">حذف</button>
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.faqs)[i].answer.ar" name="faqAnswerAr{{ i }}" placeholder="Answer (AR)"></textarea>
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.faqs)[i].answer.en" name="faqAnswerEn{{ i }}" placeholder="Answer (EN)"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <ng-container *ngIf="data.communityPerks as communityPerks">
+      <h5 class="mb-3">Community Perks</h5>
+      <div class="mb-2">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addListItem('communityPerks')">
+          + إضافة عنصر
+        </button>
+      </div>
+      <div class="row g-2 mb-2" *ngFor="let item of communityPerks.ar; let i = index; trackBy: trackByIndex">
+        <div class="col-md-5">
+          <input class="form-control" [(ngModel)]="communityPerks.ar[i]" name="perkAr{{ i }}" placeholder="Perk (AR)" />
+        </div>
+        <div class="col-md-5">
+          <input class="form-control" [(ngModel)]="communityPerks.en[i]" name="perkEn{{ i }}" placeholder="Perk (EN)" />
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="button" class="btn btn-outline-danger" (click)="removeListItem('communityPerks', i)">حذف</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <hr class="my-4" />
+
+    <h5 class="mb-3">Testimonials</h5>
+    <div class="mb-2">
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addTestimonial()">
+        + إضافة رأي
+      </button>
+    </div>
+    <div class="card mb-3" *ngFor="let item of data.testimonials; let i = index">
+      <div class="card-body">
+        <div class="row g-2">
+          <div class="col-md-3">
+            <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].name.ar" name="testimonialNameAr{{ i }}" placeholder="Name (AR)" />
+          </div>
+          <div class="col-md-3">
+            <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].name.en" name="testimonialNameEn{{ i }}" placeholder="Name (EN)" />
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].tag.ar" name="testimonialTagAr{{ i }}" placeholder="Tag (AR)" />
+          </div>
+          <div class="col-md-2">
+            <input class="form-control" [(ngModel)]="$any(data.testimonials)[i].tag.en" name="testimonialTagEn{{ i }}" placeholder="Tag (EN)" />
+          </div>
+          <div class="col-md-1">
+            <input type="number" min="1" max="5" class="form-control" [(ngModel)]="$any(data.testimonials)[i].rating" name="testimonialRating{{ i }}" />
+          </div>
+          <div class="col-md-1 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removeTestimonial(i)">×</button>
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.testimonials)[i].text.ar" name="testimonialTextAr{{ i }}" placeholder="Text (AR)"></textarea>
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.testimonials)[i].text.en" name="testimonialTextEn{{ i }}" placeholder="Text (EN)"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <h5 class="mb-3">Pricing Plans</h5>
+    <div class="mb-2">
+      <button type="button" class="btn btn-sm btn-outline-primary" (click)="addPricingPlan()">
+        + إضافة خطة
+      </button>
+    </div>
+    <div class="card mb-3" *ngFor="let item of data.pricingPlans; let i = index">
+      <div class="card-body">
+        <div class="row g-2">
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].name.ar" name="pricingNameAr{{ i }}" placeholder="Plan Name (AR)" />
+          </div>
+          <div class="col-md-5">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].name.en" name="pricingNameEn{{ i }}" placeholder="Plan Name (EN)" />
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-danger" (click)="removePricingPlan(i)">حذف</button>
           </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Badge</label>
-            <input class="form-control" [(ngModel)]="data.pricingPlans[pi].badge" name="p_badge{{pi}}" />
+          <div class="col-md-6">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].badge.ar" name="pricingBadgeAr{{ i }}" placeholder="Badge (AR)" />
+          </div>
+          <div class="col-md-6">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].badge.en" name="pricingBadgeEn{{ i }}" placeholder="Badge (EN)" />
           </div>
 
-          <div class="col-md-4">
-            <label class="form-label">السعر (نص)</label>
-            <input class="form-control" [(ngModel)]="data.pricingPlans[pi].priceText" name="p_price{{pi}}" placeholder="مثال: 399 ر.س" />
+          <div class="col-md-6">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].priceText.ar" name="pricingPriceTextAr{{ i }}" placeholder="Price text (AR)" />
+          </div>
+          <div class="col-md-6">
+            <input class="form-control" [(ngModel)]="$any(data.pricingPlans)[i].priceText.en" name="pricingPriceTextEn{{ i }}" placeholder="Price text (EN)" />
           </div>
 
-          <div class="col-12">
-            <label class="form-label">ملاحظة</label>
-            <input class="form-control" [(ngModel)]="data.pricingPlans[pi].note" name="p_note{{pi}}" />
+          <div class="col-md-6">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.pricingPlans)[i].note.ar" name="pricingNoteAr{{ i }}" placeholder="Note (AR)"></textarea>
+          </div>
+          <div class="col-md-6">
+            <textarea class="form-control" rows="2" [(ngModel)]="$any(data.pricingPlans)[i].note.en" name="pricingNoteEn{{ i }}" placeholder="Note (EN)"></textarea>
           </div>
 
           <div class="col-12">
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" [(ngModel)]="data.pricingPlans[pi].highlighted" name="p_high{{pi}}" id="high{{pi}}" />
-              <label class="form-check-label" [for]="'high'+pi">خطة مميزة (Highlight)</label>
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [(ngModel)]="$any(data.pricingPlans)[i].highlighted"
+                name="pricingHighlighted{{ i }}"
+                id="pricingHighlighted{{ i }}"
+              />
+              <label class="form-check-label" [for]="'pricingHighlighted' + i">
+                الخطة المميزة
+              </label>
             </div>
           </div>
 
           <div class="col-12">
-            <div class="d-flex gap-2 mb-2">
-              <button type="button" class="btn btn-outline-primary btn-sm" (click)="addFeature(pi)">+ إضافة ميزة</button>
-              <span class="text-muted small align-self-center">مميزات الخطة</span>
-            </div>
-
-            <div class="row g-2" *ngFor="let f of data.pricingPlans[pi].features; let fi = index">
-              <div class="col-11">
-                <input class="form-control" [(ngModel)]="data.pricingPlans[pi].features[fi]" name="p_f{{pi}}_{{fi}}" />
-              </div>
-              <div class="col-1 d-grid">
-                <button type="button" class="btn btn-outline-danger" (click)="removeFeature(pi, fi)">×</button>
-              </div>
-            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-2" (click)="addPricingFeature(i)">
+              + إضافة ميزة
+            </button>
           </div>
 
+          <ng-container *ngIf="$any(data.pricingPlans)[i].features as features">
+            <div class="row g-2" *ngFor="let feature of features.ar; let fi = index; trackBy: trackByIndex">
+              <div class="col-md-5">
+                <input class="form-control" [(ngModel)]="features.ar[fi]" name="pricingFeatureAr{{ i }}{{ fi }}" placeholder="Feature (AR)" />
+              </div>
+              <div class="col-md-5">
+                <input class="form-control" [(ngModel)]="features.en[fi]" name="pricingFeatureEn{{ i }}{{ fi }}" placeholder="Feature (EN)" />
+              </div>
+              <div class="col-md-2 d-grid">
+                <button type="button" class="btn btn-outline-danger" (click)="removePricingFeature(i, fi)">حذف</button>
+              </div>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
 
     <hr class="my-4" />
 
-    <!-- ===== Community Perks ===== -->
-    <h5 class="mb-2">مميزات المتابعة (WhatsApp / Facebook + خصومات جلسات)</h5>
-
-    <div class="mb-2 d-flex gap-2">
-      <button type="button" class="btn btn-outline-primary btn-sm" (click)="addPerk()">+ إضافة ميزة</button>
-    </div>
-
-    <div class="row g-2" *ngFor="let p of data.communityPerks; let i = index">
-      <div class="col-11">
-        <input class="form-control" [(ngModel)]="data.communityPerks[i]" name="perk{{i}}" placeholder="مثال: جروب واتساب للأسئلة والمتابعة بعد الشراء" />
+    <ng-container *ngIf="data.offer as offer">
+      <h5 class="mb-3">Offer</h5>
+      <div class="row g-3">
+        <div class="col-md-2">
+          <label class="form-label">Percent</label>
+          <input type="number" class="form-control" [(ngModel)]="offer.percent" name="offerPercent" />
+        </div>
+        <div class="col-md-5">
+          <label class="form-label">Heading (AR)</label>
+          <input class="form-control" [(ngModel)]="$any(offer).heading.ar" name="offerHeadingAr" />
+        </div>
+        <div class="col-md-5">
+          <label class="form-label">Heading (EN)</label>
+          <input class="form-control" [(ngModel)]="$any(offer).heading.en" name="offerHeadingEn" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Text (AR)</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="$any(offer).text.ar" name="offerTextAr"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Text (EN)</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="$any(offer).text.en" name="offerTextEn"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">CTA (AR)</label>
+          <input class="form-control" [(ngModel)]="$any(offer).ctaText.ar" name="offerCtaAr" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">CTA (EN)</label>
+          <input class="form-control" [(ngModel)]="$any(offer).ctaText.en" name="offerCtaEn" />
+        </div>
       </div>
-      <div class="col-1 d-grid">
-        <button type="button" class="btn btn-outline-danger" (click)="removePerk(i)">×</button>
-      </div>
-    </div>
+    </ng-container>
 
     <hr class="my-4" />
 
-    <!-- ===== Offer popup ===== -->
-    <h5 class="mb-2">عرض آخر الصفحة (Popup خصم)</h5>
-    <div class="row g-3">
-      <div class="col-md-3">
-        <label class="form-label">نسبة الخصم</label>
-        <input type="number" class="form-control" [(ngModel)]="data.offer.percent" name="offerPercent" />
+    <ng-container *ngIf="data.bottomCta as bottomCta">
+      <h5 class="mb-3">Bottom CTA</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Text (AR)</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="$any(bottomCta).text.ar" name="bottomCtaTextAr"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Text (EN)</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="$any(bottomCta).text.en" name="bottomCtaTextEn"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Button Text (AR)</label>
+          <input class="form-control" [(ngModel)]="$any(bottomCta).buttonText.ar" name="bottomCtaButtonAr" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Button Text (EN)</label>
+          <input class="form-control" [(ngModel)]="$any(bottomCta).buttonText.en" name="bottomCtaButtonEn" />
+        </div>
       </div>
-
-      <div class="col-md-9">
-        <label class="form-label">عنوان العرض</label>
-        <input class="form-control" [(ngModel)]="data.offer.heading" name="offerHeading" />
-      </div>
-
-      <div class="col-12">
-        <label class="form-label">نص العرض</label>
-        <textarea class="form-control" rows="2" [(ngModel)]="data.offer.text" name="offerText"></textarea>
-      </div>
-
-      <div class="col-12">
-        <label class="form-label">نص زر CTA</label>
-        <input class="form-control" [(ngModel)]="data.offer.ctaText" name="offerCtaText" />
-      </div>
-    </div>
-
-    <hr class="my-4" />
-
-    <!-- ===== Bottom CTA ===== -->
-    <h5 class="mb-2">CTA آخر الصفحة</h5>
-    <div class="row g-3">
-      <div class="col-12">
-        <label class="form-label">النص</label>
-        <input class="form-control" [(ngModel)]="data.bottomCta.text" name="bottomCtaText" />
-      </div>
-      <div class="col-12">
-        <label class="form-label">نص الزر</label>
-        <input class="form-control" [(ngModel)]="data.bottomCta.buttonText" name="bottomCtaBtn" />
-      </div>
-    </div>
-
-    <hr class="my-4" />
-
-    <!-- ===== Courses in diploma ===== -->
-    <h5 class="mb-2">📚 كورسات الدبلومة</h5>
-    <div class="text-muted small mb-3">اختر الكورسات اللي هتتجمع داخل الدبلومة:</div>
-
-    <div class="list-group">
-      <label class="list-group-item d-flex align-items-center gap-2" *ngFor="let c of courses">
-        <input
-          type="checkbox"
-          class="form-check-input"
-          [checked]="isSelected(c.id)"
-          (change)="toggleCourse(c.id, $any($event.target).checked)"
-        />
-        <span>{{ c.title || c.id }}</span>
-        <span class="ms-auto small text-muted">{{ c.id }}</span>
-      </label>
-    </div>
+    </ng-container>
 
     <div class="mt-4 d-flex gap-2">
-      <button class="btn btn-primary" type="submit">حفظ</button>
-      <a class="btn btn-outline-secondary" routerLink="/admin/dashboard">إلغاء</a>
+      <button type="submit" class="btn btn-primary">
+        {{ diplomaId ? 'حفظ التعديلات' : 'حفظ الدبلومة' }}
+      </button>
+
+      <a routerLink="/admin/dashboard" class="btn btn-outline-secondary">
+        إلغاء
+      </a>
     </div>
   </form>
 </div>

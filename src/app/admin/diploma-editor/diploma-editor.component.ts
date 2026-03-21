@@ -1,40 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DiplomasAdminService } from '../services/diplomas-admin.service';
-import { AdminService } from '../services/admin.service';
+import { AdminService, LocalizedStringList, LocalizedText } from '../services/admin.service';
 import {
-  Diploma,
-  DiplomaPricingPlan,
-  DiplomaTestimonial,
-} from 'src/app/shared/models/diploma.model';
+  AdminDiploma,
+  AdminDiplomaBottomCta,
+  AdminDiplomaCurriculumItem,
+  AdminDiplomaFaq,
+  AdminDiplomaMetaItem,
+  AdminDiplomaOffer,
+  AdminDiplomaPricingPlan,
+  AdminDiplomaSectionCard,
+  AdminDiplomaTestimonial,
+  DiplomasAdminService,
+} from '../services/diplomas-admin.service';
 
-type DiplomaMeta = {
-  level: string;
-  totalCourses: number;
-  totalLessons: number;
+type CourseRow = {
+  id: string;
+  title?: LocalizedText;
+  price?: number;
+  published?: boolean;
 };
 
-type DiplomaOffer = {
-  percent: number;
-  heading: string;
-  text: string;
-  ctaText: string;
-};
-
-type DiplomaBottomCta = {
-  text: string;
-  buttonText: string;
-};
-
-type DiplomaEditorForm = Diploma & {
-  courseIds: Record<string, boolean>;
-  meta: DiplomaMeta;
-  specs: string[];
-  testimonials: DiplomaTestimonial[];
-  pricingPlans: DiplomaPricingPlan[];
-  communityPerks: string[];
-  offer: DiplomaOffer;
-  bottomCta: DiplomaBottomCta;
+type DiplomaRow = {
+  id: string;
+  title?: LocalizedText;
+  published?: boolean;
+  createdAt?: number;
 };
 
 @Component({
@@ -45,12 +36,13 @@ type DiplomaEditorForm = Diploma & {
 export class DiplomaEditorComponent implements OnInit {
   loading = false;
   error?: string;
-
   diplomaId?: string;
+  activeLang: 'ar' | 'en' = 'ar';
 
-  courses: { id: string; title?: string }[] = [];
+  courses: CourseRow[] = [];
+  diplomas: DiplomaRow[] = [];
 
-  data: DiplomaEditorForm = this.buildDefaults();
+  data: AdminDiploma = this.buildDefaults();
 
   constructor(
     private route: ActivatedRoute,
@@ -64,41 +56,20 @@ export class DiplomaEditorComponent implements OnInit {
     this.error = undefined;
 
     try {
-      const rawCourses = await this.adminCourses.listCourses();
-      this.courses = rawCourses.map((c) => ({
-        id: c.id,
-        title: c.title?.ar || c.title?.en || '',
-      }));
+      await this.loadReferenceData();
 
       const id = this.route.snapshot.paramMap.get('id');
       if (id) {
         this.diplomaId = id;
-        const d = await this.diplomasAdmin.getDiploma(id);
-        if (!d) throw new Error('الدبلومة غير موجودة');
-
-        const defaults = this.buildDefaults();
-
-        this.data = {
-          ...defaults,
-          ...d,
-          courseIds: d.courseIds ?? defaults.courseIds,
-          meta: { ...defaults.meta, ...((d as any).meta ?? {}) },
-          specs: (d as any).specs ?? defaults.specs,
-          testimonials: (d as any).testimonials ?? defaults.testimonials,
-          pricingPlans: (d as any).pricingPlans ?? defaults.pricingPlans,
-          communityPerks: (d as any).communityPerks ?? defaults.communityPerks,
-          offer: { ...defaults.offer, ...((d as any).offer ?? {}) },
-          bottomCta: {
-            ...defaults.bottomCta,
-            ...((d as any).bottomCta ?? {}),
-          },
-        };
+        const diploma = await this.diplomasAdmin.getDiploma(id);
+        if (!diploma) throw new Error('الدبلومة غير موجودة');
+        this.data = this.mergeWithDefaults(diploma);
       } else {
         this.data = this.buildDefaults();
       }
 
-      this.ensureDefaults();
-      this.recalcMeta();
+      this.ensureArrays();
+      this.syncMetaFromCourses();
     } catch (e: any) {
       this.error = e?.message ?? 'تعذر التحميل';
     } finally {
@@ -106,247 +77,325 @@ export class DiplomaEditorComponent implements OnInit {
     }
   }
 
-  private buildDefaults(): DiplomaEditorForm {
+  setLang(lang: 'ar' | 'en'): void {
+    this.activeLang = lang;
+  }
+
+  private async loadReferenceData(): Promise<void> {
+    const [courses, diplomas] = await Promise.all([
+      this.adminCourses.listCourses(),
+      this.diplomasAdmin.listDiplomas(),
+    ]);
+
+    this.courses = courses;
+    this.diplomas = diplomas.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }
+
+  private buildDefaults(): AdminDiploma {
     return {
-      title: '',
-      description: '',
+      title: this.lt(),
+      description: this.lt(),
       price: 0,
       thumbnail: '',
-      categoryId: '',
+      categoryId: this.lt(),
       published: true,
-      createdAt: undefined,
-
-      programDuration: '',
-      targetAudience: '',
-
-      goalTitle: '',
-      goalDescription: '',
-      expectedStudyTimeTitle: '',
-      expectedStudyTimeDescription: '',
-      prerequisitesTitle: '',
-      prerequisitesDescription: '',
-      introVideoUrl: '',
 
       courseIds: {},
 
-      meta: {
-        level: '',
-        totalCourses: 0,
-        totalLessons: 0,
-      },
+      heroEyebrow: this.lt(),
+      heroTagline: this.lt(),
+      heroTitleHighlight: this.lt(),
 
-      specs: [''],
-      communityPerks: [''],
+      introVideoUrl: '',
 
-      testimonials: [
-        { name: '', tag: '', rating: 5, text: '' },
-        { name: '', tag: '', rating: 5, text: '' },
-        { name: '', tag: '', rating: 5, text: '' },
-      ],
+      programDuration: this.lt(),
+      targetAudience: this.lt(),
+      goalTitle: this.lt(),
+      goalDescription: this.lt(),
+      expectedStudyTimeTitle: this.lt(),
+      expectedStudyTimeDescription: this.lt(),
+      prerequisitesTitle: this.lt(),
+      prerequisitesDescription: this.lt(),
 
-      pricingPlans: [
-        {
-          name: 'الخطة الأساسية',
-          badge: '',
-          priceText: '',
-          note: '',
-          highlighted: false,
-          features: [''],
-        },
-        {
-          name: 'خطة المتابعة الجماعية',
-          badge: '',
-          priceText: '',
-          note: '',
-          highlighted: true,
-          features: [''],
-        },
-        {
-          name: 'الخطة المميّزة',
-          badge: '',
-          priceText: '',
-          note: '',
-          highlighted: false,
-          features: [''],
-        },
-      ],
+      lectureNames: this.ll(),
+      meta: [this.metaItem(), this.metaItem()],
+      outcomes: this.ll(),
+      audienceItems: this.ll(),
+      sectionCards: [this.sectionCard()],
+      curriculum: [this.curriculumItem()],
+      faqs: [this.faqItem()],
+      communityPerks: this.ll(),
+      testimonials: [this.testimonial(), this.testimonial(), this.testimonial()],
+      pricingPlans: [this.pricingPlan(), this.pricingPlan(), this.pricingPlan()],
 
-      offer: {
-        percent: 30,
-        heading: '',
-        text: '',
-        ctaText: 'اشترك الآن',
-      },
-
-      bottomCta: {
-        text: 'لو لسه مشتركتش… متضيعش الفرصة',
-        buttonText: 'اشترك الآن',
-      },
+      offer: this.offer(),
+      bottomCta: this.bottomCta(),
     };
   }
 
-  private ensureDefaults(): void {
-    if (!this.data.meta) {
-      this.data.meta = {
-        level: '',
-        totalCourses: 0,
-        totalLessons: 0,
+  private mergeWithDefaults(value: Partial<AdminDiploma>): AdminDiploma {
+    const defaults = this.buildDefaults();
+
+    return {
+      ...defaults,
+      ...value,
+      title: this.normText(value.title),
+      description: this.normText(value.description),
+      categoryId: this.normText(value.categoryId),
+      heroEyebrow: this.normText(value.heroEyebrow),
+      heroTagline: this.normText(value.heroTagline),
+      heroTitleHighlight: this.normText(value.heroTitleHighlight),
+      programDuration: this.normText(value.programDuration),
+      targetAudience: this.normText(value.targetAudience),
+      goalTitle: this.normText(value.goalTitle),
+      goalDescription: this.normText(value.goalDescription),
+      expectedStudyTimeTitle: this.normText(value.expectedStudyTimeTitle),
+      expectedStudyTimeDescription: this.normText(value.expectedStudyTimeDescription),
+      prerequisitesTitle: this.normText(value.prerequisitesTitle),
+      prerequisitesDescription: this.normText(value.prerequisitesDescription),
+
+      lectureNames: this.normList(value.lectureNames),
+      outcomes: this.normList(value.outcomes),
+      audienceItems: this.normList(value.audienceItems),
+      communityPerks: this.normList(value.communityPerks),
+
+      meta: Array.isArray(value.meta) && value.meta.length
+        ? value.meta.map((item) => ({
+            label: this.normText(item?.label),
+            value: this.normText(item?.value),
+          }))
+        : defaults.meta,
+
+      sectionCards: Array.isArray(value.sectionCards) && value.sectionCards.length
+        ? value.sectionCards.map((item) => ({
+            title: this.normText(item?.title),
+            description: this.normText(item?.description),
+          }))
+        : defaults.sectionCards,
+
+      curriculum: Array.isArray(value.curriculum) && value.curriculum.length
+        ? value.curriculum.map((item) => ({
+            title: this.normText(item?.title),
+            points: this.normList(item?.points),
+          }))
+        : defaults.curriculum,
+
+      faqs: Array.isArray(value.faqs) && value.faqs.length
+        ? value.faqs.map((item) => ({
+            question: this.normText(item?.question),
+            answer: this.normText(item?.answer),
+          }))
+        : defaults.faqs,
+
+      testimonials: Array.isArray(value.testimonials) && value.testimonials.length
+        ? value.testimonials.map((item) => ({
+            name: this.normText(item?.name),
+            tag: this.normText(item?.tag),
+            rating: Number(item?.rating || 5) || 5,
+            text: this.normText(item?.text),
+          }))
+        : defaults.testimonials,
+
+      pricingPlans: Array.isArray(value.pricingPlans) && value.pricingPlans.length
+        ? value.pricingPlans.map((item) => ({
+            name: this.normText(item?.name),
+            badge: this.normText(item?.badge),
+            priceText: this.normText(item?.priceText),
+            note: this.normText(item?.note),
+            highlighted: !!item?.highlighted,
+            features: this.normList(item?.features),
+          }))
+        : defaults.pricingPlans,
+
+      offer: {
+        percent: Number(value.offer?.percent || defaults.offer?.percent || 30),
+        heading: this.normText(value.offer?.heading),
+        text: this.normText(value.offer?.text),
+        ctaText: this.normText(value.offer?.ctaText),
+      },
+
+      bottomCta: {
+        text: this.normText(value.bottomCta?.text),
+        buttonText: this.normText(value.bottomCta?.buttonText),
+      },
+
+      courseIds:
+        value.courseIds && typeof value.courseIds === 'object'
+          ? value.courseIds
+          : {},
+    };
+  }
+
+  private ensureArrays(): void {
+    this.data.lectureNames = this.normList(this.data.lectureNames);
+    this.data.outcomes = this.normList(this.data.outcomes);
+    this.data.audienceItems = this.normList(this.data.audienceItems);
+    this.data.communityPerks = this.normList(this.data.communityPerks);
+
+    if (!Array.isArray(this.data.meta) || !this.data.meta.length) {
+      this.data.meta = [this.metaItem()];
+    }
+
+    if (!Array.isArray(this.data.sectionCards) || !this.data.sectionCards.length) {
+      this.data.sectionCards = [this.sectionCard()];
+    }
+
+    if (!Array.isArray(this.data.curriculum) || !this.data.curriculum.length) {
+      this.data.curriculum = [this.curriculumItem()];
+    }
+
+    if (!Array.isArray(this.data.faqs) || !this.data.faqs.length) {
+      this.data.faqs = [this.faqItem()];
+    }
+
+    if (!Array.isArray(this.data.testimonials) || !this.data.testimonials.length) {
+      this.data.testimonials = [this.testimonial(), this.testimonial(), this.testimonial()];
+    }
+
+    if (!Array.isArray(this.data.pricingPlans) || !this.data.pricingPlans.length) {
+      this.data.pricingPlans = [this.pricingPlan(), this.pricingPlan(), this.pricingPlan()];
+    }
+  }
+
+  private syncMetaFromCourses(): void {
+    const totalCourses = Object.keys(this.data.courseIds || {}).length;
+    const totalCoursesIndex = this.findMetaIndex('عدد الكورسات', 'Total courses');
+    if (totalCoursesIndex >= 0) {
+      this.data.meta![totalCoursesIndex].value = {
+        ar: String(totalCourses),
+        en: String(totalCourses),
       };
-    }
-
-    if (!Array.isArray(this.data.specs)) this.data.specs = [];
-    if (!Array.isArray(this.data.communityPerks)) this.data.communityPerks = [];
-    if (!Array.isArray(this.data.testimonials)) this.data.testimonials = [];
-    if (!Array.isArray(this.data.pricingPlans)) this.data.pricingPlans = [];
-
-    while (this.data.testimonials.length < 3) {
-      this.data.testimonials.push({
-        name: '',
-        tag: 'متدرب',
-        rating: 5,
-        text: '',
-      });
-    }
-    this.data.testimonials = this.data.testimonials.slice(0, 3);
-
-    if (this.data.pricingPlans.length === 0) {
-      this.data.pricingPlans = [
+    } else {
+      this.data.meta = [
+        ...(this.data.meta || []),
         {
-          name: 'الخطة الأساسية',
-          badge: 'لبداية هادئة ومركّزة',
-          priceText: '—',
-          note: 'دفع لمرة واحدة – دخول فوري للمحتوى',
-          features: [
-            'الوصول الكامل لمحتوى الدبلومة.',
-            'تحميل الملفات والتطبيقات العملية.',
-          ],
-          highlighted: false,
-        },
-        {
-          name: 'خطة المتابعة الجماعية',
-          badge: 'دعم أكبر + متابعة',
-          priceText: '—',
-          note: 'تشمل مزايا الخطة الأساسية وأكثر',
-          features: [
-            'كل مزايا الخطة الأساسية.',
-            'متابعة داخل جروب للأسئلة والنقاش.',
-          ],
-          highlighted: true,
-        },
-        {
-          name: 'الخطة المميّزة',
-          badge: 'لمن يحتاج مساحة أعمق',
-          priceText: '—',
-          note: 'مزايا إضافية للمشتركين',
-          features: ['كل مزايا خطة المتابعة.', 'خصومات على الجلسات الفردية.'],
-          highlighted: false,
+          label: { ar: 'عدد الكورسات', en: 'Total courses' },
+          value: { ar: String(totalCourses), en: String(totalCourses) },
         },
       ];
     }
-
-    this.data.pricingPlans = this.data.pricingPlans.slice(0, 3);
-
-    while (this.data.pricingPlans.length < 3) {
-      this.data.pricingPlans.push({
-        name: '',
-        badge: '',
-        priceText: '—',
-        note: '',
-        features: [],
-        highlighted: false,
-      });
-    }
-
-    this.data.pricingPlans = this.data.pricingPlans.map((p) => ({
-      ...p,
-      features: Array.isArray(p.features) ? p.features : [],
-    }));
-
-    if (!this.data.offer) {
-      this.data.offer = {
-        percent: 30,
-        heading: 'عرض خاص',
-        text: '',
-        ctaText: 'اشترك الآن',
-      };
-    } else {
-      this.data.offer.percent =
-        typeof this.data.offer.percent === 'number'
-          ? this.data.offer.percent
-          : 30;
-      this.data.offer.heading = this.data.offer.heading ?? '';
-      this.data.offer.text = this.data.offer.text ?? '';
-      this.data.offer.ctaText = this.data.offer.ctaText ?? 'اشترك الآن';
-    }
-
-    if (!this.data.bottomCta) {
-      this.data.bottomCta = {
-        text: 'لو لسه مشتركتش… متضيعش الفرصة',
-        buttonText: 'اشترك الآن',
-      };
-    } else {
-      this.data.bottomCta.text =
-        this.data.bottomCta.text ?? 'لو لسه مشتركتش… متضيعش الفرصة';
-      this.data.bottomCta.buttonText =
-        this.data.bottomCta.buttonText ?? 'اشترك الآن';
-    }
-
-    if (!this.data.courseIds) {
-      this.data.courseIds = {};
-    }
-  }
-
-  private recalcMeta(): void {
-    const totalCourses = Object.keys(this.data.courseIds ?? {}).length;
-    this.data.meta.totalCourses = totalCourses;
   }
 
   toggleCourse(courseId: string, checked: boolean): void {
-    if (!this.data.courseIds) this.data.courseIds = {};
-
+    this.data.courseIds = this.data.courseIds || {};
     if (checked) {
       this.data.courseIds[courseId] = true;
     } else {
       delete this.data.courseIds[courseId];
     }
-
-    this.recalcMeta();
+    this.syncMetaFromCourses();
   }
 
   isSelected(courseId: string): boolean {
     return !!this.data.courseIds?.[courseId];
   }
 
-  addSpec(): void {
-    this.data.specs = [...(this.data.specs ?? []), ''];
+  async editDiploma(id: string): Promise<void> {
+    await this.router.navigate(['/admin/diploma-editor', id]);
   }
 
-  removeSpec(i: number): void {
-    this.data.specs = (this.data.specs ?? []).filter((_, idx) => idx !== i);
+  trackByIndex(index: number): number {
+    return index;
   }
 
-  addPerk(): void {
-    this.data.communityPerks = [...(this.data.communityPerks ?? []), ''];
+  addListItem(
+    key: 'lectureNames' | 'outcomes' | 'audienceItems' | 'communityPerks',
+  ): void {
+    const list = this.data[key] as LocalizedStringList | undefined;
+    const normalized = this.normList(list);
+    normalized.ar.push('');
+    normalized.en.push('');
+    (this.data as any)[key] = normalized;
   }
 
-  removePerk(i: number): void {
-    this.data.communityPerks = (this.data.communityPerks ?? []).filter(
-      (_, idx) => idx !== i,
-    );
+  removeListItem(
+    key: 'lectureNames' | 'outcomes' | 'audienceItems' | 'communityPerks',
+    index: number,
+  ): void {
+    const list = this.normList((this.data as any)[key]);
+    list.ar = list.ar.filter((_, i) => i !== index);
+    list.en = list.en.filter((_, i) => i !== index);
+    (this.data as any)[key] = list;
   }
 
-  addFeature(planIndex: number): void {
-    const p = this.data.pricingPlans?.[planIndex];
-    if (!p) return;
-
-    p.features = [...(p.features ?? []), ''];
+  addMetaItem(): void {
+    this.data.meta = [...(this.data.meta || []), this.metaItem()];
   }
 
-  removeFeature(planIndex: number, featureIndex: number): void {
-    const p = this.data.pricingPlans?.[planIndex];
-    if (!p) return;
+  removeMetaItem(index: number): void {
+    this.data.meta = (this.data.meta || []).filter((_, i) => i !== index);
+  }
 
-    p.features = (p.features ?? []).filter((_, idx) => idx !== featureIndex);
+  addSectionCard(): void {
+    this.data.sectionCards = [...(this.data.sectionCards || []), this.sectionCard()];
+  }
+
+  removeSectionCard(index: number): void {
+    this.data.sectionCards = (this.data.sectionCards || []).filter((_, i) => i !== index);
+  }
+
+  addCurriculumItem(): void {
+    this.data.curriculum = [...(this.data.curriculum || []), this.curriculumItem()];
+  }
+
+  removeCurriculumItem(index: number): void {
+    this.data.curriculum = (this.data.curriculum || []).filter((_, i) => i !== index);
+  }
+
+  addCurriculumPoint(itemIndex: number): void {
+    const item = this.data.curriculum?.[itemIndex];
+    if (!item) return;
+    item.points = this.normList(item.points);
+    item.points.ar.push('');
+    item.points.en.push('');
+  }
+
+  removeCurriculumPoint(itemIndex: number, pointIndex: number): void {
+    const item = this.data.curriculum?.[itemIndex];
+    if (!item) return;
+    item.points = this.normList(item.points);
+    item.points.ar = item.points.ar.filter((_, i) => i !== pointIndex);
+    item.points.en = item.points.en.filter((_, i) => i !== pointIndex);
+  }
+
+  addFaq(): void {
+    this.data.faqs = [...(this.data.faqs || []), this.faqItem()];
+  }
+
+  removeFaq(index: number): void {
+    this.data.faqs = (this.data.faqs || []).filter((_, i) => i !== index);
+  }
+
+  addTestimonial(): void {
+    this.data.testimonials = [...(this.data.testimonials || []), this.testimonial()];
+  }
+
+  removeTestimonial(index: number): void {
+    this.data.testimonials = (this.data.testimonials || []).filter((_, i) => i !== index);
+  }
+
+  addPricingPlan(): void {
+    this.data.pricingPlans = [...(this.data.pricingPlans || []), this.pricingPlan()];
+  }
+
+  removePricingPlan(index: number): void {
+    this.data.pricingPlans = (this.data.pricingPlans || []).filter((_, i) => i !== index);
+  }
+
+  addPricingFeature(planIndex: number): void {
+    const plan = this.data.pricingPlans?.[planIndex];
+    if (!plan) return;
+    plan.features = this.normList(plan.features);
+    plan.features.ar.push('');
+    plan.features.en.push('');
+  }
+
+  removePricingFeature(planIndex: number, featureIndex: number): void {
+    const plan = this.data.pricingPlans?.[planIndex];
+    if (!plan) return;
+    plan.features = this.normList(plan.features);
+    plan.features.ar = plan.features.ar.filter((_, i) => i !== featureIndex);
+    plan.features.en = plan.features.en.filter((_, i) => i !== featureIndex);
   }
 
   async save(): Promise<void> {
@@ -354,57 +403,247 @@ export class DiplomaEditorComponent implements OnInit {
     this.loading = true;
 
     try {
-      if (!this.data.title?.trim()) {
-        throw new Error('اكتب عنوان الدبلومة');
+      const arTitle = (this.data.title?.ar || '').trim();
+      const enTitle = (this.data.title?.en || '').trim();
+
+      if (!arTitle && !enTitle) {
+        throw new Error('اكتب عنوان الدبلومة على الأقل بإحدى اللغتين');
       }
 
-      this.data.specs = (this.data.specs ?? [])
-        .map((x) => (x ?? '').trim())
-        .filter(Boolean);
+      const payload: AdminDiploma = {
+        ...this.data,
+        title: this.normText(this.data.title),
+        description: this.normText(this.data.description),
+        categoryId: this.normText(this.data.categoryId),
+        heroEyebrow: this.normText(this.data.heroEyebrow),
+        heroTagline: this.normText(this.data.heroTagline),
+        heroTitleHighlight: this.normText(this.data.heroTitleHighlight),
+        programDuration: this.normText(this.data.programDuration),
+        targetAudience: this.normText(this.data.targetAudience),
+        goalTitle: this.normText(this.data.goalTitle),
+        goalDescription: this.normText(this.data.goalDescription),
+        expectedStudyTimeTitle: this.normText(this.data.expectedStudyTimeTitle),
+        expectedStudyTimeDescription: this.normText(this.data.expectedStudyTimeDescription),
+        prerequisitesTitle: this.normText(this.data.prerequisitesTitle),
+        prerequisitesDescription: this.normText(this.data.prerequisitesDescription),
+        lectureNames: this.cleanList(this.data.lectureNames),
+        outcomes: this.cleanList(this.data.outcomes),
+        audienceItems: this.cleanList(this.data.audienceItems),
+        communityPerks: this.cleanList(this.data.communityPerks),
+        meta: (this.data.meta || [])
+          .map((item) => ({
+            label: this.normText(item.label),
+            value: this.normText(item.value),
+          }))
+          .filter(
+            (item) =>
+              item.label.ar ||
+              item.label.en ||
+              item.value.ar ||
+              item.value.en,
+          ),
+        sectionCards: (this.data.sectionCards || [])
+          .map((item) => ({
+            title: this.normText(item.title),
+            description: this.normText(item.description),
+          }))
+          .filter(
+            (item) =>
+              item.title.ar ||
+              item.title.en ||
+              item.description.ar ||
+              item.description.en,
+          ),
+        curriculum: (this.data.curriculum || [])
+          .map((item) => ({
+            title: this.normText(item.title),
+            points: this.cleanList(item.points),
+          }))
+          .filter(
+            (item) =>
+              item.title.ar ||
+              item.title.en ||
+              item.points.ar.length ||
+              item.points.en.length,
+          ),
+        faqs: (this.data.faqs || [])
+          .map((item) => ({
+            question: this.normText(item.question),
+            answer: this.normText(item.answer),
+          }))
+          .filter(
+            (item) =>
+              item.question.ar ||
+              item.question.en ||
+              item.answer.ar ||
+              item.answer.en,
+          ),
+        testimonials: (this.data.testimonials || [])
+          .map((item) => ({
+            name: this.normText(item.name),
+            tag: this.normText(item.tag),
+            rating: Number(item.rating || 5) || 5,
+            text: this.normText(item.text),
+          }))
+          .filter(
+            (item) =>
+              item.name.ar ||
+              item.name.en ||
+              item.text.ar ||
+              item.text.en,
+          ),
+        pricingPlans: (this.data.pricingPlans || [])
+          .map((item) => ({
+            name: this.normText(item.name),
+            badge: this.normText(item.badge),
+            priceText: this.normText(item.priceText),
+            note: this.normText(item.note),
+            highlighted: !!item.highlighted,
+            features: this.cleanList(item.features),
+          }))
+          .filter(
+            (item) =>
+              item.name.ar ||
+              item.name.en ||
+              item.priceText.ar ||
+              item.priceText.en ||
+              item.features.ar.length ||
+              item.features.en.length,
+          ),
+        offer: {
+          percent: Number(this.data.offer?.percent || 0) || 30,
+          heading: this.normText(this.data.offer?.heading),
+          text: this.normText(this.data.offer?.text),
+          ctaText: this.normText(this.data.offer?.ctaText),
+        },
+        bottomCta: {
+          text: this.normText(this.data.bottomCta?.text),
+          buttonText: this.normText(this.data.bottomCta?.buttonText),
+        },
+        courseIds: this.normalizeCourseIds(this.data.courseIds),
+        thumbnail: (this.data.thumbnail || '').trim(),
+        introVideoUrl: (this.data.introVideoUrl || '').trim(),
+        price: Number(this.data.price || 0) || 0,
+        published: !!this.data.published,
+      };
 
-      this.data.communityPerks = (this.data.communityPerks ?? [])
-        .map((x) => (x ?? '').trim())
-        .filter(Boolean);
-
-      this.data.testimonials = (this.data.testimonials ?? [])
-        .slice(0, 3)
-        .map((t) => ({
-          ...t,
-          name: (t.name ?? '').trim(),
-          tag: (t.tag ?? '').trim(),
-          text: (t.text ?? '').trim(),
-          rating: typeof t.rating === 'number' ? t.rating : 5,
-        }))
-        .filter((t) => t.name && t.text);
-
-      this.data.pricingPlans = (this.data.pricingPlans ?? [])
-        .slice(0, 3)
-        .map((p: DiplomaPricingPlan) => ({
-          ...p,
-          name: (p.name ?? '').trim(),
-          badge: (p.badge ?? '').trim(),
-          priceText: (p.priceText ?? '—').trim(),
-          note: (p.note ?? '').trim(),
-          features: (p.features ?? [])
-            .map((x) => (x ?? '').trim())
-            .filter(Boolean),
-          highlighted: !!p.highlighted,
-        }));
-
-      this.recalcMeta();
+      this.syncMetaFromCourses();
 
       if (this.diplomaId) {
-        await this.diplomasAdmin.updateDiploma(this.diplomaId, this.data);
+        await this.diplomasAdmin.updateDiploma(this.diplomaId, payload);
       } else {
-        const newId = await this.diplomasAdmin.createDiploma(this.data);
+        const newId = await this.diplomasAdmin.createDiploma(payload);
         this.diplomaId = newId;
       }
 
-      this.router.navigate(['/admin/dashboard']);
+      await this.loadReferenceData();
+      await this.router.navigate(['/admin/diploma-editor', this.diplomaId]);
     } catch (e: any) {
       this.error = e?.message ?? 'تعذر الحفظ';
     } finally {
       this.loading = false;
     }
+  }
+
+  private findMetaIndex(arLabel: string, enLabel: string): number {
+    return (this.data.meta || []).findIndex((item) => {
+      const ar = (item.label?.ar || '').trim();
+      const en = (item.label?.en || '').trim();
+      return ar === arLabel || en === enLabel;
+    });
+  }
+
+  private lt(): LocalizedText {
+    return { ar: '', en: '' };
+  }
+
+  private ll(): LocalizedStringList {
+    return { ar: [''], en: [''] };
+  }
+
+  private metaItem(): AdminDiplomaMetaItem {
+    return { label: this.lt(), value: this.lt() };
+  }
+
+  private sectionCard(): AdminDiplomaSectionCard {
+    return { title: this.lt(), description: this.lt() };
+  }
+
+  private curriculumItem(): AdminDiplomaCurriculumItem {
+    return { title: this.lt(), points: this.ll() };
+  }
+
+  private faqItem(): AdminDiplomaFaq {
+    return { question: this.lt(), answer: this.lt() };
+  }
+
+  private testimonial(): AdminDiplomaTestimonial {
+    return { name: this.lt(), tag: this.lt(), rating: 5, text: this.lt() };
+  }
+
+  private pricingPlan(): AdminDiplomaPricingPlan {
+    return {
+      name: this.lt(),
+      badge: this.lt(),
+      priceText: this.lt(),
+      note: this.lt(),
+      highlighted: false,
+      features: this.ll(),
+    };
+  }
+
+  private offer(): AdminDiplomaOffer {
+    return {
+      percent: 30,
+      heading: this.lt(),
+      text: this.lt(),
+      ctaText: this.lt(),
+    };
+  }
+
+  private bottomCta(): AdminDiplomaBottomCta {
+    return {
+      text: this.lt(),
+      buttonText: this.lt(),
+    };
+  }
+
+  private normText(value?: Partial<LocalizedText> | null): LocalizedText {
+    return {
+      ar: (value?.ar || '').trim(),
+      en: (value?.en || '').trim(),
+    };
+  }
+
+  private normList(value?: Partial<LocalizedStringList> | null): LocalizedStringList {
+    return {
+      ar: Array.isArray(value?.ar) ? [...value!.ar] : [''],
+      en: Array.isArray(value?.en) ? [...value!.en] : [''],
+    };
+  }
+
+  private cleanList(value?: Partial<LocalizedStringList> | null): LocalizedStringList {
+    return {
+      ar: Array.isArray(value?.ar)
+        ? value.ar.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+        : [],
+      en: Array.isArray(value?.en)
+        ? value.en.map((item) => `${item ?? ''}`.trim()).filter(Boolean)
+        : [],
+    };
+  }
+
+  private normalizeCourseIds(value?: Record<string, boolean>): Record<string, boolean> {
+    if (!value || typeof value !== 'object') return {};
+    return Object.keys(value).reduce((acc, key) => {
+      if (value[key]) acc[key] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+  }
+
+  getLocalizedTitle(value?: LocalizedText): string {
+    return this.activeLang === 'en'
+      ? value?.en || value?.ar || ''
+      : value?.ar || value?.en || '';
   }
 }
