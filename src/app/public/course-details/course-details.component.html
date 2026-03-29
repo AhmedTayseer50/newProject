@@ -15,119 +15,7 @@
   <div class="alert alert-danger">{{ error }}</div>
 </div>
 
-<!-- this section for the poster and the title of the page  -->
-<section
-  class="course-hero"
-  [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
->
-  <div class="container">
-    <div class="course-hero-inner">
-      <div class="course-hero-content">
-
-        <!-- some wordes before the title -->
-        <div class="course-hero-eyebrow">
-          {{ course.heroEyebrow || heroFallbackEyebrow }}
-        </div>
-
-        <!-- the title -->
-        <h1 class="course-hero-title">
-          {{ course.title }}
-          <span class="hero-highlight" *ngIf="course.heroTitleHighlight">
-            {{ course.heroTitleHighlight }}
-          </span>
-        </h1>
-
-        <!-- pargraph under the title  -->
-        <p class="course-hero-tagline">
-          {{ course.heroTagline || course.description || heroFallbackTagline }}
-        </p>
-
-        <!-- some small notes -->
-        <div
-          class="course-hero-meta"
-          *ngIf="course.meta?.length; else fallbackHeroMeta"
-        >
-          <span class="course-hero-pill" *ngFor="let item of course.meta">
-            <strong *ngIf="item.label">{{ item.label }}:</strong>
-            {{ item.value }}
-          </span>
-        </div>
-
-
-        <!-- this part need clarefication -->
-        <ng-template #fallbackHeroMeta>
-          <div class="course-hero-meta">
-            <span class="course-hero-pill" *ngIf="course.programDuration">
-              {{ course.programDuration }}
-            </span>
-            <span class="course-hero-pill" *ngIf="course.targetAudience">
-              {{ course.targetAudience }}
-            </span>
-            <span class="course-hero-pill" *ngIf="course.price">
-              {{ isEnglish ? 'Starts from' : 'يبدأ من' }} {{ course.price }}
-            </span>
-          </div>
-        </ng-template>
-        <!-- button to subscripe  -->
-        <div class="course-hero-actions">
-          <button
-            *ngIf="!canViewLessons"
-            class="btn btn-primary"
-            type="button"
-            (click)="goToPurchase()"
-          >
-            {{ enrollButtonText }}
-          </button>
-
-          <!-- link for the video of the how to show the short cut of the coures -->
-          <a
-            *ngIf="introVideoSafeUrl"
-            class="btn btn-outline-primary"
-            href="#course-video"
-          >
-            {{ isEnglish ? 'Watch intro video' : 'شاهد الفيديو التعريفي' }}
-          </a>
-
-
-          <!-- button for watch the lessons after subscripe -->
-          <button
-            *ngIf="canViewLessons && firstLessonId"
-            class="btn btn-outline-primary"
-            type="button"
-            (click)="goToLessons()"
-          >
-            {{ watchLessonsLabel }}
-          </button>
-        </div>
-
-        <div class="hero-trust-line">
-          {{
-            isEnglish
-              ? 'Clear content • Practical learning path • Supportive experience'
-              : 'محتوى واضح • رحلة تعلم عملية • تجربة أكثر دعمًا ووضوحًا'
-          }}
-        </div>
-      </div>
-
-      <!-- photo for the course -->
-      <div class="course-hero-media">
-        <div class="course-hero-poster">
-          <img
-            [src]="course.thumbnail || defaultThumbnail"
-            [alt]="course.title || (isEnglish ? 'Course poster' : 'بوستر الكورس')"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-</section>
-
-
 <!-- this part for the auth part -->
-
 <div class="container mb-4" *ngIf="!loading && !error && course" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
   <div
     *ngIf="canViewLessons && firstLessonId"
@@ -189,113 +77,105 @@
   </div>
 </div>
 
-
-<!-- Study highlights (moved from hero) -->
+<!-- HERO -->
 <section
-  class="section study-highlights"
+  class="course-hero"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
   *ngIf="!loading && !error && course"
 >
   <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">
-        {{ isEnglish ? 'Study highlights' : 'نظرة سريعة على الدراسة' }}
-      </h2>
-      <p class="section-subtitle">
-        {{
-          isEnglish
-            ? 'Quick details to understand how the course is structured before you dive deeper.'
-            : 'تفاصيل سريعة تساعدك على فهم طبيعة الدراسة قبل الدخول في التفاصيل الكاملة.'
-        }}
-      </p>
-    </div>
+    <div class="course-hero-inner">
+      <div class="course-hero-content">
 
-    <div class="overview-grid">
-
-      <!-- Duration -->
-      <article class="overview-card" *ngIf="course.programDuration">
-        <div class="overview-label">
-          {{ isEnglish ? 'Duration' : 'المدة' }}
+        <div class="course-hero-eyebrow">
+          {{ course.heroEyebrow || heroFallbackEyebrow }}
         </div>
-        <p class="overview-text">
-          {{ course.programDuration }}
+
+        <h1 class="course-hero-title">
+          {{ course.title }}
+          <span class="hero-highlight" *ngIf="course.heroTitleHighlight">
+            {{ course.heroTitleHighlight }}
+          </span>
+        </h1>
+
+        <p class="course-hero-tagline">
+          {{ course.heroTagline || course.description || heroFallbackTagline }}
         </p>
-      </article>
 
-      <!-- Study pace -->
-      <article class="overview-card" *ngIf="course.expectedStudyTimeDescription">
-        <div class="overview-label">
-          {{ isEnglish ? 'Study pace' : 'نمط الدراسة' }}
-        </div>
-        <p class="overview-text">
-          {{ course.expectedStudyTimeDescription }}
-        </p>
-      </article>
-
-      <!-- Experience -->
-      <article class="overview-card" *ngIf="course.prerequisitesDescription || course.targetAudience">
-        <div class="overview-label">
-          {{ isEnglish ? 'Experience needed' : 'الخبرة المطلوبة' }}
-        </div>
-        <p class="overview-text">
-          {{ course.prerequisitesDescription || course.targetAudience }}
-        </p>
-      </article>
-
-    </div>
-  </div>
-</section>
-
-<!-- this part for if this course sutble for the user -->
-<section
-  class="section section--light"
-  [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
->
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">
-        {{ isEnglish ? 'Is this course for you?' : 'هل هذا الكورس مناسب لك؟' }}
-      </h2>
-      <p class="section-subtitle">
-        {{
-          isEnglish
-            ? 'This part helps the visitor quickly decide whether the course matches their current need and level.'
-            : 'هذا الجزء يساعد الزائر أن يعرف بسرعة هل الكورس مناسب له فعلًا في هذه المرحلة أم لا.'
-        }}
-      </p>
-    </div>
-
-    <div class="audience-fit-grid">
-      <article class="fit-card">
-        <div class="fit-card__badge">
-          {{ isEnglish ? 'Who it is for' : 'لمن صُمم' }}
+        <div
+          class="course-hero-meta"
+          *ngIf="course.meta?.length; else fallbackHeroMeta"
+        >
+          <span class="course-hero-pill" *ngFor="let item of course.meta">
+            <strong *ngIf="item.label">{{ item.label }}:</strong>
+            {{ item.value }}
+          </span>
         </div>
 
-        <ul class="check-list" *ngIf="course.audienceItems?.length; else noAudience">
-          <li *ngFor="let item of course.audienceItems">{{ item }}</li>
-        </ul>
-
-        <ng-template #noAudience>
-          <p class="m-0 overview-text">{{ defaultAudienceEmpty }}</p>
+        <ng-template #fallbackHeroMeta>
+          <div class="course-hero-meta">
+            <span class="course-hero-pill" *ngIf="course.programDuration">
+              {{ course.programDuration }}
+            </span>
+            <span class="course-hero-pill" *ngIf="course.targetAudience">
+              {{ course.targetAudience }}
+            </span>
+            <span class="course-hero-pill" *ngIf="course.price">
+              {{ isEnglish ? 'Starts from' : 'يبدأ من' }} {{ course.price }}
+            </span>
+          </div>
         </ng-template>
-      </article>
 
-      <article class="fit-card">
-        <div class="fit-card__badge">
-          {{ isEnglish ? 'Before you start' : 'قبل أن تبدأ' }}
+        <div class="course-hero-actions">
+          <button
+            *ngIf="!canViewLessons"
+            class="btn btn-primary"
+            type="button"
+            (click)="goToPurchase()"
+          >
+            {{ enrollButtonText }}
+          </button>
+
+          <a
+            *ngIf="introVideoSafeUrl"
+            class="btn btn-outline-primary"
+            href="#course-video"
+          >
+            {{ isEnglish ? 'Watch intro video' : 'شاهد الفيديو التعريفي' }}
+          </a>
+
+          <button
+            *ngIf="canViewLessons && firstLessonId"
+            class="btn btn-outline-primary"
+            type="button"
+            (click)="goToLessons()"
+          >
+            {{ watchLessonsLabel }}
+          </button>
         </div>
-        <p class="overview-text m-0">
-          {{ course.prerequisitesDescription || course.targetAudience || defaultAudienceEmpty }}
-        </p>
-      </article>
+
+        <div class="hero-trust-line">
+          {{
+            isEnglish
+              ? 'Clear content • Practical learning path • Supportive experience'
+              : 'محتوى واضح • رحلة تعلم عملية • تجربة أكثر دعمًا ووضوحًا'
+          }}
+        </div>
+      </div>
+
+      <div class="course-hero-media">
+        <div class="course-hero-poster">
+          <img
+            [src]="course.thumbnail || defaultThumbnail"
+            [alt]="course.title || (isEnglish ? 'Course poster' : 'بوستر الكورس')"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-
-<!-- this part for what the user will descover in the course -->
-
+<!-- WHAT WILL YOU GAIN -->
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
@@ -337,8 +217,7 @@
   </div>
 </section>
 
-<!-- this part for watch the course before you buy this course with video-->
-
+<!-- VIDEO -->
 <section
   id="course-video"
   class="section section--accent"
@@ -400,8 +279,7 @@
   </div>
 </section>
 
-
-<!-- this part for the content of this course -->
+<!-- CURRICULUM -->
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
@@ -459,66 +337,48 @@
   </div>
 </section>
 
-
-<!-- this part for details of the study the course -->
+<!-- STUDY HIGHLIGHTS -->
 <section
-  class="section section--light"
+  class="section study-highlights"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
   *ngIf="!loading && !error && course"
 >
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">
-        {{ isEnglish ? 'Study details' : 'تفاصيل الدراسة' }}
+        {{ isEnglish ? 'Study highlights' : 'نظرة سريعة على الدراسة' }}
       </h2>
       <p class="section-subtitle">
         {{
           isEnglish
-            ? 'This section answers the practical questions before purchase: duration, pace, goal, and readiness.'
-            : 'هذا الجزء يجيب على الأسئلة العملية قبل الشراء مثل المدة وطبيعة الدراسة والهدف والاستعداد المطلوب.'
+            ? 'Quick details to understand how the course is structured before you dive deeper.'
+            : 'تفاصيل سريعة تساعدك على فهم طبيعة الدراسة قبل الدخول في التفاصيل الكاملة.'
         }}
       </p>
     </div>
 
     <div class="overview-grid">
-      <article
-        class="overview-card"
-        *ngIf="course.goalTitle || course.goalDescription || course.description"
-      >
+      <article class="overview-card" *ngIf="course.programDuration">
         <div class="overview-label">
-          {{ course.goalTitle || defaultGoalTitle }}
+          {{ isEnglish ? 'Duration' : 'المدة' }}
         </div>
         <p class="overview-text">
-          {{ course.goalDescription || course.description }}
+          {{ course.programDuration }}
         </p>
       </article>
 
-      <article
-        class="overview-card"
-        *ngIf="
-          course.expectedStudyTimeTitle ||
-          course.expectedStudyTimeDescription ||
-          course.programDuration
-        "
-      >
+      <article class="overview-card" *ngIf="course.expectedStudyTimeDescription">
         <div class="overview-label">
-          {{ course.expectedStudyTimeTitle || defaultExpectedStudyTitle }}
+          {{ isEnglish ? 'Study pace' : 'نمط الدراسة' }}
         </div>
         <p class="overview-text">
-          {{ course.expectedStudyTimeDescription || course.programDuration }}
+          {{ course.expectedStudyTimeDescription }}
         </p>
       </article>
 
-      <article
-        class="overview-card"
-        *ngIf="
-          course.prerequisitesTitle ||
-          course.prerequisitesDescription ||
-          course.targetAudience
-        "
-      >
+      <article class="overview-card" *ngIf="course.prerequisitesDescription || course.targetAudience">
         <div class="overview-label">
-          {{ course.prerequisitesTitle || defaultPrerequisitesTitle }}
+          {{ isEnglish ? 'Experience needed' : 'الخبرة المطلوبة' }}
         </div>
         <p class="overview-text">
           {{ course.prerequisitesDescription || course.targetAudience }}
@@ -528,8 +388,54 @@
   </div>
 </section>
 
+<!-- IS THIS COURSE FOR YOU -->
+<section
+  class="section section--light"
+  [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
+  *ngIf="!loading && !error && course"
+>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">
+        {{ isEnglish ? 'Is this course for you?' : 'هل هذا الكورس مناسب لك؟' }}
+      </h2>
+      <p class="section-subtitle">
+        {{
+          isEnglish
+            ? 'This part helps the visitor quickly decide whether the course matches their current need and level.'
+            : 'هذا الجزء يساعد الزائر أن يعرف بسرعة هل الكورس مناسب له فعلًا في هذه المرحلة أم لا.'
+        }}
+      </p>
+    </div>
 
-<!-- the result of the course what the user will gain -->
+    <div class="audience-fit-grid">
+      <article class="fit-card">
+        <div class="fit-card__badge">
+          {{ isEnglish ? 'Who it is for' : 'لمن صُمم' }}
+        </div>
+
+        <ul class="check-list" *ngIf="course.audienceItems?.length; else noAudience">
+          <li *ngFor="let item of course.audienceItems">{{ item }}</li>
+        </ul>
+
+        <ng-template #noAudience>
+          <p class="m-0 overview-text">{{ defaultAudienceEmpty }}</p>
+        </ng-template>
+      </article>
+
+      <article class="fit-card">
+        <div class="fit-card__badge">
+          {{ isEnglish ? 'Before you start' : 'قبل أن تبدأ' }}
+        </div>
+        <p class="overview-text m-0">
+          {{ course.prerequisitesDescription || course.targetAudience || defaultAudienceEmpty }}
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSFORMATION -->
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
@@ -563,7 +469,7 @@
   </div>
 </section>
 
-<!-- this part for the opinon of the other users -->
+<!-- TESTIMONIALS -->
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
@@ -612,8 +518,7 @@
   </div>
 </section>
 
-
-<!-- the price of the course and the benfites -->
+<!-- PRICING -->
 <section
   class="section section--light"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
@@ -690,8 +595,7 @@
   </div>
 </section>
 
-
-<!-- what the user gain after buy the course -->
+<!-- COMMUNITY -->
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
@@ -723,8 +627,7 @@
   </div>
 </section>
 
-
-<!-- faq part -->
+<!-- FAQ -->
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
@@ -750,7 +653,7 @@
   </div>
 </section>
 
-
+<!-- FINAL CTA -->
 <section
   class="final-push"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
@@ -794,6 +697,7 @@
   </div>
 </section>
 
+<!-- OFFER -->
 <section
   class="offer-strip"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
