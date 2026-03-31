@@ -1,0 +1,100 @@
+<div class="cart-page" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <div>
+        <h2 class="mb-1">{{ isEnglish ? 'Shopping Cart' : 'سلة المشتريات' }}</h2>
+        <p class="text-muted mb-0">
+          {{
+            isEnglish
+              ? 'Review your selected courses before checkout.'
+              : 'راجع الكورسات التي اخترتها قبل إتمام الشراء.'
+          }}
+        </p>
+      </div>
+
+      <button
+        *ngIf="items.length"
+        class="btn btn-outline-danger"
+        type="button"
+        (click)="clearCart()"
+      >
+        {{ isEnglish ? 'Clear cart' : 'إفراغ السلة' }}
+      </button>
+    </div>
+
+    <div *ngIf="!items.length" class="card shadow-sm border-0 empty-cart text-center p-5">
+      <h4 class="mb-3">{{ isEnglish ? 'Your cart is empty' : 'السلة فارغة' }}</h4>
+      <p class="text-muted mb-4">
+        {{
+          isEnglish
+            ? 'Add courses first, then come back here to complete your purchase.'
+            : 'أضف الكورسات أولًا ثم عد هنا لإتمام الشراء.'
+        }}
+      </p>
+
+      <button class="btn btn-primary" type="button" (click)="continueShopping()">
+        {{ isEnglish ? 'Browse courses' : 'تصفح الكورسات' }}
+      </button>
+    </div>
+
+    <div *ngIf="items.length" class="row g-4">
+      <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-0">
+            <div
+              *ngFor="let item of items; let last = last"
+              class="cart-item d-flex gap-3 align-items-start p-3"
+              [class.border-bottom]="!last"
+            >
+              <img
+                [src]="item.thumbnail || 'https://via.placeholder.com/120x90'"
+                [alt]="item.title"
+                class="cart-thumb"
+              />
+
+              <div class="flex-grow-1">
+                <h5 class="mb-1">{{ item.title }}</h5>
+                <p class="text-muted small mb-2">{{ item.description }}</p>
+                <strong>{{ item.price | number:'1.0-0' }} EGP</strong>
+              </div>
+
+              <button
+                class="btn btn-sm btn-outline-danger"
+                type="button"
+                (click)="removeItem(item.id)"
+              >
+                {{ isEnglish ? 'Remove' : 'حذف' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <h5 class="mb-3">{{ isEnglish ? 'Order summary' : 'ملخص الطلب' }}</h5>
+
+            <div class="d-flex justify-content-between mb-2">
+              <span>{{ isEnglish ? 'Courses count' : 'عدد الكورسات' }}</span>
+              <strong>{{ items.length }}</strong>
+            </div>
+
+            <div class="d-flex justify-content-between mb-3">
+              <span>{{ isEnglish ? 'Total' : 'الإجمالي' }}</span>
+              <strong>{{ totalPrice | number:'1.0-0' }} EGP</strong>
+            </div>
+
+            <button class="btn btn-primary w-100 mb-2" type="button" (click)="goToCheckout()">
+              {{ isEnglish ? 'Continue to checkout' : 'الانتقال إلى الدفع' }}
+            </button>
+
+            <button class="btn btn-outline-secondary w-100" type="button" (click)="continueShopping()">
+              {{ isEnglish ? 'Continue shopping' : 'متابعة التصفح' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

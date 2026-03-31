@@ -1,4 +1,3 @@
-
 // src/app/public/course-details/course-details.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,7 +11,7 @@ import {
 import { EnrollmentsService } from 'src/app/core/services/enrollments.service';
 
 import { firstValueFrom, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { DiplomasService } from '../services/diplomas.service';
 import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
 
@@ -21,6 +20,7 @@ import { ref, get, query, orderByChild, limitToFirst } from 'firebase/database';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Course } from 'src/app/shared/models/course.model';
 import { TelegramJoinService } from '../services/telegram-join.service';
+import { CartService } from 'src/app/billing/services/cart.service';
 
 @Component({
   selector: 'app-course-details',
@@ -53,20 +53,25 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   private destroyed$ = new Subject<void>();
 
   constructor(
+    public auth: Auth,
     private route: ActivatedRoute,
     private router: Router,
     private courses: CoursesService,
-    private auth: Auth,
     private enrollments: EnrollmentsService,
     private db: Database,
     private sanitizer: DomSanitizer,
     private diplomasSvc: DiplomasService,
     private wa: WhatsAppService,
     private telegramJoin: TelegramJoinService,
+    private cartSvc: CartService
   ) {}
 
   get isEnglish(): boolean {
     return window.location.pathname.startsWith('/en');
+  }
+
+  get currentLang(): 'ar' | 'en' {
+    return this.isEnglish ? 'en' : 'ar';
   }
 
   get backLabel(): string {
@@ -81,11 +86,15 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   }
 
   get sectionTitleLearn(): string {
-    return this.isEnglish ? 'What will you learn?' : 'ماذا ستتعلم داخل البرنامج؟';
+    return this.isEnglish
+      ? 'What will you learn?'
+      : 'ماذا ستتعلم داخل البرنامج؟';
   }
 
   get sectionTitleAudience(): string {
-    return this.isEnglish ? 'Who is this program for?' : 'لمن صُمم هذا البرنامج؟';
+    return this.isEnglish
+      ? 'Who is this program for?'
+      : 'لمن صُمم هذا البرنامج؟';
   }
 
   get sectionTitleCurriculum(): string {
@@ -169,7 +178,9 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   }
 
   get heroFallbackEyebrow(): string {
-    return this.isEnglish ? 'A practical transformative program' : 'برنامج عملي متكامل';
+    return this.isEnglish
+      ? 'A practical transformative program'
+      : 'برنامج عملي متكامل';
   }
 
   get heroFallbackTagline(): string {
@@ -222,7 +233,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
             : null;
 
           this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(
-            this.courseId,
+            this.courseId
           );
         } catch (e: any) {
           this.error =
@@ -253,7 +264,9 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         }
 
         try {
-          const myCourses = await this.enrollments.listUserEnrollments(user.uid);
+          const myCourses = await this.enrollments.listUserEnrollments(
+            user.uid
+          );
           this.canViewLessons = myCourses.includes(this.courseId);
 
           if (this.canViewLessons) {
@@ -274,7 +287,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
           this.telegramBusy = false;
           this.telegramMessage = '';
         }
-      },
+      }
     );
   }
 
@@ -287,7 +300,9 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
   public async goToLessons(): Promise<void> {
     if (!this.firstLessonId) {
-      this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(this.courseId);
+      this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(
+        this.courseId
+      );
     }
 
     if (!this.firstLessonId) {
@@ -332,7 +347,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     try {
       const idToken = await user.getIdToken();
       const res = await firstValueFrom(
-        this.telegramJoin.createSession(this.courseId, idToken),
+        this.telegramJoin.createSession(this.courseId, idToken)
       );
 
       this.telegramEligible = false;
@@ -356,7 +371,9 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
   private async loadTelegramAccessState(uid: string): Promise<void> {
     try {
-      const snap = await get(ref(this.db, `telegramAccess/${uid}/${this.courseId}`));
+      const snap = await get(
+        ref(this.db, `telegramAccess/${uid}/${this.courseId}`)
+      );
 
       if (!snap.exists()) {
         this.telegramEligible = false;
@@ -392,7 +409,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   }
 
   private async resolveFirstLessonIdFromRTDB(
-    courseId: string,
+    courseId: string
   ): Promise<string | null> {
     try {
       let firstId = await this.pickFirstKeyByChild(courseId, 'lessonIndex');
@@ -416,12 +433,12 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
   private async pickFirstKeyByChild(
     courseId: string,
-    child: string,
+    child: string
   ): Promise<string | null> {
     const qy = query(
       ref(this.db, `lessons/${courseId}`),
       orderByChild(child),
-      limitToFirst(1),
+      limitToFirst(1)
     );
 
     const snap = await get(qy);
@@ -432,6 +449,27 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     }
 
     return null;
+  }
+
+  addToCart(): void {
+    if (!this.course || !this.auth.currentUser) return;
+
+    this.cartSvc.addCourse(this.course);
+
+    alert(
+      this.currentLang === 'en' ? 'Added to cart' : 'تمت الإضافة إلى السلة'
+    );
+  }
+
+  buyNow(): void {
+    if (!this.course?.id) return;
+
+    if (!this.auth.currentUser) {
+      this.goToPurchase();
+      return;
+    }
+
+    this.router.navigate(['/checkout', this.course.id]);
   }
 
   closeOffer(): void {
@@ -447,6 +485,6 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   onOfferSubscribe(): void {
     if (this.canViewLessons) return;
     this.closeOffer();
-    this.goToPurchase();
+    this.buyNow();
   }
 }

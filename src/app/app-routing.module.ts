@@ -1,4 +1,3 @@
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
@@ -44,6 +43,7 @@ import { LessonMaterialViewComponent } from './learning/lesson-material-view/les
 import { PurchaseCourseComponent } from './billing/purchase-course/purchase-course.component';
 import { PaymentResultComponent } from './billing/payment-result/payment-result.component';
 import { FaqComponent } from './public/faq/faq.component';
+import { CartComponent } from './billing/cart/cart.component';
 
 const routes: Routes = [
   {
@@ -89,6 +89,13 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: { title: $localize`:@@title_checkout:إتمام الشراء` },
   },
+
+  {
+    path: 'cart',
+    component: CartComponent,
+    data: { title: $localize`:@@title_cart:سلة المشتريات` },
+  },
+
   {
     path: 'payment-result',
     component: PaymentResultComponent,
@@ -237,117 +244,3 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

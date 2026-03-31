@@ -127,14 +127,35 @@
         </ng-template>
 
         <div class="course-hero-actions">
-          <button
-            *ngIf="!canViewLessons"
-            class="btn btn-primary"
-            type="button"
-            (click)="goToPurchase()"
-          >
-            {{ enrollButtonText }}
-          </button>
+          <ng-container *ngIf="!canViewLessons">
+            <ng-container *ngIf="auth.currentUser; else loginToBuyHero">
+              <button
+                class="btn btn-primary"
+                type="button"
+                (click)="buyNow()"
+              >
+                {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
+              </button>
+
+              <button
+                class="btn btn-outline-primary"
+                type="button"
+                (click)="addToCart()"
+              >
+                {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
+              </button>
+            </ng-container>
+
+            <ng-template #loginToBuyHero>
+              <button
+                class="btn btn-primary"
+                type="button"
+                (click)="goToPurchase()"
+              >
+                {{ currentLang === 'en' ? 'Login to purchase' : 'سجل دخول للشراء' }}
+              </button>
+            </ng-template>
+          </ng-container>
 
           <a
             *ngIf="introVideoSafeUrl"
@@ -552,13 +573,35 @@
           <li *ngFor="let item of plan.features">{{ item }}</li>
         </ul>
 
-        <button
-          class="btn btn-primary w-100"
-          type="button"
-          (click)="goToPurchase()"
-        >
-          {{ enrollButtonText }}
-        </button>
+        <ng-container *ngIf="auth.currentUser; else loginToBuyPricing">
+          <div class="d-flex gap-2">
+            <button
+              class="btn btn-primary flex-fill"
+              type="button"
+              (click)="buyNow()"
+            >
+              {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
+            </button>
+
+            <button
+              class="btn btn-outline-primary flex-fill"
+              type="button"
+              (click)="addToCart()"
+            >
+              {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-template #loginToBuyPricing>
+          <button
+            class="btn btn-primary w-100"
+            type="button"
+            (click)="goToPurchase()"
+          >
+            {{ currentLang === 'en' ? 'Login to purchase' : 'سجل دخول للشراء' }}
+          </button>
+        </ng-template>
       </article>
     </div>
 
@@ -582,13 +625,35 @@
             }}
           </div>
 
-          <button
-            class="btn btn-primary w-100"
-            type="button"
-            (click)="goToPurchase()"
-          >
-            {{ enrollButtonText }}
-          </button>
+          <ng-container *ngIf="auth.currentUser; else loginToBuyFallbackPricing">
+            <div class="d-flex gap-2">
+              <button
+                class="btn btn-primary flex-fill"
+                type="button"
+                (click)="buyNow()"
+              >
+                {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
+              </button>
+
+              <button
+                class="btn btn-outline-primary flex-fill"
+                type="button"
+                (click)="addToCart()"
+              >
+                {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
+              </button>
+            </div>
+          </ng-container>
+
+          <ng-template #loginToBuyFallbackPricing>
+            <button
+              class="btn btn-primary w-100"
+              type="button"
+              (click)="goToPurchase()"
+            >
+              {{ currentLang === 'en' ? 'Login to purchase' : 'سجل دخول للشراء' }}
+            </button>
+          </ng-template>
         </article>
       </div>
     </ng-template>
@@ -684,15 +749,37 @@
         </p>
       </div>
 
-      <div class="final-push-actions">
-        <button
-          class="btn btn-primary"
-          type="button"
-          (click)="onOfferSubscribe()"
-        >
-          {{ enrollButtonText }}
-        </button>
-      </div>
+      <ng-container *ngIf="auth.currentUser; else loginToBuyFinal">
+        <div class="final-push-actions d-flex gap-2">
+          <button
+            class="btn btn-primary"
+            type="button"
+            (click)="buyNow()"
+          >
+            {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
+          </button>
+
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+            (click)="addToCart()"
+          >
+            {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #loginToBuyFinal>
+        <div class="final-push-actions">
+          <button
+            class="btn btn-primary"
+            type="button"
+            (click)="goToPurchase()"
+          >
+            {{ currentLang === 'en' ? 'Login to purchase' : 'سجل دخول للشراء' }}
+          </button>
+        </div>
+      </ng-template>
     </div>
   </div>
 </section>
@@ -726,13 +813,35 @@
         </p>
       </div>
 
-      <button
-        class="btn btn-light offer-strip__btn"
-        type="button"
-        (click)="onOfferSubscribe()"
-      >
-        {{ course?.offer?.ctaText || enrollButtonText }}
-      </button>
+      <ng-container *ngIf="auth.currentUser; else loginToBuyOfferStrip">
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-light offer-strip__btn"
+            type="button"
+            (click)="buyNow()"
+          >
+            {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
+          </button>
+
+          <button
+            class="btn btn-outline-light offer-strip__btn"
+            type="button"
+            (click)="addToCart()"
+          >
+            {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #loginToBuyOfferStrip>
+        <button
+          class="btn btn-light offer-strip__btn"
+          type="button"
+          (click)="goToPurchase()"
+        >
+          {{ currentLang === 'en' ? 'Login to purchase' : 'سجل دخول للشراء' }}
+        </button>
+      </ng-template>
     </div>
   </div>
 </section>
@@ -767,12 +876,34 @@
       }}
     </p>
 
-    <button
-      class="btn btn-primary w-100"
-      type="button"
-      (click)="onOfferSubscribe()"
-    >
-      {{ course?.offer?.ctaText || enrollButtonText }}
-    </button>
+    <ng-container *ngIf="auth.currentUser; else loginToBuyOfferPopup">
+      <div class="d-flex gap-2">
+        <button
+          class="btn btn-primary w-100"
+          type="button"
+          (click)="buyNow()"
+        >
+          {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
+        </button>
+
+        <button
+          class="btn btn-outline-primary w-100"
+          type="button"
+          (click)="addToCart()"
+        >
+          {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
+        </button>
+      </div>
+    </ng-container>
+
+    <ng-template #loginToBuyOfferPopup>
+      <button
+        class="btn btn-primary w-100"
+        type="button"
+        (click)="goToPurchase()"
+      >
+        {{ currentLang === 'en' ? 'Login to purchase' : 'سجل دخول للشراء' }}
+      </button>
+    </ng-template>
   </div>
 </div>

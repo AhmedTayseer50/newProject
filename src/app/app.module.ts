@@ -55,6 +55,8 @@ import { DiplomasListComponent } from './public/diplomas-list/diplomas-list.comp
 import { DiplomaDetailsComponent } from './public/diploma-details/diploma-details.component';
 import { DiplomaEditorComponent } from './admin/diploma-editor/diploma-editor.component';
 import { LessonMaterialViewComponent } from './learning/lesson-material-view/lesson-material-view.component';
+import { CartComponent } from './billing/cart/cart.component';
+
 
 
 @NgModule({
@@ -95,6 +97,8 @@ import { LessonMaterialViewComponent } from './learning/lesson-material-view/les
     DiplomaDetailsComponent,
     DiplomaEditorComponent,
     LessonMaterialViewComponent,
+    CartComponent,
+    
     
   ],
   imports: [

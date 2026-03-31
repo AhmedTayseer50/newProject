@@ -4,17 +4,19 @@ import { Router } from '@angular/router';
 
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { UserService } from 'src/app/core/services/user.service';
+import { CartService } from 'src/app/billing/services/cart.service';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+  styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     public auth: AuthService,
     private userSvc: UserService,
-    private router: Router
+    private router: Router,
+    public cartSvc: CartService
   ) {}
 
   isAdmin = false;
@@ -51,14 +53,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
           return Promise.all([
             this.userSvc.isAdmin(user.uid),
             this.userSvc.isDisabled(user.uid),
-            this.userSvc.isStaff(user.uid)
+            this.userSvc.isStaff(user.uid),
           ]).then(([isAdmin, isDisabled, isStaff]) => ({
             isAdmin,
             isDisabled,
-            isStaff
+            isStaff,
           }));
         }),
-        catchError(() => of({ isAdmin: false, isDisabled: false, isStaff: false }))
+        catchError(() =>
+          of({ isAdmin: false, isDisabled: false, isStaff: false })
+        )
       )
       .subscribe((roles) => {
         this.isAdmin = roles.isAdmin;
@@ -87,7 +91,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private initTheme(): void {
-    const saved = (localStorage.getItem(this.THEME_KEY) || 'light').toLowerCase();
+    const saved = (
+      localStorage.getItem(this.THEME_KEY) || 'light'
+    ).toLowerCase();
     this.isDarkTheme = saved === 'dark';
     this.applyThemeClass();
   }

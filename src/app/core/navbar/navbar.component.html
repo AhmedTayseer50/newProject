@@ -60,6 +60,7 @@
     </nav>
 
     <div class="nav-actions">
+      <!-- Theme -->
       <button
         id="themeToggle"
         class="theme-toggle"
@@ -72,6 +73,7 @@
         {{ isDarkTheme ? '☀️' : '🌙' }}
       </button>
 
+      <!-- Language -->
       <button
         class="btn btn-ghost"
         type="button"
@@ -84,6 +86,22 @@
         {{ currentLang === 'ar' ? 'EN' : 'AR' }}
       </button>
 
+      <!-- Cart يظهر فقط بعد تسجيل الدخول -->
+      <a
+        *ngIf="auth.isLoggedIn$ | async"
+        class="btn btn-ghost position-relative"
+        routerLink="/cart"
+      >
+        {{ currentLang === 'en' ? 'Cart' : 'السلة' }}
+        <span
+          *ngIf="cartSvc.getCount() > 0"
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+        >
+          {{ cartSvc.getCount() }}
+        </span>
+      </a>
+
+      <!-- Auth -->
       <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loggedIn">
         <button class="btn btn-ghost" type="button" routerLink="/login" i18n>
           دخول
@@ -99,6 +117,7 @@
         </button>
       </ng-container>
 
+      <!-- Logged in -->
       <ng-template #loggedIn>
         <div class="user-menu" [class.open]="isUserMenuOpen">
           <button
@@ -207,6 +226,21 @@
         >
           {{ currentLang === 'ar' ? 'EN' : 'AR' }}
         </button>
+
+        <!-- Cart mobile يظهر فقط بعد تسجيل الدخول -->
+        <a
+          *ngIf="auth.isLoggedIn$ | async"
+          class="btn btn-ghost w-100 position-relative"
+          routerLink="/cart"
+        >
+          {{ currentLang === 'en' ? 'Cart' : 'السلة' }}
+          <span
+            *ngIf="cartSvc.getCount() > 0"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          >
+            {{ cartSvc.getCount() }}
+          </span>
+        </a>
 
         <ng-container *ngIf="!(auth.isLoggedIn$ | async); else loggedInMobile">
           <button class="btn btn-ghost w-100" type="button" routerLink="/login" i18n>
