@@ -93,6 +93,7 @@ function normalizePlanId(value) {
 
 function parsePrice(value) {
   const normalized = String(value || '')
+    .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString())
     .replace(/[^\d.,]/g, '')
     .replace(/,/g, '');
 
@@ -100,14 +101,47 @@ function parsePrice(value) {
   return Number.isFinite(amount) ? amount : 0;
 }
 
-function getPlanId(plan, index) {
-  const directId = normalizePlanId(plan?.id);
-  if (directId) return directId;
+function getLocalizedText(value) {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object') {
+    return value.ar || value.en || value.name || value.title || value.label || '';
+  }
+  return '';
+}
 
-  const fromName = normalizePlanId(plan?.name || plan?.title || plan?.label);
-  if (fromName) return fromName;
+function getPlanAliases(plan, index) {
+  const aliases = new Set();
 
-  return `plan-${index + 1}`;
+  const rawId = plan?.id;
+  const rawIdString = String(rawId ?? '').trim();
+
+  if (rawIdString) {
+    aliases.add(rawIdString.toLowerCase());
+    aliases.add(normalizePlanId(rawIdString));
+  }
+
+  const nameText = getLocalizedText(plan?.name);
+  const titleText = getLocalizedText(plan?.title);
+  const labelText = getLocalizedText(plan?.label);
+
+  const normalizedName = normalizePlanId(nameText);
+  const normalizedTitle = normalizePlanId(titleText);
+  const normalizedLabel = normalizePlanId(labelText);
+
+  if (normalizedName) aliases.add(normalizedName);
+  if (normalizedTitle) aliases.add(normalizedTitle);
+  if (normalizedLabel) aliases.add(normalizedLabel);
+
+  const oneBasedIndex = index + 1;
+  aliases.add(String(oneBasedIndex));
+  aliases.add(`plan-${oneBasedIndex}`);
+
+  return Array.from(aliases).filter(Boolean);
+}
+
+function getCanonicalPlanId(plan, index) {
+  const aliases = getPlanAliases(plan, index);
+  return aliases[0] || `plan-${index + 1}`;
 }
 
 function getCourseTitle(course) {
@@ -146,17 +180,21 @@ function resolvePlanFromCourse(course, requestedPlanId) {
 
   for (let i = 0; i < plans.length; i += 1) {
     const plan = plans[i] || {};
-    const computedPlanId = getPlanId(plan, i);
+    const aliases = getPlanAliases(plan, i);
 
-    if (computedPlanId !== normalizedRequestedPlanId) {
+    const matched = aliases.some(
+      (alias) => normalizePlanId(alias) === normalizedRequestedPlanId
+    );
+
+    if (!matched) {
       continue;
     }
 
     const planName =
-      plan.name ||
-      plan.title ||
-      plan.label ||
-      '';
+      getLocalizedText(plan.name) ||
+      getLocalizedText(plan.title) ||
+      getLocalizedText(plan.label) ||
+      `Plan ${i + 1}`;
 
     const priceSource =
       plan.priceText ??
@@ -171,13 +209,13 @@ function resolvePlanFromCourse(course, requestedPlanId) {
     }
 
     return {
-      planId: computedPlanId,
+      planId: getCanonicalPlanId(plan, i),
       planName: String(planName || ''),
       price,
       priceText: String(priceSource || ''),
       features: Array.isArray(plan.features) ? plan.features : [],
-      badge: String(plan.badge || ''),
-      note: String(plan.note || ''),
+      badge: getLocalizedText(plan.badge) || '',
+      note: getLocalizedText(plan.note) || '',
     };
   }
 
