@@ -91,22 +91,64 @@ function normalizePlanId(value) {
     .replace(/^-|-$/g, '');
 }
 
+function getLocalizedText(value) {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return String(value);
+  }
+
+  if (value && typeof value === 'object') {
+    if (typeof value.ar === 'string' || typeof value.ar === 'number') {
+      return String(value.ar);
+    }
+
+    if (typeof value.en === 'string' || typeof value.en === 'number') {
+      return String(value.en);
+    }
+
+    if (typeof value.name === 'string' || typeof value.name === 'number') {
+      return String(value.name);
+    }
+
+    if (typeof value.title === 'string' || typeof value.title === 'number') {
+      return String(value.title);
+    }
+
+    if (typeof value.label === 'string' || typeof value.label === 'number') {
+      return String(value.label);
+    }
+  }
+
+  return '';
+}
+
+function getLocalizedArray(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item || '')).filter(Boolean);
+  }
+
+  if (value && typeof value === 'object') {
+    if (Array.isArray(value.ar)) {
+      return value.ar.map((item) => String(item || '')).filter(Boolean);
+    }
+
+    if (Array.isArray(value.en)) {
+      return value.en.map((item) => String(item || '')).filter(Boolean);
+    }
+  }
+
+  return [];
+}
+
 function parsePrice(value) {
-  const normalized = String(value || '')
+  const text = getLocalizedText(value);
+
+  const normalized = text
     .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString())
     .replace(/[^\d.,]/g, '')
     .replace(/,/g, '');
 
-  const amount = Number(normalized);
+  const amount = Number.parseFloat(normalized);
   return Number.isFinite(amount) ? amount : 0;
-}
-
-function getLocalizedText(value) {
-  if (typeof value === 'string') return value;
-  if (value && typeof value === 'object') {
-    return value.ar || value.en || value.name || value.title || value.label || '';
-  }
-  return '';
 }
 
 function getPlanAliases(plan, index) {
@@ -140,24 +182,22 @@ function getPlanAliases(plan, index) {
 }
 
 function getCanonicalPlanId(plan, index) {
-  const aliases = getPlanAliases(plan, index);
-  return aliases[0] || `plan-${index + 1}`;
+  const rawIdString = String(plan?.id ?? '').trim();
+  if (rawIdString) {
+    return normalizePlanId(rawIdString);
+  }
+
+  return `plan-${index + 1}`;
 }
 
 function getCourseTitle(course) {
   if (!course || typeof course !== 'object') return '';
 
-  if (typeof course.title === 'string') return course.title;
-  if (course.title && typeof course.title === 'object') {
-    return course.title.ar || course.title.en || '';
-  }
-
-  if (typeof course.name === 'string') return course.name;
-  if (course.name && typeof course.name === 'object') {
-    return course.name.ar || course.name.en || '';
-  }
-
-  return '';
+  return (
+    getLocalizedText(course.title) ||
+    getLocalizedText(course.name) ||
+    ''
+  );
 }
 
 function getPricingPlans(course) {
@@ -212,10 +252,10 @@ function resolvePlanFromCourse(course, requestedPlanId) {
       planId: getCanonicalPlanId(plan, i),
       planName: String(planName || ''),
       price,
-      priceText: String(priceSource || ''),
-      features: Array.isArray(plan.features) ? plan.features : [],
-      badge: getLocalizedText(plan.badge) || '',
-      note: getLocalizedText(plan.note) || '',
+      priceText: getLocalizedText(priceSource),
+      features: getLocalizedArray(plan.features),
+      badge: getLocalizedText(plan.badge),
+      note: getLocalizedText(plan.note),
     };
   }
 
