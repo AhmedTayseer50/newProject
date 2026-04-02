@@ -81,6 +81,109 @@ function normalizePhone(phone) {
     .replace(/[^\d+]/g, '');
 }
 
+function normalizePlanId(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\u0621-\u064Aa-z0-9-_]/gi, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function parsePrice(value) {
+  const normalized = String(value || '')
+    .replace(/[^\d.,]/g, '')
+    .replace(/,/g, '');
+
+  const amount = Number(normalized);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+function getPlanId(plan, index) {
+  const directId = normalizePlanId(plan?.id);
+  if (directId) return directId;
+
+  const fromName = normalizePlanId(plan?.name || plan?.title || plan?.label);
+  if (fromName) return fromName;
+
+  return `plan-${index + 1}`;
+}
+
+function getCourseTitle(course) {
+  if (!course || typeof course !== 'object') return '';
+
+  if (typeof course.title === 'string') return course.title;
+  if (course.title && typeof course.title === 'object') {
+    return course.title.ar || course.title.en || '';
+  }
+
+  if (typeof course.name === 'string') return course.name;
+  if (course.name && typeof course.name === 'object') {
+    return course.name.ar || course.name.en || '';
+  }
+
+  return '';
+}
+
+function getPricingPlans(course) {
+  if (!course || typeof course !== 'object') return [];
+
+  if (Array.isArray(course.pricingPlans)) return course.pricingPlans;
+  if (Array.isArray(course.pricing)) return course.pricing;
+  if (Array.isArray(course.plans)) return course.plans;
+
+  return [];
+}
+
+function resolvePlanFromCourse(course, requestedPlanId) {
+  const plans = getPricingPlans(course);
+  const normalizedRequestedPlanId = normalizePlanId(requestedPlanId);
+
+  if (!plans.length || !normalizedRequestedPlanId) {
+    return null;
+  }
+
+  for (let i = 0; i < plans.length; i += 1) {
+    const plan = plans[i] || {};
+    const computedPlanId = getPlanId(plan, i);
+
+    if (computedPlanId !== normalizedRequestedPlanId) {
+      continue;
+    }
+
+    const planName =
+      plan.name ||
+      plan.title ||
+      plan.label ||
+      '';
+
+    const priceSource =
+      plan.priceText ??
+      plan.price ??
+      plan.amount ??
+      '';
+
+    const price = parsePrice(priceSource);
+
+    if (!price || price <= 0) {
+      return null;
+    }
+
+    return {
+      planId: computedPlanId,
+      planName: String(planName || ''),
+      price,
+      priceText: String(priceSource || ''),
+      features: Array.isArray(plan.features) ? plan.features : [],
+      badge: String(plan.badge || ''),
+      note: String(plan.note || ''),
+    };
+  }
+
+  return null;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return send(res, 405, { message: 'Method Not Allowed' });
@@ -97,10 +200,6 @@ module.exports = async function handler(req, res) {
     const idToken = match[1];
     const body = req.body || {};
 
-    const courseIds = Array.isArray(body.courseIds)
-      ? body.courseIds.map((x) => String(x || '').trim()).filter(Boolean)
-      : [];
-
     const customerName = String(body.customerName || '').trim();
     const customerEmail = String(body.customerEmail || '').trim().toLowerCase();
     const customerPhone = normalizePhone(body.customerPhone);
@@ -109,21 +208,29 @@ module.exports = async function handler(req, res) {
       ? body.selectedItems
           .map((item) => ({
             courseId: String(item?.courseId || '').trim(),
-            planId: String(item?.planId || '').trim(),
-            planName: String(item?.planName || '').trim(),
-            priceText: String(item?.priceText || '').trim(),
-            price: Number(item?.price || 0),
+            planId: normalizePlanId(item?.planId),
           }))
-          .filter((item) => item.courseId)
+          .filter((item) => item.courseId && item.planId)
       : [];
 
-    if (!courseIds.length) {
-      return send(res, 400, { message: 'courseIds is required' });
+    if (!selectedItems.length) {
+      return send(res, 400, {
+        message: 'selectedItems is required and must contain courseId and planId',
+      });
     }
 
     if (!customerName || !customerEmail || !customerPhone) {
       return send(res, 400, { message: 'Customer info is required' });
     }
+
+    const uniqueMap = new Map();
+    for (const item of selectedItems) {
+      const key = `${item.courseId}__${item.planId}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, item);
+      }
+    }
+    const uniqueSelectedItems = Array.from(uniqueMap.values());
 
     const admin = getFirebaseAdmin();
     const decoded = await admin.auth().verifyIdToken(idToken);
@@ -132,32 +239,25 @@ module.exports = async function handler(req, res) {
     let totalAmount = 0;
     const resolvedCourses = [];
 
-    const selectedItemsByCourseId = selectedItems.reduce((acc, item) => {
-      if (!acc[item.courseId]) acc[item.courseId] = item;
-      return acc;
-    }, {});
-
-    for (const courseId of courseIds) {
-      const courseSnap = await admin.database().ref(`courses/${courseId}`).get();
+    for (const item of uniqueSelectedItems) {
+      const courseSnap = await admin.database().ref(`courses/${item.courseId}`).get();
 
       if (!courseSnap.exists()) {
-        return send(res, 404, { message: `Course not found: ${courseId}` });
+        return send(res, 404, { message: `Course not found: ${item.courseId}` });
       }
 
       const course = courseSnap.val() || {};
-      const selectedItem = selectedItemsByCourseId[courseId] || null;
-      const selectedPrice = Number(selectedItem?.price || 0);
-      const price = selectedPrice > 0 ? selectedPrice : Number(course.price || 0);
+      const resolvedPlan = resolvePlanFromCourse(course, item.planId);
 
-      if (!price || price <= 0) {
+      if (!resolvedPlan) {
         return send(res, 400, {
-          message: `Course price is invalid for course: ${courseId}`,
+          message: `Pricing plan not found or invalid for course: ${item.courseId}`,
         });
       }
 
       const enrollmentSnap = await admin
         .database()
-        .ref(`enrollments/${uid}/${courseId}`)
+        .ref(`enrollments/${uid}/${item.courseId}`)
         .get();
 
       if (enrollmentSnap.exists()) {
@@ -166,14 +266,24 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      totalAmount += price;
+      totalAmount += resolvedPlan.price;
+
       resolvedCourses.push({
-        id: courseId,
-        title: course.title || '',
-        price,
-        priceText: selectedItem?.priceText || '',
-        planId: selectedItem?.planId || '',
-        planName: selectedItem?.planName || '',
+        id: item.courseId,
+        title: getCourseTitle(course),
+        price: resolvedPlan.price,
+        priceText: resolvedPlan.priceText,
+        planId: resolvedPlan.planId,
+        planName: resolvedPlan.planName,
+        badge: resolvedPlan.badge,
+        note: resolvedPlan.note,
+        features: resolvedPlan.features,
+      });
+    }
+
+    if (!resolvedCourses.length || totalAmount <= 0) {
+      return send(res, 400, {
+        message: 'No valid purchasable items were found.',
       });
     }
 
@@ -189,8 +299,8 @@ module.exports = async function handler(req, res) {
       amount: totalAmount,
       amountCents,
       currency: 'EGP',
-      courseIds: courseIds.reduce((acc, id) => {
-        acc[id] = true;
+      courseIds: resolvedCourses.reduce((acc, item) => {
+        acc[item.id] = true;
         return acc;
       }, {}),
       items: resolvedCourses,

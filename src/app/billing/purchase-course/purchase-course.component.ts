@@ -143,15 +143,30 @@ export class PurchaseCourseComponent implements OnInit {
     this.submitting = true;
 
     try {
-      const uniqueCourseIds = Array.from(new Set(this.items.map((item) => item.courseId).filter(Boolean)));
+      const selectedItemsMap = new Map<string, StartPaymobCheckoutItem>();
 
-      const selectedItems: StartPaymobCheckoutItem[] = this.items.map((item) => ({
-        courseId: item.courseId,
-        planId: item.planId,
-        planName: item.planName,
-        price: item.price,
-        priceText: item.priceText,
-      }));
+      for (const item of this.items) {
+        const courseId = String(item.courseId || '').trim();
+        const planId = String(item.planId || '').trim();
+
+        if (!courseId || !planId) continue;
+
+        selectedItemsMap.set(`${courseId}__${planId}`, {
+          courseId,
+          planId,
+        });
+      }
+
+      const selectedItems = Array.from(selectedItemsMap.values());
+      const uniqueCourseIds = Array.from(new Set(selectedItems.map((item) => item.courseId)));
+
+      if (!selectedItems.length || !uniqueCourseIds.length) {
+        throw new Error(
+          this.isEnglish
+            ? 'Your cart contains invalid pricing selections'
+            : 'السلة تحتوي على خطط سعرية غير صالحة'
+        );
+      }
 
       const result = await this.paymentsService.startCheckout({
         courseIds: uniqueCourseIds,

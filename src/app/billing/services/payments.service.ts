@@ -5,10 +5,7 @@ import { firstValueFrom } from 'rxjs';
 
 export interface StartPaymobCheckoutItem {
   courseId: string;
-  planId?: string;
-  planName?: string;
-  price?: number;
-  priceText?: string;
+  planId: string;
 }
 
 export interface StartPaymobCheckoutPayload {
