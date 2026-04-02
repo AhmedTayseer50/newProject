@@ -1,12 +1,214 @@
-<section class="page-section" dir="rtl">
+<section class="sales-page" dir="rtl">
   <div class="container py-4">
-    <div class="card shadow-sm border-0">
-      <div class="card-body p-4">
-        <h1 class="h3 mb-3">تحليلات المبيعات</h1>
-        <p class="text-muted mb-0">
-          هذه الصفحة قيد التطوير حاليًا، وسيتم إضافة تقارير المبيعات والإحصائيات هنا لاحقًا.
+    <div class="page-head mb-4">
+      <div>
+        <span class="eyebrow">لوحة الإدارة</span>
+        <h1 class="page-title mb-2">المبيعات والإحصائيات</h1>
+        <p class="page-subtitle mb-0">
+          متابعة عمليات البيع بالتفاصيل، مع إجماليات يومية وشهرية، وإمكانية طباعة فاتورة PDF لأي عملية.
         </p>
       </div>
+
+      <button class="btn btn-primary refresh-btn" type="button" (click)="loadData()" [disabled]="loading">
+        {{ loading ? 'جاري التحديث...' : 'تحديث البيانات' }}
+      </button>
     </div>
+
+    <div *ngIf="error" class="alert alert-danger shadow-sm mb-4">
+      {{ error }}
+    </div>
+
+    <div *ngIf="loading" class="loading-box shadow-sm">
+      جاري تحميل بيانات المبيعات...
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <div class="stats-grid mb-4">
+        <article class="stat-card shadow-sm">
+          <span class="stat-label">إجمالي المبيعات المدفوعة</span>
+          <strong class="stat-value">{{ formatCurrency(totalRevenue) }} EGP</strong>
+          <span class="stat-sub">عدد العمليات: {{ paidOrdersCount }}</span>
+        </article>
+
+        <article class="stat-card shadow-sm">
+          <span class="stat-label">مبيعات اليوم</span>
+          <strong class="stat-value">{{ formatCurrency(todayRevenue) }} EGP</strong>
+          <span class="stat-sub">عدد العمليات: {{ todayOrdersCount }}</span>
+        </article>
+
+        <article class="stat-card shadow-sm">
+          <span class="stat-label">مبيعات الشهر الحالي</span>
+          <strong class="stat-value">{{ formatCurrency(currentMonthRevenue) }} EGP</strong>
+          <span class="stat-sub">عدد العمليات: {{ currentMonthOrdersCount }}</span>
+        </article>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-12 col-xl-6">
+          <div class="panel shadow-sm h-100">
+            <div class="panel-header">
+              <h2 class="panel-title mb-0">الإجماليات الشهرية</h2>
+            </div>
+
+            <div class="panel-body p-0">
+              <div *ngIf="!monthlySummary.length" class="empty-box p-4">لا توجد عمليات مدفوعة حتى الآن.</div>
+
+              <div *ngIf="monthlySummary.length" class="summary-table-wrap">
+                <table class="table summary-table align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>الشهر</th>
+                      <th>عدد العمليات</th>
+                      <th>الإجمالي</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let row of monthlySummary">
+                      <td>{{ row.label }}</td>
+                      <td>{{ row.ordersCount }}</td>
+                      <td>{{ formatCurrency(row.revenue) }} EGP</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+          <div class="panel shadow-sm h-100">
+            <div class="panel-header">
+              <h2 class="panel-title mb-0">الإجماليات اليومية</h2>
+            </div>
+
+            <div class="panel-body p-0">
+              <div *ngIf="!dailySummary.length" class="empty-box p-4">لا توجد بيانات يومية متاحة.</div>
+
+              <div *ngIf="dailySummary.length" class="summary-table-wrap">
+                <table class="table summary-table align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>اليوم</th>
+                      <th>عدد العمليات</th>
+                      <th>الإجمالي</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let row of dailySummary | slice:0:31">
+                      <td>{{ row.label }}</td>
+                      <td>{{ row.ordersCount }}</td>
+                      <td>{{ formatCurrency(row.revenue) }} EGP</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel shadow-sm mb-4">
+        <div class="panel-header filters-head">
+          <div>
+            <h2 class="panel-title mb-1">كل عمليات البيع</h2>
+            <p class="panel-subtitle mb-0">يمكنك البحث بالاسم أو الإيميل أو رقم الطلب أو رقم المعاملة.</p>
+          </div>
+        </div>
+
+        <div class="panel-body filters-body">
+          <div class="row g-3">
+            <div class="col-12 col-lg-5">
+              <label class="form-label">بحث</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="searchTerm"
+                (ngModelChange)="applyFilters()"
+                placeholder="ابحث بالاسم أو الإيميل أو رقم الطلب..."
+              />
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+              <label class="form-label">الحالة</label>
+              <select class="form-select" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
+                <option value="all">الكل</option>
+                <option value="paid">مدفوع</option>
+                <option value="failed">فشل</option>
+                <option value="pending">قيد المعالجة</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+              <label class="form-label">الشهر</label>
+              <select class="form-select" [(ngModel)]="monthFilter" (ngModelChange)="applyFilters()">
+                <option value="all">كل الشهور</option>
+                <option *ngFor="let month of availableMonths" [value]="month.key">{{ month.label }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel shadow-sm overflow-hidden">
+        <div *ngIf="!filteredOrders.length" class="empty-box p-4">
+          لا توجد عمليات مطابقة للفلاتر الحالية.
+        </div>
+
+        <div *ngIf="filteredOrders.length" class="orders-table-wrap">
+          <table class="table orders-table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>الحالة</th>
+                <th>رقم الطلب</th>
+                <th>التاريخ</th>
+                <th>الوقت</th>
+                <th>الإيميل</th>
+                <th>الاسم</th>
+                <th>الهاتف</th>
+                <th>العناصر</th>
+                <th>الإجمالي</th>
+                <th>المعاملة</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of filteredOrders; trackBy: trackByOrderId">
+                <td>
+                  <span class="status-pill" [ngClass]="getStatusClass(order.status)">
+                    {{ getStatusLabel(order.status) }}
+                  </span>
+                </td>
+                <td class="mono-cell">{{ order.merchantOrderId }}</td>
+                <td>{{ formatDate(getOrderPrimaryTimestamp(order)) }}</td>
+                <td>{{ formatTime(getOrderPrimaryTimestamp(order)) }}</td>
+                <td class="break-cell">{{ order.userEmail || '—' }}</td>
+                <td>{{ order.userName || '—' }}</td>
+                <td>{{ order.userPhone || '—' }}</td>
+                <td>
+                  <div class="items-list" *ngIf="order.items.length; else noItems">
+                    <div class="item-line" *ngFor="let item of order.items">
+                      <strong>{{ item.title }}</strong>
+                      <span>{{ item.planName }}</span>
+                    </div>
+                  </div>
+                  <ng-template #noItems>—</ng-template>
+                </td>
+                <td class="amount-cell">{{ formatCurrency(order.amount) }} EGP</td>
+                <td class="mono-cell">{{ order.transactionId || '—' }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    (click)="printInvoice(order)"
+                  >
+                    طباعة فاتورة PDF
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </section>
