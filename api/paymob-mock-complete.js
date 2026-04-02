@@ -1,5 +1,10 @@
 const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
 
+
+function resolveOrderLanguage(orderData) {
+  return String(orderData?.language || 'ar').trim().toLowerCase() === 'en' ? 'en' : 'ar';
+}
+
 async function grantCoursesAndTelegram(admin, orderData) {
   const uid = orderData.userId;
   const courseIdsObj = orderData.courseIds || {};
@@ -73,7 +78,7 @@ module.exports = async function handler(req, res) {
 
     return res.redirect(
       302,
-      `/payment-result?merchantOrderId=${encodeURIComponent(merchantOrderId)}`
+      `/${resolveOrderLanguage(orderData)}/payment-result?merchantOrderId=${encodeURIComponent(merchantOrderId)}`
     );
   } catch (error) {
     console.error('[paymob-mock-complete] ERROR:', error);

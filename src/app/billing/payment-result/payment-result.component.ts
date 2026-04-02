@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CartService } from '../services/cart.service';
 import { OrdersService, PaymentResultResponse } from '../services/orders.service';
 
 @Component({
@@ -10,6 +11,7 @@ import { OrdersService, PaymentResultResponse } from '../services/orders.service
 export class PaymentResultComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private ordersService = inject(OrdersService);
+  private cartService = inject(CartService);
 
   loading = true;
   error = '';
@@ -39,6 +41,10 @@ export class PaymentResultComponent implements OnInit {
 
   get coursesLabel(): string {
     return this.isEnglish ? 'Courses' : 'الكورسات';
+  }
+
+  get purchasedCoursesLabel(): string {
+    return this.isEnglish ? 'Purchased courses' : 'الكورسات المشتراة';
   }
 
   get transactionIdLabel(): string {
@@ -74,8 +80,8 @@ export class PaymentResultComponent implements OnInit {
 
     if (this.result.status === 'paid') {
       return this.isEnglish
-        ? 'Your access will be activated automatically.'
-        : 'سيتم تفعيل وصولك تلقائيًا.';
+        ? 'Your access has been activated successfully.'
+        : 'تم تفعيل وصولك بنجاح.';
     }
 
     if (this.result.status === 'pending') {
@@ -101,11 +107,12 @@ export class PaymentResultComponent implements OnInit {
 
     try {
       this.result = await this.ordersService.getPaymentResult(merchantOrderId);
+
+      if (this.result?.status === 'paid' && this.result.courseIds?.length) {
+        this.cartService.removePurchasedCourses(this.result.courseIds);
+      }
     } catch (e: any) {
-      this.error =
-        e?.error?.message ||
-        e?.message ||
-        this.loadErrorText;
+      this.error = e?.error?.message || e?.message || this.loadErrorText;
     } finally {
       this.loading = false;
     }

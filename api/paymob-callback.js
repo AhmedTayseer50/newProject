@@ -11,6 +11,10 @@ function getTransactionObject(req) {
   return null;
 }
 
+function resolveOrderLanguage(orderData) {
+  return String(orderData?.language || 'ar').trim().toLowerCase() === 'en' ? 'en' : 'ar';
+}
+
 async function grantCoursesAndTelegram(admin, orderData) {
   const uid = orderData.userId;
   const courseIdsObj = orderData.courseIds || {};
@@ -93,7 +97,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const redirectBase = '/payment-result';
+    const redirectBase = `/${resolveOrderLanguage(orderData)}/payment-result`;
     const redirectUrl = `${redirectBase}?merchantOrderId=${encodeURIComponent(
       merchantOrderId
     )}`;

@@ -14,6 +14,7 @@ export interface StartPaymobCheckoutPayload {
   customerEmail: string;
   customerPhone: string;
   selectedItems?: StartPaymobCheckoutItem[];
+  language?: 'ar' | 'en';
 }
 
 export interface StartPaymobCheckoutResponse {

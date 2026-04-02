@@ -384,6 +384,7 @@ module.exports = async function handler(req, res) {
       items: resolvedCourses,
       status: 'pending',
       paymentProvider: isMockModeEnabled() ? 'paymob-mock' : 'paymob',
+      language,
       createdAt: Date.now(),
     };
 

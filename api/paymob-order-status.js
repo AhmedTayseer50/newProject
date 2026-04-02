@@ -24,6 +24,8 @@ module.exports = async function handler(req, res) {
 
     const data = snap.val() || {};
     const courseIds = Object.keys(data.courseIds || {});
+    const items = Array.isArray(data.items) ? data.items : [];
+    const language = String(data.language || 'ar').trim().toLowerCase() === 'en' ? 'en' : 'ar';
 
     return res.status(200).json({
       ok: true,
@@ -31,6 +33,8 @@ module.exports = async function handler(req, res) {
       status: data.status || 'pending',
       amount: Number(data.amount || 0),
       courseIds,
+      items,
+      language,
       transactionId: data.transactionId || null,
       message:
         data.status === 'paid'

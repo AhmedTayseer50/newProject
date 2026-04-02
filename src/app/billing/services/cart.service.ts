@@ -88,6 +88,22 @@ export class CartService {
     this.updateState([]);
   }
 
+  removePurchasedCourses(courseIds: string[]): void {
+    const normalizedCourseIds = Array.from(
+      new Set((courseIds || []).map((id) => `${id || ''}`.trim()).filter(Boolean))
+    );
+
+    if (!normalizedCourseIds.length) {
+      return;
+    }
+
+    const items = this.itemsSubject.value.filter(
+      (item) => !normalizedCourseIds.includes(`${item.courseId || ''}`.trim())
+    );
+
+    this.updateState(items);
+  }
+
   private updateState(items: CartItem[]): void {
     this.itemsSubject.next(items);
     localStorage.setItem(this.storageKey, JSON.stringify(items));

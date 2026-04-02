@@ -27,6 +27,16 @@
           <p><strong>{{ amountLabel }}:</strong> {{ result.amount }} EGP</p>
           <p><strong>{{ coursesLabel }}:</strong> {{ result.courseIds.length }}</p>
 
+          <div *ngIf="result.items?.length" class="mb-3">
+            <strong class="d-block mb-2">{{ purchasedCoursesLabel }}:</strong>
+            <ul class="mb-0 ps-3">
+              <li *ngFor="let item of result.items">
+                {{ item.title || item.id }}
+                <span *ngIf="item.planName">- {{ item.planName }}</span>
+              </li>
+            </ul>
+          </div>
+
           <p *ngIf="result.transactionId">
             <strong>{{ transactionIdLabel }}:</strong>
             {{ result.transactionId }}

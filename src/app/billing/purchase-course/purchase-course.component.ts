@@ -174,6 +174,7 @@ export class PurchaseCourseComponent implements OnInit {
         customerEmail: this.customerEmail.trim(),
         customerPhone: this.customerPhone.trim(),
         selectedItems,
+        language: this.currentLang,
       });
 
       window.location.href = result.iframeUrl;

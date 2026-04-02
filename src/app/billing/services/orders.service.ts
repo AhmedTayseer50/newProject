@@ -8,6 +8,18 @@ export interface PaymentResultResponse {
   status: 'pending' | 'paid' | 'failed';
   amount: number;
   courseIds: string[];
+  items?: Array<{
+    id: string;
+    title?: string;
+    price?: number;
+    priceText?: string;
+    planId?: string;
+    planName?: string;
+    badge?: string;
+    note?: string;
+    features?: string[];
+  }>;
+  language?: 'ar' | 'en';
   transactionId?: string | null;
   message?: string;
 }
