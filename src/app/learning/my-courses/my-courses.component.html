@@ -1,36 +1,57 @@
-<div class="container py-4" [attr.dir]="pageDir">
-  <h3 class="mb-3">{{ pageTitle }}</h3>
+<section class="page-hero" [attr.dir]="pageDir">
+  <div class="container">
+    <div class="page-hero-eyebrow">{{ eyebrowText }}</div>
+    <h1 class="page-hero-title">{{ pageTitle }}</h1>
+    <p class="page-hero-subtitle">
+      {{ pageSubtitle }}
+    </p>
+  </div>
+</section>
 
+<div class="container py-4" [attr.dir]="pageDir">
   <ng-container *ngIf="myCourses$ | async as list">
-    <div *ngIf="!list.length" class="alert alert-info">
-      {{ emptyText }}
+    <div *ngIf="!list.length" class="empty-state">
+      <h3 class="empty-state-title">{{ emptyText }}</h3>
+      <p class="empty-state-text">{{ emptyHintText }}</p>
     </div>
 
-    <div class="row g-3" *ngIf="list.length">
-      <div class="col-12 col-md-6 col-lg-4" *ngFor="let c of list">
-        <div class="card h-100 mycourse-card">
-          <img *ngIf="c.thumbnail" [src]="c.thumbnail" class="card-img-top" [alt]="c.title || untitledText" />
+    <div *ngIf="list.length" class="courses-grid">
+      <article
+        class="course-card"
+        *ngFor="let c of list; trackBy: trackByCourseId"
+      >
+        <div
+          class="course-image"
+          [style.background-image]="'url(' + (c.thumbnail || 'assets/images/placeholder-course.jpg') + ')'"
+        >
+          <img
+            [src]="c.thumbnail || 'assets/images/placeholder-course.jpg'"
+            [alt]="c.title || untitledText"
+            class="sr-only-img"
+            loading="lazy"
+          />
 
-          <div class="card-body">
-            <h5 class="card-title mb-2">{{ c.title || untitledText }}</h5>
+          <span class="course-tag">{{ c.categoryId || categoryFallback }}</span>
+        </div>
 
-            <p class="card-text text-muted small mb-2">
-              {{ c.description || '' }}
-            </p>
+        <div class="course-body">
+          <h3 class="course-title">{{ c.title || untitledText }}</h3>
+          <p class="course-desc">{{ c.description || noDescriptionText }}</p>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-              <span class="badge text-bg-secondary" *ngIf="c.categoryId">{{ c.categoryId }}</span>
-              <span class="fw-bold" *ngIf="c.price != null">{{ c.price }}</span>
-            </div>
-          </div>
-
-          <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
-            <a class="btn btn-primary w-100" [routerLink]="['/courses', c.id]">
-              {{ openCourseText }}
-            </a>
+          <div class="course-meta">
+            <span class="course-level"></span>
+            <span class="course-price">
+              {{ c.displayPriceText || (c.price | currency: 'EGP' : 'symbol' : '1.0-0') }}
+            </span>
           </div>
         </div>
-      </div>
+
+        <div class="course-footer">
+          <button class="btn btn-open" [routerLink]="['/courses', c.id]">
+            {{ openCourseText }}
+          </button>
+        </div>
+      </article>
     </div>
   </ng-container>
 </div>
