@@ -1,5 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+
 import { CartItem, CartService } from '../services/cart.service';
 
 @Component({
@@ -7,9 +9,10 @@ import { CartItem, CartService } from '../services/cart.service';
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css'],
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
   private cartService = inject(CartService);
   private router = inject(Router);
+  private subscription?: Subscription;
 
   items: CartItem[] = [];
 
@@ -22,13 +25,28 @@ export class CartComponent implements OnInit {
   }
 
   get totalPrice(): number {
-    return this.items.reduce((sum, item) => sum + Number(item.price || 0), 0);
+    return this.items.reduce(
+      (sum, item) => sum + Number(item.price || 0),
+      0,
+    );
+  }
+
+  get itemsCountLabel(): string {
+    if (this.isEnglish) {
+      return this.items.length === 1 ? 'course' : 'courses';
+    }
+
+    return this.items.length === 1 ? 'كورس' : 'كورسات';
   }
 
   ngOnInit(): void {
-    this.cartService.items$.subscribe((items) => {
+    this.subscription = this.cartService.items$.subscribe((items) => {
       this.items = items;
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   removeItem(courseId: string): void {
@@ -43,11 +61,16 @@ export class CartComponent implements OnInit {
     this.router.navigate(['/courses']);
   }
 
-  goToCheckout(): void {
-    if (!this.items.length) return;
+  viewCourse(courseId: string): void {
+    if (!courseId) return;
+    this.router.navigate(['/courses', courseId]);
+  }
 
-    // الخطوة الحالية فقط: نجهز الانتقال
-    // الخطوة التالية هنحوّل checkout بالكامل ليقرأ من cart
+  goToCheckout(): void {
+    if (!this.items.length) {
+      return;
+    }
+
     this.router.navigate(['/checkout', this.items[0].id], {
       queryParams: { fromCart: '1' },
     });

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { AuthService } from '../services/auth.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +14,7 @@ export class LoginComponent implements OnInit {
   googleLoading = false;
   error?: string;
   currentLang: 'ar' | 'en' = 'ar';
+  redirectUrl = '/courses';
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -22,11 +24,17 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
     this.currentLang = this.detectLangFromPath();
+
+    const redirect = this.route.snapshot.queryParamMap.get('redirect');
+    if (redirect && redirect.startsWith('/')) {
+      this.redirectUrl = redirect;
+    }
   }
 
   get emailControl() {
@@ -79,7 +87,7 @@ export class LoginComponent implements OnInit {
     try {
       const { email, password } = this.form.value;
       await this.auth.login(email!, password!);
-      this.router.navigateByUrl('/courses');
+      await this.router.navigateByUrl(this.redirectUrl);
     } catch (e: any) {
       this.error =
         e?.message ?? $localize`:@@login_error_default:حدث خطأ أثناء تسجيل الدخول`;
@@ -94,7 +102,7 @@ export class LoginComponent implements OnInit {
 
     try {
       await this.auth.loginWithGoogle();
-      this.router.navigateByUrl('/courses');
+      await this.router.navigateByUrl(this.redirectUrl);
     } catch (e: any) {
       const msg = (e?.message || '').toString();
 

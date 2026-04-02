@@ -1,6 +1,6 @@
 <div class="cart-page" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
   <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div class="cart-header d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
       <div>
         <h2 class="mb-1">{{ isEnglish ? 'Shopping Cart' : 'سلة المشتريات' }}</h2>
         <p class="text-muted mb-0">
@@ -39,7 +39,7 @@
 
     <div *ngIf="items.length" class="row g-4">
       <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 cart-list-card">
           <div class="card-body p-0">
             <div
               *ngFor="let item of items; let last = last"
@@ -47,15 +47,30 @@
               [class.border-bottom]="!last"
             >
               <img
-                [src]="item.thumbnail || 'https://via.placeholder.com/120x90'"
+                [src]="item.thumbnail || 'https://via.placeholder.com/120x90?text=Course'"
                 [alt]="item.title"
                 class="cart-thumb"
               />
 
-              <div class="flex-grow-1">
-                <h5 class="mb-1">{{ item.title }}</h5>
-                <p class="text-muted small mb-2">{{ item.description }}</p>
-                <strong>{{ item.price | number:'1.0-0' }} EGP</strong>
+              <div class="flex-grow-1 min-w-0">
+                <button
+                  type="button"
+                  class="course-link-btn"
+                  (click)="viewCourse(item.id)"
+                >
+                  {{ item.title }}
+                </button>
+
+                <p class="text-muted small mb-2 cart-desc">
+                  {{ item.description || (isEnglish ? 'Selected course' : 'كورس محدد للشراء') }}
+                </p>
+
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                  <span class="badge text-bg-light cart-badge">
+                    {{ isEnglish ? 'Course' : 'كورس' }}
+                  </span>
+                  <strong class="price-text">{{ item.price | number:'1.0-0' }} EGP</strong>
+                </div>
               </div>
 
               <button
@@ -71,18 +86,23 @@
       </div>
 
       <div class="col-lg-4">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 cart-summary-card sticky-lg-top">
           <div class="card-body p-4">
             <h5 class="mb-3">{{ isEnglish ? 'Order summary' : 'ملخص الطلب' }}</h5>
 
-            <div class="d-flex justify-content-between mb-2">
-              <span>{{ isEnglish ? 'Courses count' : 'عدد الكورسات' }}</span>
-              <strong>{{ items.length }}</strong>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span>{{ isEnglish ? 'Items' : 'العناصر' }}</span>
+              <strong>{{ items.length }} {{ itemsCountLabel }}</strong>
             </div>
 
-            <div class="d-flex justify-content-between mb-3">
-              <span>{{ isEnglish ? 'Total' : 'الإجمالي' }}</span>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span>{{ isEnglish ? 'Subtotal' : 'الإجمالي الفرعي' }}</span>
               <strong>{{ totalPrice | number:'1.0-0' }} EGP</strong>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 total-row pt-3 border-top">
+              <span>{{ isEnglish ? 'Total' : 'الإجمالي' }}</span>
+              <strong class="total-price">{{ totalPrice | number:'1.0-0' }} EGP</strong>
             </div>
 
             <button class="btn btn-primary w-100 mb-2" type="button" (click)="goToCheckout()">

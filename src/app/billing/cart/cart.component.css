@@ -1,17 +1,63 @@
+.cart-page {
+  min-height: 60vh;
+}
+
 .cart-thumb {
   width: 120px;
   height: 90px;
   object-fit: cover;
   border-radius: 12px;
   flex-shrink: 0;
+  background: #f6f6f6;
 }
 
 .cart-item {
   background: #fff;
 }
 
+.cart-list-card,
+.cart-summary-card,
 .empty-cart {
   border-radius: 20px;
+}
+
+.course-link-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: start;
+  color: #212529;
+}
+
+.course-link-btn:hover {
+  color: #0d6efd;
+}
+
+.cart-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cart-badge {
+  font-weight: 500;
+}
+
+.price-text {
+  white-space: nowrap;
+}
+
+.total-row {
+  font-size: 1.05rem;
+}
+
+.total-price {
+  font-size: 1.2rem;
 }
 
 @media (max-width: 767px) {
@@ -22,5 +68,9 @@
   .cart-thumb {
     width: 100%;
     height: 180px;
+  }
+
+  .cart-header {
+    align-items: stretch !important;
   }
 }

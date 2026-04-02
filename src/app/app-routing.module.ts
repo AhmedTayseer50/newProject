@@ -93,6 +93,7 @@ const routes: Routes = [
   {
     path: 'cart',
     component: CartComponent,
+    canActivate: [AuthGuard],
     data: { title: $localize`:@@title_cart:سلة المشتريات` },
   },
 
