@@ -23,6 +23,7 @@ export interface CourseTestimonial {
 }
 
 export interface CoursePricingPlan {
+  id?: string;
   name: string;
   badge?: string;
   priceText: string;
@@ -80,6 +81,8 @@ export interface Course {
   communityPerks?: string[];
   testimonials?: CourseTestimonial[];
   pricingPlans?: CoursePricingPlan[];
+  featuredPlan?: CoursePricingPlan | null;
+  displayPriceText?: string;
   offer?: CourseOffer;
   bottomCta?: CourseBottomCta;
 }

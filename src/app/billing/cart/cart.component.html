@@ -6,8 +6,8 @@
         <p class="text-muted mb-0">
           {{
             isEnglish
-              ? 'Review your selected courses before checkout.'
-              : 'راجع الكورسات التي اخترتها قبل إتمام الشراء.'
+              ? 'Review your selected pricing plans before checkout.'
+              : 'راجع الخطط السعرية التي اخترتها قبل إتمام الشراء.'
           }}
         </p>
       </div>
@@ -27,8 +27,8 @@
       <p class="text-muted mb-4">
         {{
           isEnglish
-            ? 'Add courses first, then come back here to complete your purchase.'
-            : 'أضف الكورسات أولًا ثم عد هنا لإتمام الشراء.'
+            ? 'Choose a pricing plan first, then come back here to complete your purchase.'
+            : 'اختر خطة سعرية أولًا ثم عد هنا لإتمام الشراء.'
         }}
       </p>
 
@@ -53,11 +53,7 @@
               />
 
               <div class="flex-grow-1 min-w-0">
-                <button
-                  type="button"
-                  class="course-link-btn"
-                  (click)="viewCourse(item.id)"
-                >
+                <button type="button" class="course-link-btn" (click)="viewCourse(item.courseId)">
                   {{ item.title }}
                 </button>
 
@@ -65,19 +61,32 @@
                   {{ item.description || (isEnglish ? 'Selected course' : 'كورس محدد للشراء') }}
                 </p>
 
+                <div class="mb-2">
+                  <div class="fw-semibold">
+                    {{ isEnglish ? 'Selected plan:' : 'الخطة المختارة:' }}
+                    <span>{{ item.planName || (isEnglish ? 'Pricing plan' : 'خطة سعرية') }}</span>
+                  </div>
+                  <div class="small text-muted" *ngIf="item.planBadge">
+                    {{ item.planBadge }}
+                  </div>
+                  <div class="small text-muted" *ngIf="item.planNote">
+                    {{ item.planNote }}
+                  </div>
+                </div>
+
+                <ul class="small ps-3 mb-2" *ngIf="item.planFeatures.length">
+                  <li *ngFor="let feature of item.planFeatures">{{ feature }}</li>
+                </ul>
+
                 <div class="d-flex flex-wrap align-items-center gap-2">
                   <span class="badge text-bg-light cart-badge">
-                    {{ isEnglish ? 'Course' : 'كورس' }}
+                    {{ isEnglish ? 'Pricing plan' : 'خطة سعرية' }}
                   </span>
-                  <strong class="price-text">{{ item.price | number:'1.0-0' }} EGP</strong>
+                  <strong class="price-text">{{ item.priceText || (item.price | number:'1.0-0') + ' EGP' }}</strong>
                 </div>
               </div>
 
-              <button
-                class="btn btn-sm btn-outline-danger"
-                type="button"
-                (click)="removeItem(item.id)"
-              >
+              <button class="btn btn-sm btn-outline-danger" type="button" (click)="removeItem(item.key)">
                 {{ isEnglish ? 'Remove' : 'حذف' }}
               </button>
             </div>

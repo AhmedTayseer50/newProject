@@ -18,7 +18,7 @@ import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
 import { Database } from '@angular/fire/database';
 import { ref, get, query, orderByChild, limitToFirst } from 'firebase/database';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Course } from 'src/app/shared/models/course.model';
+import { Course, CoursePricingPlan } from 'src/app/shared/models/course.model';
 import { TelegramJoinService } from '../services/telegram-join.service';
 import { CartService } from 'src/app/billing/services/cart.service';
 
@@ -183,6 +183,17 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
       : 'برنامج عملي متكامل';
   }
 
+
+  get selectedPriceLabel(): string {
+    const featuredPlan = this.getFeaturedPlan();
+    return featuredPlan?.priceText || this.course?.displayPriceText || `${this.course?.price || ''}`;
+  }
+
+  get selectedPlanLabel(): string {
+    const featuredPlan = this.getFeaturedPlan();
+    return featuredPlan?.name || (this.isEnglish ? 'Course enrollment' : 'الاشتراك في الكورس');
+  }
+
   get heroFallbackTagline(): string {
     return this.isEnglish
       ? 'A guided journey that helps you understand, apply, and move toward a more balanced inner state.'
@@ -317,13 +328,58 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     if (!this.auth.currentUser) {
       this.router.navigate(['/login'], {
         queryParams: {
-          redirect: `/checkout/${this.courseId}`,
+          redirect: `/courses/${this.courseId}`,
         },
       });
       return;
     }
 
-    this.router.navigate(['/checkout', this.courseId]);
+    this.scrollToPricing();
+  }
+
+  scrollToPricing(): void {
+    const pricingSection = document.getElementById('course-pricing');
+    if (!pricingSection) return;
+
+    pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  getFeaturedPlan(): CoursePricingPlan | null {
+    if (this.course?.pricingPlans?.length) {
+      return this.course.pricingPlans.find((plan) => !!plan.highlighted) || this.course.pricingPlans[0] || null;
+    }
+
+    if (!this.course) return null;
+
+    return {
+      id: 'default-plan',
+      name: this.isEnglish ? 'Course enrollment' : 'الاشتراك في الكورس',
+      badge: '',
+      priceText: this.course.displayPriceText || `${this.course.price || ''}`,
+      note: this.isEnglish
+        ? 'Course enrollment with the currently available price.'
+        : 'اشتراك الكورس بالسعر المتاح حاليًا.',
+      highlighted: true,
+      features: [],
+    };
+  }
+
+  addSelectedPlanToCart(plan: CoursePricingPlan | null): void {
+    if (!this.course || !plan || !this.auth.currentUser) return;
+
+    this.cartSvc.addCourse(this.course, plan);
+  }
+
+  buyPlan(plan: CoursePricingPlan | null): void {
+    if (!plan) return;
+
+    if (!this.auth.currentUser) {
+      this.goToPurchase();
+      return;
+    }
+
+    this.addSelectedPlanToCart(plan);
+    this.router.navigate(['/cart']);
   }
 
   lessonLabel(index: number): string {
@@ -451,25 +507,16 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  addToCart(): void {
-    if (!this.course || !this.auth.currentUser) return;
+  addToCart(plan: CoursePricingPlan | null): void {
+    if (!plan || !this.auth.currentUser) return;
 
-    this.cartSvc.addCourse(this.course);
+    this.addSelectedPlanToCart(plan);
 
-    alert(
-      this.currentLang === 'en' ? 'Added to cart' : 'تمت الإضافة إلى السلة'
-    );
+    alert(this.currentLang === 'en' ? 'Added to cart' : 'تمت الإضافة إلى السلة');
   }
 
   buyNow(): void {
-    if (!this.course?.id) return;
-
-    if (!this.auth.currentUser) {
-      this.goToPurchase();
-      return;
-    }
-
-    this.router.navigate(['/checkout', this.course.id]);
+    this.scrollToPricing();
   }
 
   closeOffer(): void {
@@ -485,6 +532,6 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   onOfferSubscribe(): void {
     if (this.canViewLessons) return;
     this.closeOffer();
-    this.buyNow();
+    this.scrollToPricing();
   }
 }

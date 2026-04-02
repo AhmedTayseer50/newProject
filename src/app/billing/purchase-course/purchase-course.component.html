@@ -4,7 +4,7 @@
       <div class="spinner-border" role="status"></div>
     </div>
 
-    <div *ngIf="!loading && course" class="row g-4">
+    <div *ngIf="!loading && items.length" class="row g-4">
       <div class="col-lg-7">
         <div class="card shadow-sm border-0 checkout-card">
           <div class="card-body p-4">
@@ -16,37 +16,20 @@
 
             <div class="mb-3">
               <label class="form-label">{{ fullNameLabel }}</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="customerName"
-              />
+              <input type="text" class="form-control" [(ngModel)]="customerName" />
             </div>
 
             <div class="mb-3">
               <label class="form-label">{{ emailLabel }}</label>
-              <input
-                type="email"
-                class="form-control"
-                [(ngModel)]="customerEmail"
-              />
+              <input type="email" class="form-control" [(ngModel)]="customerEmail" />
             </div>
 
             <div class="mb-3">
               <label class="form-label">{{ phoneLabel }}</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="customerPhone"
-              />
+              <input type="text" class="form-control" [(ngModel)]="customerPhone" />
             </div>
 
-            <button
-              class="btn btn-primary w-100"
-              type="button"
-              [disabled]="submitting"
-              (click)="payNow()"
-            >
+            <button class="btn btn-primary w-100" type="button" [disabled]="submitting" (click)="payNow()">
               {{ payButtonText }}
             </button>
           </div>
@@ -58,18 +41,23 @@
           <div class="card-body p-4">
             <h5 class="mb-3">{{ summaryTitle }}</h5>
 
-            <div class="course-box d-flex gap-3 align-items-start">
+            <div class="course-box d-flex gap-3 align-items-start mb-3" *ngFor="let item of items">
               <img
-                [src]="course.thumbnail || 'https://via.placeholder.com/120x90'"
-                [alt]="course.title"
+                [src]="item.thumbnail || 'https://via.placeholder.com/120x90'"
+                [alt]="item.title"
                 class="course-thumb"
               />
 
               <div class="flex-grow-1">
-                <h6 class="mb-1">{{ course.title }}</h6>
-                <p class="text-muted small mb-2">{{ course.description }}</p>
+                <h6 class="mb-1">{{ item.title }}</h6>
+                <p class="text-muted small mb-2">{{ item.description }}</p>
+                <div class="small fw-semibold mb-1">
+                  {{ isEnglish ? 'Plan:' : 'الخطة:' }} {{ item.planName }}
+                </div>
+                <div class="small text-muted mb-1" *ngIf="item.planBadge">{{ item.planBadge }}</div>
+                <div class="small text-muted mb-2" *ngIf="item.planNote">{{ item.planNote }}</div>
                 <div class="price-line">
-                  <strong>{{ totalPrice | number:'1.0-0' }} EGP</strong>
+                  <strong>{{ item.priceText || ((item.price | number:'1.0-0') + ' EGP') }}</strong>
                 </div>
               </div>
             </div>

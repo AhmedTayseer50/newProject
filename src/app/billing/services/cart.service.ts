@@ -1,13 +1,20 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Course } from 'src/app/shared/models/course.model';
+import { Course, CoursePricingPlan } from 'src/app/shared/models/course.model';
 
 export interface CartItem {
-  id: string;
+  key: string;
+  courseId: string;
+  planId: string;
   title: string;
   description: string;
   price: number;
+  priceText: string;
   thumbnail?: string;
+  planName: string;
+  planBadge?: string;
+  planNote?: string;
+  planFeatures: string[];
 }
 
 @Injectable({
@@ -31,28 +38,49 @@ export class CartService {
     return this.itemsSubject.value.reduce((sum, item) => sum + Number(item.price || 0), 0);
   }
 
-  hasItem(courseId: string): boolean {
-    return this.itemsSubject.value.some((item) => item.id === courseId);
+  hasItem(courseId: string, planId: string): boolean {
+    return this.itemsSubject.value.some(
+      (item) => item.courseId === courseId && item.planId === planId,
+    );
   }
 
-  addCourse(course: Course): void {
-    if (!course?.id) return;
-    if (this.hasItem(course.id)) return;
+  addCourse(course: Course, plan: CoursePricingPlan): CartItem | null {
+    if (!course?.id || !plan?.priceText?.trim()) return null;
 
-    const items = [...this.itemsSubject.value];
-    items.push({
-      id: course.id,
+    const planId = this.resolvePlanId(plan);
+    const existingIndex = this.itemsSubject.value.findIndex(
+      (item) => item.courseId === course.id && item.planId === planId,
+    );
+
+    const newItem: CartItem = {
+      key: `${course.id}__${planId}`,
+      courseId: course.id,
+      planId,
       title: course.title || '',
       description: course.description || '',
-      price: Number(course.price || 0),
+      price: this.parsePrice(plan.priceText),
+      priceText: plan.priceText || '',
       thumbnail: course.thumbnail || '',
-    });
+      planName: plan.name || '',
+      planBadge: plan.badge || '',
+      planNote: plan.note || '',
+      planFeatures: Array.isArray(plan.features) ? [...plan.features] : [],
+    };
+
+    const items = [...this.itemsSubject.value];
+
+    if (existingIndex >= 0) {
+      items[existingIndex] = newItem;
+    } else {
+      items.push(newItem);
+    }
 
     this.updateState(items);
+    return newItem;
   }
 
-  removeItem(courseId: string): void {
-    const items = this.itemsSubject.value.filter((item) => item.id !== courseId);
+  removeItem(itemKey: string): void {
+    const items = this.itemsSubject.value.filter((item) => item.key !== itemKey);
     this.updateState(items);
   }
 
@@ -75,5 +103,27 @@ export class CartService {
     } catch {
       return [];
     }
+  }
+
+  private resolvePlanId(plan: CoursePricingPlan): string {
+    const fromPlan = `${plan.id || ''}`.trim();
+    if (fromPlan) return fromPlan;
+
+    const fromName = `${plan.name || ''}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    return fromName || 'plan';
+  }
+
+  private parsePrice(value: string): number {
+    const normalized = `${value || ''}`
+      .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString())
+      .replace(/[^0-9.,]/g, '')
+      .replace(/,/g, '');
+
+    const numeric = Number.parseFloat(normalized);
+    return Number.isFinite(numeric) ? numeric : 0;
   }
 }

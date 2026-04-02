@@ -84,6 +84,12 @@ const routes: Routes = [
   },
 
   {
+    path: 'checkout',
+    component: PurchaseCourseComponent,
+    canActivate: [AuthGuard],
+    data: { title: $localize`:@@title_checkout:إتمام الشراء` },
+  },
+  {
     path: 'checkout/:courseId',
     component: PurchaseCourseComponent,
     canActivate: [AuthGuard],

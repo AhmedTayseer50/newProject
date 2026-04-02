@@ -120,8 +120,8 @@
             <span class="course-hero-pill" *ngIf="course.targetAudience">
               {{ course.targetAudience }}
             </span>
-            <span class="course-hero-pill" *ngIf="course.price">
-              {{ isEnglish ? 'Starts from' : 'يبدأ من' }} {{ course.price }}
+            <span class="course-hero-pill" *ngIf="selectedPriceLabel">
+              {{ isEnglish ? 'Starts from' : 'يبدأ من' }} {{ selectedPriceLabel }}
             </span>
           </div>
         </ng-template>
@@ -135,14 +135,6 @@
                 (click)="buyNow()"
               >
                 {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
-              </button>
-
-              <button
-                class="btn btn-outline-primary"
-                type="button"
-                (click)="addToCart()"
-              >
-                {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
               </button>
             </ng-container>
 
@@ -541,6 +533,7 @@
 
 <!-- PRICING -->
 <section
+  id="course-pricing"
   class="section section--light"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
   *ngIf="!loading && !error && course && !canViewLessons"
@@ -578,7 +571,7 @@
             <button
               class="btn btn-primary flex-fill"
               type="button"
-              (click)="buyNow()"
+              (click)="buyPlan(plan)"
             >
               {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
             </button>
@@ -586,7 +579,7 @@
             <button
               class="btn btn-outline-primary flex-fill"
               type="button"
-              (click)="addToCart()"
+              (click)="addToCart(plan)"
             >
               {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
             </button>
@@ -615,7 +608,7 @@
             {{ isEnglish ? 'Course enrollment' : 'الاشتراك في الكورس' }}
           </div>
           <div class="pricing-price">
-            {{ course.price }}
+            {{ selectedPriceLabel }}
           </div>
           <div class="pricing-note">
             {{
@@ -630,7 +623,7 @@
               <button
                 class="btn btn-primary flex-fill"
                 type="button"
-                (click)="buyNow()"
+                (click)="buyPlan(getFeaturedPlan())"
               >
                 {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
               </button>
@@ -638,7 +631,7 @@
               <button
                 class="btn btn-outline-primary flex-fill"
                 type="button"
-                (click)="addToCart()"
+                (click)="addToCart(getFeaturedPlan())"
               >
                 {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
               </button>
@@ -750,21 +743,13 @@
       </div>
 
       <ng-container *ngIf="auth.currentUser; else loginToBuyFinal">
-        <div class="final-push-actions d-flex gap-2">
+        <div class="final-push-actions">
           <button
             class="btn btn-primary"
             type="button"
             (click)="buyNow()"
           >
             {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
-          </button>
-
-          <button
-            class="btn btn-outline-primary"
-            type="button"
-            (click)="addToCart()"
-          >
-            {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
           </button>
         </div>
       </ng-container>
@@ -814,21 +799,13 @@
       </div>
 
       <ng-container *ngIf="auth.currentUser; else loginToBuyOfferStrip">
-        <div class="d-flex gap-2">
+        <div>
           <button
             class="btn btn-light offer-strip__btn"
             type="button"
             (click)="buyNow()"
           >
             {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
-          </button>
-
-          <button
-            class="btn btn-outline-light offer-strip__btn"
-            type="button"
-            (click)="addToCart()"
-          >
-            {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
           </button>
         </div>
       </ng-container>
@@ -877,21 +854,13 @@
     </p>
 
     <ng-container *ngIf="auth.currentUser; else loginToBuyOfferPopup">
-      <div class="d-flex gap-2">
+      <div>
         <button
           class="btn btn-primary w-100"
           type="button"
           (click)="buyNow()"
         >
           {{ currentLang === 'en' ? 'Buy Now' : 'اشترِ الآن' }}
-        </button>
-
-        <button
-          class="btn btn-outline-primary w-100"
-          type="button"
-          (click)="addToCart()"
-        >
-          {{ currentLang === 'en' ? 'Add to Cart' : 'أضف إلى السلة' }}
         </button>
       </div>
     </ng-container>

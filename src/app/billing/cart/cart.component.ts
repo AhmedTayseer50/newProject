@@ -25,18 +25,15 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   get totalPrice(): number {
-    return this.items.reduce(
-      (sum, item) => sum + Number(item.price || 0),
-      0,
-    );
+    return this.items.reduce((sum, item) => sum + Number(item.price || 0), 0);
   }
 
   get itemsCountLabel(): string {
     if (this.isEnglish) {
-      return this.items.length === 1 ? 'course' : 'courses';
+      return this.items.length === 1 ? 'plan' : 'plans';
     }
 
-    return this.items.length === 1 ? 'كورس' : 'كورسات';
+    return this.items.length === 1 ? 'خطة' : 'خطط';
   }
 
   ngOnInit(): void {
@@ -49,8 +46,8 @@ export class CartComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  removeItem(courseId: string): void {
-    this.cartService.removeItem(courseId);
+  removeItem(itemKey: string): void {
+    this.cartService.removeItem(itemKey);
   }
 
   clearCart(): void {
@@ -71,7 +68,7 @@ export class CartComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.router.navigate(['/checkout', this.items[0].id], {
+    this.router.navigate(['/checkout'], {
       queryParams: { fromCart: '1' },
     });
   }

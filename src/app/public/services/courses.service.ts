@@ -148,7 +148,8 @@ export class CoursesService {
     const pricingPlans: CoursePricingPlan[] = (
       Array.isArray(raw.pricingPlans) ? raw.pricingPlans : []
     )
-      .map((plan) => ({
+      .map((plan, index) => ({
+        id: this.buildPricingPlanId(index, this.pickText(plan?.name, lang, '')),
         name: this.pickText(plan?.name, lang, ''),
         badge: this.pickText(plan?.badge, lang, ''),
         priceText: this.pickText(plan?.priceText, lang, ''),
@@ -212,6 +213,9 @@ export class CoursesService {
         }
       : undefined;
 
+    const featuredPlan = this.pickFeaturedPlan(pricingPlans);
+    const displayPriceText = this.pickDisplayPriceText(featuredPlan, raw.price);
+
     return {
       id,
       lang,
@@ -261,9 +265,33 @@ export class CoursesService {
       communityPerks: this.pickList(raw.communityPerks, lang),
       testimonials,
       pricingPlans,
+      featuredPlan,
+      displayPriceText,
       offer,
       bottomCta,
     };
+  }
+
+
+  private pickFeaturedPlan(pricingPlans: CoursePricingPlan[]): CoursePricingPlan | null {
+    if (!pricingPlans.length) return null;
+    return pricingPlans.find((plan) => !!plan.highlighted) || pricingPlans[0] || null;
+  }
+
+  private pickDisplayPriceText(featuredPlan: CoursePricingPlan | null, fallbackPrice?: number): string {
+    const featuredPrice = `${featuredPlan?.priceText || ''}`.trim();
+    if (featuredPrice) return featuredPrice;
+    const numeric = Number(fallbackPrice || 0);
+    return numeric > 0 ? `${numeric} EGP` : '';
+  }
+
+  private buildPricingPlanId(index: number, name: string): string {
+    const base = `${name || 'plan'}-${index + 1}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    return base || `plan-${index + 1}`;
   }
 
   private detectLang(): CourseLang {

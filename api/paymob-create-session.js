@@ -105,6 +105,18 @@ module.exports = async function handler(req, res) {
     const customerEmail = String(body.customerEmail || '').trim().toLowerCase();
     const customerPhone = normalizePhone(body.customerPhone);
 
+    const selectedItems = Array.isArray(body.selectedItems)
+      ? body.selectedItems
+          .map((item) => ({
+            courseId: String(item?.courseId || '').trim(),
+            planId: String(item?.planId || '').trim(),
+            planName: String(item?.planName || '').trim(),
+            priceText: String(item?.priceText || '').trim(),
+            price: Number(item?.price || 0),
+          }))
+          .filter((item) => item.courseId)
+      : [];
+
     if (!courseIds.length) {
       return send(res, 400, { message: 'courseIds is required' });
     }
@@ -120,14 +132,22 @@ module.exports = async function handler(req, res) {
     let totalAmount = 0;
     const resolvedCourses = [];
 
+    const selectedItemsByCourseId = selectedItems.reduce((acc, item) => {
+      if (!acc[item.courseId]) acc[item.courseId] = item;
+      return acc;
+    }, {});
+
     for (const courseId of courseIds) {
       const courseSnap = await admin.database().ref(`courses/${courseId}`).get();
+
       if (!courseSnap.exists()) {
         return send(res, 404, { message: `Course not found: ${courseId}` });
       }
 
       const course = courseSnap.val() || {};
-      const price = Number(course.price || 0);
+      const selectedItem = selectedItemsByCourseId[courseId] || null;
+      const selectedPrice = Number(selectedItem?.price || 0);
+      const price = selectedPrice > 0 ? selectedPrice : Number(course.price || 0);
 
       if (!price || price <= 0) {
         return send(res, 400, {
@@ -151,6 +171,9 @@ module.exports = async function handler(req, res) {
         id: courseId,
         title: course.title || '',
         price,
+        priceText: selectedItem?.priceText || '',
+        planId: selectedItem?.planId || '',
+        planName: selectedItem?.planName || '',
       });
     }
 

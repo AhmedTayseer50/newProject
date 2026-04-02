@@ -3,11 +3,20 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Auth } from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
 
+export interface StartPaymobCheckoutItem {
+  courseId: string;
+  planId?: string;
+  planName?: string;
+  price?: number;
+  priceText?: string;
+}
+
 export interface StartPaymobCheckoutPayload {
   courseIds: string[];
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  selectedItems?: StartPaymobCheckoutItem[];
 }
 
 export interface StartPaymobCheckoutResponse {

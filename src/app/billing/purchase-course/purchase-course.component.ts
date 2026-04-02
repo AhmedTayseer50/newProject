@@ -1,10 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
-import { CoursesService } from 'src/app/public/services/courses.service';
-import { PaymentsService } from '../services/payments.service';
+import { PaymentsService, StartPaymobCheckoutItem } from '../services/payments.service';
 import { UserService } from 'src/app/core/services/user.service';
-import { Course } from 'src/app/shared/models/course.model';
+import { CartItem, CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-purchase-course',
@@ -15,12 +14,12 @@ export class PurchaseCourseComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private auth = inject(Auth);
-  private coursesService = inject(CoursesService);
   private paymentsService = inject(PaymentsService);
   private userService = inject(UserService);
+  private cartService = inject(CartService);
 
   courseId = '';
-  course: Course | null = null;
+  items: CartItem[] = [];
 
   customerName = '';
   customerEmail = '';
@@ -39,7 +38,7 @@ export class PurchaseCourseComponent implements OnInit {
   }
 
   get totalPrice(): number {
-    return Number(this.course?.price || 0);
+    return this.items.reduce((sum, item) => sum + Number(item.price || 0), 0);
   }
 
   get pageTitle(): string {
@@ -78,13 +77,19 @@ export class PurchaseCourseComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.courseId = this.route.snapshot.paramMap.get('courseId') || '';
-    if (!this.courseId) {
-      this.router.navigate(['/courses']);
-      return;
-    }
 
     try {
-      this.course = await this.coursesService.getCourseById(this.courseId);
+      const cartItems = this.cartService.getItems();
+
+      if (cartItems.length) {
+        this.items = cartItems;
+      } else if (this.courseId) {
+        this.router.navigate(['/courses', this.courseId]);
+        return;
+      } else {
+        this.router.navigate(['/cart']);
+        return;
+      }
 
       const user = this.auth.currentUser;
       if (user?.uid) {
@@ -107,10 +112,10 @@ export class PurchaseCourseComponent implements OnInit {
   async payNow(): Promise<void> {
     this.error = '';
 
-    if (!this.course) {
+    if (!this.items.length) {
       this.error = this.isEnglish
-        ? 'This course is currently unavailable'
-        : 'الكورس غير متاح حالياً';
+        ? 'There are no items available for checkout'
+        : 'لا توجد عناصر متاحة لإتمام الشراء';
       return;
     }
 
@@ -138,11 +143,22 @@ export class PurchaseCourseComponent implements OnInit {
     this.submitting = true;
 
     try {
+      const uniqueCourseIds = Array.from(new Set(this.items.map((item) => item.courseId).filter(Boolean)));
+
+      const selectedItems: StartPaymobCheckoutItem[] = this.items.map((item) => ({
+        courseId: item.courseId,
+        planId: item.planId,
+        planName: item.planName,
+        price: item.price,
+        priceText: item.priceText,
+      }));
+
       const result = await this.paymentsService.startCheckout({
-        courseIds: [this.courseId],
+        courseIds: uniqueCourseIds,
         customerName: this.customerName.trim(),
         customerEmail: this.customerEmail.trim(),
         customerPhone: this.customerPhone.trim(),
+        selectedItems,
       });
 
       window.location.href = result.iframeUrl;

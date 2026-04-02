@@ -49,7 +49,7 @@
           <span class="course-level"></span>
 
           <span class="course-price">
-            {{ c.price | currency: "EGP" : "symbol" : "1.0-0" }}
+            {{ c.displayPriceText || (c.price | currency: 'EGP' : 'symbol' : '1.0-0') }}
           </span>
         </div>
       </div>
