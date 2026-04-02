@@ -22,6 +22,7 @@ type LocalizedStringList =
   | undefined;
 
 type RawCoursePricingPlan = {
+  id?: string | number;
   name?: LocalizedText;
   badge?: LocalizedText;
   priceText?: LocalizedText;
@@ -149,7 +150,7 @@ export class CoursesService {
       Array.isArray(raw.pricingPlans) ? raw.pricingPlans : []
     )
       .map((plan, index) => ({
-        id: this.buildPricingPlanId(index, this.pickText(plan?.name, lang, '')),
+        id: this.buildPricingPlanId(index, this.pickText(plan?.name, lang, ''), plan?.id),
         name: this.pickText(plan?.name, lang, ''),
         badge: this.pickText(plan?.badge, lang, ''),
         priceText: this.pickText(plan?.priceText, lang, ''),
@@ -285,13 +286,28 @@ export class CoursesService {
     return numeric > 0 ? `${numeric} EGP` : '';
   }
 
-  private buildPricingPlanId(index: number, name: string): string {
-    const base = `${name || 'plan'}-${index + 1}`
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+  private buildPricingPlanId(index: number, name: string, rawId?: string | number): string {
+    const directId = this.normalizePricingPlanId(rawId);
+    if (directId) {
+      return directId;
+    }
 
-    return base || `plan-${index + 1}`;
+    const fromName = this.normalizePricingPlanId(name);
+    if (fromName && !/^\d+$/.test(fromName)) {
+      return fromName;
+    }
+
+    return `plan-${index + 1}`;
+  }
+
+  private normalizePricingPlanId(value: string | number | null | undefined): string {
+    return `${value ?? ''}`
+      .trim()
+      .toLowerCase()
+      .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString())
+      .replace(/[^a-z0-9-_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   private detectLang(): CourseLang {

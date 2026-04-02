@@ -109,6 +109,24 @@ export class PurchaseCourseComponent implements OnInit {
     }
   }
 
+
+
+  private normalizeCheckoutPlanId(planId: string): string {
+    const normalized = `${planId || ''}`
+      .trim()
+      .toLowerCase()
+      .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString())
+      .replace(/[^a-z0-9-_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    if (/^\d+$/.test(normalized)) {
+      return `plan-${normalized}`;
+    }
+
+    return normalized;
+  }
+
   async payNow(): Promise<void> {
     this.error = '';
 
@@ -143,30 +161,12 @@ export class PurchaseCourseComponent implements OnInit {
     this.submitting = true;
 
     try {
-      const selectedItemsMap = new Map<string, StartPaymobCheckoutItem>();
+      const uniqueCourseIds = Array.from(new Set(this.items.map((item) => item.courseId).filter(Boolean)));
 
-      for (const item of this.items) {
-        const courseId = String(item.courseId || '').trim();
-        const planId = String(item.planId || '').trim();
-
-        if (!courseId || !planId) continue;
-
-        selectedItemsMap.set(`${courseId}__${planId}`, {
-          courseId,
-          planId,
-        });
-      }
-
-      const selectedItems = Array.from(selectedItemsMap.values());
-      const uniqueCourseIds = Array.from(new Set(selectedItems.map((item) => item.courseId)));
-
-      if (!selectedItems.length || !uniqueCourseIds.length) {
-        throw new Error(
-          this.isEnglish
-            ? 'Your cart contains invalid pricing selections'
-            : 'السلة تحتوي على خطط سعرية غير صالحة'
-        );
-      }
+      const selectedItems: StartPaymobCheckoutItem[] = this.items.map((item) => ({
+        courseId: item.courseId,
+        planId: this.normalizeCheckoutPlanId(item.planId),
+      }));
 
       const result = await this.paymentsService.startCheckout({
         courseIds: uniqueCourseIds,
