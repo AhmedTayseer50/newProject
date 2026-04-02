@@ -91,6 +91,11 @@ function normalizePlanId(value) {
     .replace(/^-|-$/g, '');
 }
 
+function normalizeLanguage(value) {
+  const lang = String(value || '').trim().toLowerCase();
+  return lang === 'en' ? 'en' : 'ar';
+}
+
 function getLocalizedText(value) {
   if (typeof value === 'string' || typeof value === 'number') {
     return String(value);
@@ -193,11 +198,7 @@ function getCanonicalPlanId(plan, index) {
 function getCourseTitle(course) {
   if (!course || typeof course !== 'object') return '';
 
-  return (
-    getLocalizedText(course.title) ||
-    getLocalizedText(course.name) ||
-    ''
-  );
+  return getLocalizedText(course.title) || getLocalizedText(course.name) || '';
 }
 
 function getPricingPlans(course) {
@@ -236,12 +237,7 @@ function resolvePlanFromCourse(course, requestedPlanId) {
       getLocalizedText(plan.label) ||
       `Plan ${i + 1}`;
 
-    const priceSource =
-      plan.priceText ??
-      plan.price ??
-      plan.amount ??
-      '';
-
+    const priceSource = plan.priceText ?? plan.price ?? plan.amount ?? '';
     const price = parsePrice(priceSource);
 
     if (!price || price <= 0) {
@@ -281,6 +277,7 @@ module.exports = async function handler(req, res) {
     const customerName = String(body.customerName || '').trim();
     const customerEmail = String(body.customerEmail || '').trim().toLowerCase();
     const customerPhone = normalizePhone(body.customerPhone);
+    const language = normalizeLanguage(body.language);
 
     const selectedItems = Array.isArray(body.selectedItems)
       ? body.selectedItems
@@ -374,6 +371,7 @@ module.exports = async function handler(req, res) {
       userEmail: customerEmail,
       userName: customerName,
       userPhone: customerPhone,
+      language,
       amount: totalAmount,
       amountCents,
       currency: 'EGP',
@@ -384,7 +382,6 @@ module.exports = async function handler(req, res) {
       items: resolvedCourses,
       status: 'pending',
       paymentProvider: isMockModeEnabled() ? 'paymob-mock' : 'paymob',
-      language,
       createdAt: Date.now(),
     };
 
