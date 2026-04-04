@@ -1,20 +1,27 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Course, CoursePricingPlan } from 'src/app/shared/models/course.model';
+import { Diploma, DiplomaPricingPlan } from 'src/app/shared/models/diploma.model';
+
+export type CartItemType = 'course' | 'diploma';
 
 export interface CartItem {
   key: string;
-  courseId: string;
-  planId: string;
+  itemType: CartItemType;
+  itemId: string;
+  courseId?: string;
+  diplomaId?: string;
   title: string;
   description: string;
   price: number;
   priceText: string;
   thumbnail?: string;
+  planId: string;
   planName: string;
   planBadge?: string;
   planNote?: string;
   planFeatures: string[];
+  includedCourseIds?: string[];
 }
 
 @Injectable({
@@ -38,44 +45,62 @@ export class CartService {
     return this.itemsSubject.value.reduce((sum, item) => sum + Number(item.price || 0), 0);
   }
 
-  hasItem(courseId: string, planId: string): boolean {
+  hasItem(itemId: string, planId: string, itemType: CartItemType = 'course'): boolean {
     return this.itemsSubject.value.some(
-      (item) => item.courseId === courseId && item.planId === planId,
+      (item) => item.itemType === itemType && item.itemId === itemId && item.planId === planId,
     );
   }
 
   addCourse(course: Course, plan: CoursePricingPlan): CartItem | null {
     if (!course?.id || !plan?.priceText?.trim()) return null;
 
-    const planId = this.resolvePlanId(plan);
-    const existingIndex = this.itemsSubject.value.findIndex(
-      (item) => item.courseId === course.id && item.planId === planId,
-    );
-
+    const planId = this.resolvePlanId(plan.id, plan.name);
     const newItem: CartItem = {
-      key: `${course.id}__${planId}`,
+      key: this.buildKey('course', course.id, planId),
+      itemType: 'course',
+      itemId: course.id,
       courseId: course.id,
-      planId,
       title: course.title || '',
       description: course.description || '',
       price: this.parsePrice(plan.priceText),
       priceText: plan.priceText || '',
       thumbnail: course.thumbnail || '',
+      planId,
       planName: plan.name || '',
       planBadge: plan.badge || '',
       planNote: plan.note || '',
       planFeatures: Array.isArray(plan.features) ? [...plan.features] : [],
+      includedCourseIds: [course.id],
     };
 
-    const items = [...this.itemsSubject.value];
+    this.upsertItem(newItem);
+    return newItem;
+  }
 
-    if (existingIndex >= 0) {
-      items[existingIndex] = newItem;
-    } else {
-      items.push(newItem);
-    }
+  addDiploma(diploma: Diploma & { id: string }, plan: DiplomaPricingPlan): CartItem | null {
+    if (!diploma?.id || !plan?.priceText?.trim()) return null;
 
-    this.updateState(items);
+    const includedCourseIds = Object.keys(diploma.courseIds || {}).filter(Boolean);
+    const planId = this.resolvePlanId(plan.id, plan.name);
+    const newItem: CartItem = {
+      key: this.buildKey('diploma', diploma.id, planId),
+      itemType: 'diploma',
+      itemId: diploma.id,
+      diplomaId: diploma.id,
+      title: diploma.title || '',
+      description: diploma.description || '',
+      price: this.parsePrice(plan.priceText),
+      priceText: plan.priceText || '',
+      thumbnail: diploma.thumbnail || '',
+      planId,
+      planName: plan.name || '',
+      planBadge: plan.badge || '',
+      planNote: plan.note || '',
+      planFeatures: Array.isArray(plan.features) ? [...plan.features] : [],
+      includedCourseIds,
+    };
+
+    this.upsertItem(newItem);
     return newItem;
   }
 
@@ -88,20 +113,48 @@ export class CartService {
     this.updateState([]);
   }
 
-  removePurchasedCourses(courseIds: string[]): void {
-    const normalizedCourseIds = Array.from(
-      new Set((courseIds || []).map((id) => `${id || ''}`.trim()).filter(Boolean))
-    );
+  removePurchasedItems(purchasedKeys: string[], grantedCourseIds: string[] = []): void {
+    const keysSet = new Set((purchasedKeys || []).map((key) => `${key || ''}`.trim()).filter(Boolean));
+    const courseIdsSet = new Set((grantedCourseIds || []).map((id) => `${id || ''}`.trim()).filter(Boolean));
 
-    if (!normalizedCourseIds.length) {
+    if (!keysSet.size && !courseIdsSet.size) {
       return;
     }
 
-    const items = this.itemsSubject.value.filter(
-      (item) => !normalizedCourseIds.includes(`${item.courseId || ''}`.trim())
-    );
+    const items = this.itemsSubject.value.filter((item) => {
+      if (keysSet.has(item.key)) {
+        return false;
+      }
+
+      if (item.itemType === 'course' && courseIdsSet.has(`${item.courseId || ''}`.trim())) {
+        return false;
+      }
+
+      return true;
+    });
 
     this.updateState(items);
+  }
+
+  removePurchasedCourses(courseIds: string[]): void {
+    this.removePurchasedItems([], courseIds);
+  }
+
+  private upsertItem(newItem: CartItem): void {
+    const items = [...this.itemsSubject.value];
+    const existingIndex = items.findIndex((item) => item.key === newItem.key);
+
+    if (existingIndex >= 0) {
+      items[existingIndex] = newItem;
+    } else {
+      items.push(newItem);
+    }
+
+    this.updateState(items);
+  }
+
+  private buildKey(itemType: CartItemType, itemId: string, planId: string): string {
+    return `${itemType}:${itemId}__${planId}`;
   }
 
   private updateState(items: CartItem[]): void {
@@ -121,16 +174,23 @@ export class CartService {
     }
   }
 
-  private resolvePlanId(plan: CoursePricingPlan): string {
-    const fromPlan = `${plan.id || ''}`.trim();
-    if (fromPlan) return fromPlan;
+  private resolvePlanId(id?: string, fallbackName?: string): string {
+    const fromId = `${id || ''}`.trim();
+    if (fromId) {
+      return this.slugify(fromId);
+    }
 
-    const fromName = `${plan.name || ''}`
+    return this.slugify(`${fallbackName || ''}`) || 'plan';
+  }
+
+  private slugify(value: string): string {
+    return `${value || ''}`
+      .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString())
+      .replace(/[^\u0621-\u064Aa-z0-9-_]+/gi, '-')
+      .replace(/-+/g, '-')
       .replace(/^-+|-+$/g, '');
-
-    return fromName || 'plan';
   }
 
   private parsePrice(value: string): number {

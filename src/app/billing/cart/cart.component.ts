@@ -30,10 +30,10 @@ export class CartComponent implements OnInit, OnDestroy {
 
   get itemsCountLabel(): string {
     if (this.isEnglish) {
-      return this.items.length === 1 ? 'plan' : 'plans';
+      return this.items.length === 1 ? 'item' : 'items';
     }
 
-    return this.items.length === 1 ? 'خطة' : 'خطط';
+    return this.items.length === 1 ? 'عنصر' : 'عناصر';
   }
 
   ngOnInit(): void {
@@ -55,12 +55,14 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   continueShopping(): void {
-    this.router.navigate(['/courses']);
+    const hasDiploma = this.items.some((item) => item.itemType === 'diploma');
+    this.router.navigate([hasDiploma ? '/diplomas' : '/courses']);
   }
 
-  viewCourse(courseId: string): void {
-    if (!courseId) return;
-    this.router.navigate(['/courses', courseId]);
+  viewItem(item: CartItem): void {
+    if (!item.itemId) return;
+
+    this.router.navigate([item.itemType === 'diploma' ? '/diplomas' : '/courses', item.itemId]);
   }
 
   goToCheckout(): void {

@@ -4,12 +4,13 @@ import { Auth } from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
 
 export interface StartPaymobCheckoutItem {
-  courseId: string;
+  itemType: 'course' | 'diploma';
+  itemId: string;
   planId: string;
 }
 
 export interface StartPaymobCheckoutPayload {
-  courseIds: string[];
+  courseIds?: string[];
   customerName: string;
   customerEmail: string;
   customerPhone: string;

@@ -5,63 +5,6 @@
   </a>
 </div>
 
-<section class="course-hero" [attr.dir]="pageDir" *ngIf="!loading && diploma as d">
-  <div class="container">
-    <div class="course-hero-inner">
-      <div class="course-hero-text">
-        <div class="course-hero-eyebrow">
-          {{ d.heroEyebrow }}
-        </div>
-
-        <h1 class="course-hero-title">{{ d.title }}</h1>
-
-        <p class="course-hero-tagline">
-          {{ d.heroTagline || d.description }}
-        </p>
-
-        <div class="course-hero-meta">
-          <span class="course-hero-pill">
-            {{ isEnglish ? 'Program duration:' : 'مدة البرنامج:' }}
-            {{ d.programDuration || "—" }}
-          </span>
-
-          <span class="course-hero-pill">{{ d.targetAudience || "—" }}</span>
-
-          <span class="course-hero-pill" *ngIf="d.meta?.totalCourses">
-            {{
-              isEnglish
-                ? ('Includes ' + d.meta?.totalCourses + ' courses')
-                : ('يشمل ' + d.meta?.totalCourses + ' كورس')
-            }}
-          </span>
-        </div>
-
-        <div class="course-hero-actions">
-          <button
-            class="btn btn-primary"
-            type="button"
-            (click)="goToPurchase()"
-          >
-            {{ enrollDiplomaText }}
-          </button>
-        </div>
-      </div>
-
-      <div class="course-hero-poster-wrapper">
-        <div class="course-hero-poster">
-          <img
-            [src]="d.thumbnail || defaultThumbnail"
-            [alt]="d.title || (isEnglish ? 'Diploma poster' : 'بوستر الدبلومة')"
-          />
-          <div class="poster-play-badge" *ngIf="introVideoSafeUrl">
-            <div class="poster-play-icon">▶</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <div class="container mb-3" *ngIf="loading" [attr.dir]="pageDir">
   <div class="alert alert-info">{{ loadingText }}</div>
 </div>
@@ -70,235 +13,275 @@
   <div class="alert alert-danger">{{ error }}</div>
 </div>
 
-<section class="section" *ngIf="!loading && !error && diploma as d" [attr.dir]="pageDir">
-  <div class="container course-info-grid">
-    <div class="course-info-card">
-      <div class="course-info-label">{{ goalLabel }}</div>
-      <div class="course-info-main">{{ d.goalTitle }}</div>
-      <p class="course-info-text">{{ d.goalDescription }}</p>
+<section class="diploma-hero" *ngIf="!loading && !error && diploma as d" [attr.dir]="pageDir">
+  <div class="container diploma-hero-inner">
+    <div class="diploma-hero-copy">
+      <div class="hero-eyebrow">{{ heroEyebrow }}</div>
+      <h1 class="hero-title">{{ heroTitle }}</h1>
+      <p class="hero-tagline">{{ heroTagline }}</p>
+
+      <div class="hero-meta" *ngIf="heroMetaItems.length || d.programDuration || selectedPlan?.priceText">
+        <span class="hero-pill" *ngIf="d.programDuration">{{ d.programDuration }}</span>
+        <span class="hero-pill" *ngIf="selectedPlan?.priceText">{{ selectedPlan?.priceText }} EGP</span>
+        <span class="hero-pill" *ngFor="let item of heroMetaItems">
+          <strong *ngIf="item.label">{{ item.label }}:</strong>
+          {{ item.value }}
+        </span>
+      </div>
+
+      <div class="hero-chip-list" *ngIf="lectureNames.length">
+        <span class="hero-chip" *ngFor="let item of lectureNames; trackBy: trackByIndex">{{ item }}</span>
+      </div>
+
+      <div class="hero-actions">
+        <ng-container *ngIf="auth.currentUser; else loginToBuyHero">
+          <button class="btn btn-primary" type="button" (click)="buyNow()">
+            {{ buyNowText }}
+          </button>
+          <button class="btn btn-outline-primary" type="button" (click)="addToCart()">
+            {{ addToCartText }}
+          </button>
+        </ng-container>
+
+        <ng-template #loginToBuyHero>
+          <button class="btn btn-primary" type="button" (click)="goToPurchase()">
+            {{ loginToPurchaseText }}
+          </button>
+        </ng-template>
+      </div>
     </div>
 
-    <div class="course-info-card">
-      <div class="course-info-label">{{ expectedStudyLabel }}</div>
-      <div class="course-info-main">{{ d.expectedStudyTimeTitle }}</div>
-      <p class="course-info-text">{{ d.expectedStudyTimeDescription }}</p>
-    </div>
-
-    <div class="course-info-card">
-      <div class="course-info-label">{{ prerequisitesLabel }}</div>
-      <div class="course-info-main">{{ d.prerequisitesTitle }}</div>
-      <p class="course-info-text">{{ d.prerequisitesDescription }}</p>
-    </div>
-  </div>
-</section>
-
-<section class="section" *ngIf="introVideoSafeUrl" [attr.dir]="pageDir">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-eyebrow">{{ introVideoEyebrow }}</div>
-      <h2 class="section-title">{{ introVideoTitle }}</h2>
-      <p class="section-subtitle">{{ introVideoSubtitle }}</p>
-    </div>
-
-    <div class="course-video-wrapper">
-      <div class="course-video-frame">
-        <iframe
-          [src]="introVideoSafeUrl"
-          [title]="introVideoFrameTitle"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"
-          allowfullscreen
-        ></iframe>
+    <div class="diploma-hero-media">
+      <div class="hero-poster">
+        <img [src]="d.thumbnail || defaultThumbnail" [alt]="d.title" />
       </div>
     </div>
   </div>
 </section>
 
-<section class="section" *ngIf="!loading && !error && diploma as d" [attr.dir]="pageDir">
+<section class="content-section" *ngIf="!loading && !error && diploma as d" [attr.dir]="pageDir">
+  <div class="container info-grid">
+    <article class="info-card" *ngIf="d.goalTitle || d.goalDescription">
+      <div class="info-label">{{ isEnglish ? 'Goal' : 'الهدف' }}</div>
+      <h2 class="info-title">{{ d.goalTitle }}</h2>
+      <p class="info-text">{{ d.goalDescription }}</p>
+    </article>
+
+    <article class="info-card" *ngIf="d.expectedStudyTimeTitle || d.expectedStudyTimeDescription">
+      <div class="info-label">{{ isEnglish ? 'Expected study time' : 'المدة المتوقعة' }}</div>
+      <h2 class="info-title">{{ d.expectedStudyTimeTitle }}</h2>
+      <p class="info-text">{{ d.expectedStudyTimeDescription }}</p>
+    </article>
+
+    <article class="info-card" *ngIf="d.prerequisitesTitle || d.prerequisitesDescription">
+      <div class="info-label">{{ isEnglish ? 'Before you begin' : 'قبل أن تبدأ' }}</div>
+      <h2 class="info-title">{{ d.prerequisitesTitle }}</h2>
+      <p class="info-text">{{ d.prerequisitesDescription }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="content-section" *ngIf="introVideoSafeUrl" [attr.dir]="pageDir">
   <div class="container">
-    <div class="section-header">
-      <div class="section-eyebrow">{{ specsEyebrow }}</div>
-      <h2 class="section-title">{{ specsTitle }}</h2>
-      <p class="section-subtitle">{{ specsSubtitle }}</p>
+    <div class="section-header text-center">
+      <div class="section-eyebrow">{{ isEnglish ? 'Intro video' : 'فيديو تعريفي' }}</div>
+      <h2 class="section-title">{{ isEnglish ? 'Introduction to the diploma' : 'مقدمة عن الدبلومة' }}</h2>
     </div>
-
-    <div class="specs-card">
-      <ul class="specs-list" *ngIf="(d.specs?.length || 0) > 0; else noSpecs">
-        <li *ngFor="let s of d.specs">{{ s }}</li>
-      </ul>
-
-      <ng-template #noSpecs>
-        <p class="text-muted text-center m-0">{{ noSpecsText }}</p>
-      </ng-template>
+    <div class="video-frame">
+      <iframe
+        [src]="introVideoSafeUrl"
+        [title]="isEnglish ? 'Diploma intro video' : 'فيديو تعريفي للدبلومة'"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
     </div>
   </div>
 </section>
 
-<section class="section" *ngIf="!loading && !error" [attr.dir]="pageDir">
+<section class="content-section section-accent" *ngIf="sectionCards.length" [attr.dir]="pageDir">
   <div class="container">
-    <div class="section-header">
-      <div class="section-eyebrow">{{ contentEyebrow }}</div>
-      <h2 class="section-title">{{ contentTitle }}</h2>
-      <p class="section-subtitle">{{ contentSubtitle }}</p>
+    <div class="section-header text-center">
+      <div class="section-eyebrow">{{ isEnglish ? 'Highlights' : 'مميزات ومحاور أساسية' }}</div>
+      <h2 class="section-title">{{ isEnglish ? 'Why this diploma path matters' : 'لماذا هذا المسار مهم؟' }}</h2>
+    </div>
+    <div class="card-grid three-cols">
+      <article class="feature-card" *ngFor="let card of sectionCards">
+        <h3>{{ card.title }}</h3>
+        <p>{{ card.description }}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="content-section" *ngIf="includedCourses.length" [attr.dir]="pageDir">
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-eyebrow">{{ isEnglish ? 'Included courses' : 'الكورسات الموجودة داخل الدبلومة' }}</div>
+      <h2 class="section-title">{{ isEnglish ? 'What courses are included?' : 'ما الكورسات المشمولة داخل الباقة؟' }}</h2>
     </div>
 
-    <div class="courses-grid" *ngIf="includedCourses.length; else noCourses">
-      <article class="course-card" *ngFor="let c of includedCourses">
-        <div
-          class="course-image"
-          [style.background-image]="'url(' + (c.thumbnail || defaultThumbnail) + ')'"
-        >
-          <span class="course-tag">{{ c.categoryId || (isEnglish ? 'General' : 'عام') }}</span>
-        </div>
-
-        <div class="course-body">
-          <h3 class="course-title">{{ c.title }}</h3>
-          <p class="course-desc">{{ c.description }}</p>
-
-          <div class="course-meta">
-            <span class="course-price">
-              {{ c.price | currency: "EGP" : "symbol" : "1.0-0" }}
-            </span>
-          </div>
-        </div>
-
-        <div class="course-footer">
-          <button class="btn btn-outline" [routerLink]="['/courses', c.id]">
-            {{ courseDetailsText }}
+    <div class="included-grid">
+      <article class="included-card" *ngFor="let course of includedCourses">
+        <img class="included-thumb" [src]="course.thumbnail || defaultThumbnail" [alt]="course.title" />
+        <div class="included-body">
+          <div class="included-category" *ngIf="course.categoryId">{{ course.categoryId }}</div>
+          <h3>{{ course.title }}</h3>
+          <p>{{ course.description }}</p>
+          <button class="btn btn-outline-primary btn-sm" type="button" (click)="openCourseDetails(course.id)">
+            {{ isEnglish ? 'View course details' : 'عرض تفاصيل الكورس' }}
           </button>
         </div>
       </article>
     </div>
-
-    <ng-template #noCourses>
-      <p class="text-muted text-center">{{ noCoursesText }}</p>
-    </ng-template>
   </div>
 </section>
 
-<section class="section" *ngIf="!loading && !error && diploma as d" [attr.dir]="pageDir">
+<section class="content-section" *ngIf="curriculum.length" [attr.dir]="pageDir">
   <div class="container">
-    <div class="section-header">
-      <div class="section-eyebrow">{{ perksEyebrow }}</div>
-      <h2 class="section-title">{{ perksTitle }}</h2>
-      <p class="section-subtitle">{{ perksSubtitle }}</p>
+    <div class="section-header text-center">
+      <div class="section-eyebrow">{{ isEnglish ? 'Curriculum' : 'محتوى الدبلومة' }}</div>
+      <h2 class="section-title">{{ isEnglish ? 'The main learning path' : 'المسار التعليمي الرئيسي' }}</h2>
     </div>
 
-    <div class="specs-card">
-      <ul class="specs-list" *ngIf="(d.communityPerks?.length || 0) > 0; else noPerks">
-        <li *ngFor="let s of d.communityPerks">{{ s }}</li>
-      </ul>
-
-      <ng-template #noPerks>
-        <p class="text-muted text-center m-0">{{ noPerksText }}</p>
-      </ng-template>
-    </div>
-  </div>
-</section>
-
-<section class="section" *ngIf="!loading && !error && diploma as d" [attr.dir]="pageDir">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-eyebrow">{{ testimonialsEyebrow }}</div>
-      <h2 class="section-title">{{ testimonialsTitle }}</h2>
-      <p class="section-subtitle">{{ testimonialsSubtitle }}</p>
-    </div>
-
-    <div class="testimonials-row">
-      <article class="testimonial-card" *ngFor="let t of d.testimonials || []">
-        <div class="testimonial-header">
-          <div class="testimonial-user">
-            <div class="avatar">{{ (t?.name || "?").slice(0, 1) }}</div>
-            <div>
-              <div class="testimonial-name">{{ t?.name }}</div>
-              <div class="testimonial-tag">{{ t?.tag || testimonialDefaultTag }}</div>
-            </div>
-          </div>
-
-          <div class="testimonial-stars" *ngIf="t?.rating">
-            {{ "★".repeat(t.rating || 0) }}
-          </div>
+    <div class="curriculum-list">
+      <article class="curriculum-card" *ngFor="let item of curriculum; let i = index">
+        <div class="curriculum-index">{{ i + 1 }}</div>
+        <div class="curriculum-content">
+          <h3>{{ item.title }}</h3>
+          <ul *ngIf="item.points.length">
+            <li *ngFor="let point of item.points">{{ point }}</li>
+          </ul>
         </div>
-
-        <div class="testimonial-text">{{ t?.text }}</div>
-        <div class="testimonial-label">{{ testimonialFooterLabel }}</div>
       </article>
     </div>
   </div>
 </section>
 
-<section class="section" *ngIf="!loading && !error && diploma as d" [attr.dir]="pageDir">
+<section class="content-section section-accent" *ngIf="outcomes.length || audienceItems.length" [attr.dir]="pageDir">
+  <div class="container dual-grid">
+    <article class="simple-card" *ngIf="outcomes.length">
+      <div class="section-eyebrow">{{ isEnglish ? 'Expected outcomes' : 'المخرجات المتوقعة' }}</div>
+      <h2 class="section-title section-title--left">{{ isEnglish ? 'What the learner will gain' : 'ماذا سيستفيد المتدرب؟' }}</h2>
+      <ul class="feature-list">
+        <li *ngFor="let item of outcomes">{{ item }}</li>
+      </ul>
+    </article>
+
+    <article class="simple-card" *ngIf="audienceItems.length">
+      <div class="section-eyebrow">{{ isEnglish ? 'Target audience' : 'الفئة المستهدفة' }}</div>
+      <h2 class="section-title section-title--left">{{ isEnglish ? 'Who is this diploma for?' : 'لمن هذه الدبلومة؟' }}</h2>
+      <ul class="feature-list">
+        <li *ngFor="let item of audienceItems">{{ item }}</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<section class="content-section" *ngIf="communityPerks.length" [attr.dir]="pageDir">
   <div class="container">
-    <div class="section-header">
-      <div class="section-eyebrow">{{ pricingEyebrow }}</div>
-      <h2 class="section-title">{{ pricingTitle }}</h2>
+    <div class="section-header text-center">
+      <div class="section-eyebrow">{{ isEnglish ? 'Additional value' : 'قيمة إضافية' }}</div>
+      <h2 class="section-title">{{ isEnglish ? 'What strengthens the learner experience?' : 'ما الذي يعزز تجربة المتدرب؟' }}</h2>
+    </div>
+    <div class="simple-card">
+      <ul class="feature-list compact">
+        <li *ngFor="let item of communityPerks">{{ item }}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="content-section" *ngIf="testimonials.length" [attr.dir]="pageDir">
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-eyebrow">{{ isEnglish ? 'Testimonials' : 'آراء المشتركين' }}</div>
+      <h2 class="section-title">{{ isEnglish ? 'What do learners say?' : 'ماذا يقول المشتركون؟' }}</h2>
+    </div>
+    <div class="card-grid three-cols">
+      <article class="testimonial-card" *ngFor="let item of testimonials">
+        <div class="testimonial-header">
+          <div>
+            <h3>{{ item.name }}</h3>
+            <div class="testimonial-tag" *ngIf="item.tag">{{ item.tag }}</div>
+          </div>
+          <div class="testimonial-stars" *ngIf="item.rating">{{ '★'.repeat(item.rating || 0) }}</div>
+        </div>
+        <p>{{ item.text }}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="content-section" *ngIf="faqs.length" [attr.dir]="pageDir">
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-eyebrow">{{ isEnglish ? 'FAQ' : 'الأسئلة الشائعة' }}</div>
+      <h2 class="section-title">{{ isEnglish ? 'Important questions before purchasing' : 'أسئلة مهمة قبل الشراء' }}</h2>
+    </div>
+    <div class="faq-list">
+      <article class="faq-card" *ngFor="let faq of faqs">
+        <h3>{{ faq.question }}</h3>
+        <p>{{ faq.answer }}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="diploma-pricing" class="content-section pricing-section" *ngIf="pricingPlans.length" [attr.dir]="pageDir">
+  <div class="container">
+    <div class="section-header text-center">
+      <div class="section-eyebrow">{{ isEnglish ? 'Pricing plans' : 'خطط الاشتراك' }}</div>
+      <h2 class="section-title">{{ isEnglish ? 'Choose your plan' : 'اختر الخطة المناسبة لك' }}</h2>
       <p class="section-subtitle">{{ pricingSubtitle }}</p>
     </div>
 
-    <div class="pricing-grid">
-      <article
-        class="pricing-card"
-        *ngFor="let p of d.pricingPlans || []"
-        [class.highlight]="!!p?.highlighted"
-      >
-        <div class="pricing-ribbon" *ngIf="p?.highlighted">{{ mostSelectedText }}</div>
+    <div class="card-grid three-cols pricing-grid">
+      <article class="pricing-card" *ngFor="let plan of pricingPlans; trackBy: planTrackBy" [class.highlight]="isPlanSelected(plan)">
+        <div class="pricing-badge-top" *ngIf="plan.badge">{{ plan.badge }}</div>
+        <h3>{{ plan.name }}</h3>
+        <div class="pricing-price">{{ plan.priceText }} <span>EGP</span></div>
+        <p class="pricing-note" *ngIf="plan.note">{{ plan.note }}</p>
 
-        <div class="pricing-name">{{ p?.name }}</div>
-        <div class="pricing-badge">{{ p?.badge }}</div>
-        <div class="pricing-price">{{ p?.priceText }}</div>
-        <div class="pricing-note">{{ p?.note }}</div>
-
-        <ul class="pricing-features">
-          <li *ngFor="let f of p?.features || []">{{ f }}</li>
+        <ul class="pricing-features" *ngIf="plan.features.length">
+          <li *ngFor="let feature of plan.features">{{ feature }}</li>
         </ul>
 
-        <button class="btn btn-primary" type="button" (click)="goToPurchase()">
-          {{ enrollNowText }}
-        </button>
+        <div class="pricing-actions">
+          <button class="btn btn-outline-primary w-100" type="button" (click)="selectPlan(plan)">
+            {{ isPlanSelected(plan) ? (isEnglish ? 'Selected' : 'تم الاختيار') : (isEnglish ? 'Choose this plan' : 'اختر هذه الخطة') }}
+          </button>
+
+          <ng-container *ngIf="auth.currentUser; else planLoginBlock">
+            <button class="btn btn-light border w-100" type="button" *ngIf="isPlanSelected(plan)" (click)="addToCart()">
+              {{ addToCartText }}
+            </button>
+            <button class="btn btn-primary w-100" type="button" *ngIf="isPlanSelected(plan)" (click)="buyNow()">
+              {{ buyNowText }}
+            </button>
+          </ng-container>
+
+          <ng-template #planLoginBlock>
+            <button class="btn btn-primary w-100" type="button" *ngIf="isPlanSelected(plan)" (click)="goToPurchase()">
+              {{ loginToPurchaseText }}
+            </button>
+          </ng-template>
+        </div>
       </article>
     </div>
   </div>
 </section>
 
 <section class="bottom-cta" *ngIf="!loading && !error && diploma as d" [attr.dir]="pageDir">
-  <div class="container">
-    <p>{{ d.bottomCta?.text }}</p>
-    <button class="btn btn-primary" type="button" (click)="onOfferSubscribe()">
-      {{ d.bottomCta?.buttonText || enrollNowText }}
-    </button>
+  <div class="container bottom-cta-inner">
+    <div>
+      <h2 *ngIf="d.bottomCta?.buttonText">{{ d.bottomCta?.buttonText }}</h2>
+      <p>{{ d.bottomCta?.text || heroTagline }}</p>
+    </div>
+    <ng-container *ngIf="auth.currentUser; else bottomLoginBlock">
+      <button class="btn btn-primary" type="button" (click)="buyNow()">{{ buyNowText }}</button>
+    </ng-container>
+    <ng-template #bottomLoginBlock>
+      <button class="btn btn-primary" type="button" (click)="goToPurchase()">{{ loginToPurchaseText }}</button>
+    </ng-template>
   </div>
 </section>
-
-<div
-  class="offer-backdrop"
-  *ngIf="!loading && !error && diploma as d"
-  [class.show]="showOfferPopup"
-  (click)="onOfferBackdropClick($event)"
->
-  <div class="offer-popup" [attr.dir]="pageDir">
-    <button
-      class="offer-close"
-      type="button"
-      (click)="closeOffer()"
-      [attr.aria-label]="isEnglish ? 'Close' : 'إغلاق'"
-    >
-      ×
-    </button>
-
-    <div class="offer-heading">
-      {{
-        d.offer?.heading ||
-          (isEnglish
-            ? ('Special ' + (d.offer?.percent || 30) + '% discount offer')
-            : ('عرض خاص بخصم ' + (d.offer?.percent || 30) + '٪'))
-      }}
-    </div>
-
-    <div class="offer-badge">{{ limitedOfferText }}</div>
-
-    <p class="offer-text">{{ d.offer?.text }}</p>
-
-    <button class="btn btn-primary" type="button" (click)="onOfferSubscribe()">
-      {{ d.offer?.ctaText || enrollNowText }}
-    </button>
-  </div>
-</div>

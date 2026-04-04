@@ -96,6 +96,10 @@ function normalizeLanguage(value) {
   return lang === 'en' ? 'en' : 'ar';
 }
 
+function normalizeItemType(value) {
+  return String(value || '').trim().toLowerCase() === 'diploma' ? 'diploma' : 'course';
+}
+
 function getLocalizedText(value) {
   if (typeof value === 'string' || typeof value === 'number') {
     return String(value);
@@ -195,24 +199,23 @@ function getCanonicalPlanId(plan, index) {
   return `plan-${index + 1}`;
 }
 
-function getCourseTitle(course) {
-  if (!course || typeof course !== 'object') return '';
-
-  return getLocalizedText(course.title) || getLocalizedText(course.name) || '';
+function getEntityTitle(entity) {
+  if (!entity || typeof entity !== 'object') return '';
+  return getLocalizedText(entity.title) || getLocalizedText(entity.name) || '';
 }
 
-function getPricingPlans(course) {
-  if (!course || typeof course !== 'object') return [];
+function getPricingPlans(entity) {
+  if (!entity || typeof entity !== 'object') return [];
 
-  if (Array.isArray(course.pricingPlans)) return course.pricingPlans;
-  if (Array.isArray(course.pricing)) return course.pricing;
-  if (Array.isArray(course.plans)) return course.plans;
+  if (Array.isArray(entity.pricingPlans)) return entity.pricingPlans;
+  if (Array.isArray(entity.pricing)) return entity.pricing;
+  if (Array.isArray(entity.plans)) return entity.plans;
 
   return [];
 }
 
-function resolvePlanFromCourse(course, requestedPlanId) {
-  const plans = getPricingPlans(course);
+function resolvePlanFromEntity(entity, requestedPlanId) {
+  const plans = getPricingPlans(entity);
   const normalizedRequestedPlanId = normalizePlanId(requestedPlanId);
 
   if (!plans.length || !normalizedRequestedPlanId) {
@@ -258,6 +261,17 @@ function resolvePlanFromCourse(course, requestedPlanId) {
   return null;
 }
 
+async function hasAnyEnrollment(admin, uid, courseIds) {
+  for (const courseId of courseIds) {
+    const enrollmentSnap = await admin.database().ref(`enrollments/${uid}/${courseId}`).get();
+    if (!enrollmentSnap.exists()) {
+      return false;
+    }
+  }
+
+  return courseIds.length > 0;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return send(res, 405, { message: 'Method Not Allowed' });
@@ -281,16 +295,24 @@ module.exports = async function handler(req, res) {
 
     const selectedItems = Array.isArray(body.selectedItems)
       ? body.selectedItems
-          .map((item) => ({
-            courseId: String(item?.courseId || '').trim(),
-            planId: normalizePlanId(item?.planId),
-          }))
-          .filter((item) => item.courseId && item.planId)
+          .map((item) => {
+            const itemType = normalizeItemType(item?.itemType);
+            const itemId = String(
+              item?.itemId || item?.courseId || item?.diplomaId || ''
+            ).trim();
+
+            return {
+              itemType,
+              itemId,
+              planId: normalizePlanId(item?.planId),
+            };
+          })
+          .filter((item) => item.itemId && item.planId)
       : [];
 
     if (!selectedItems.length) {
       return send(res, 400, {
-        message: 'selectedItems is required and must contain courseId and planId',
+        message: 'selectedItems is required and must contain itemType, itemId and planId',
       });
     }
 
@@ -300,7 +322,7 @@ module.exports = async function handler(req, res) {
 
     const uniqueMap = new Map();
     for (const item of selectedItems) {
-      const key = `${item.courseId}__${item.planId}`;
+      const key = `${item.itemType}:${item.itemId}__${item.planId}`;
       if (!uniqueMap.has(key)) {
         uniqueMap.set(key, item);
       }
@@ -312,40 +334,97 @@ module.exports = async function handler(req, res) {
     const uid = decoded.uid;
 
     let totalAmount = 0;
-    const resolvedCourses = [];
+    const resolvedItems = [];
+    const grantedCourseIdsMap = {};
+    const purchasedKeys = [];
 
     for (const item of uniqueSelectedItems) {
-      const courseSnap = await admin.database().ref(`courses/${item.courseId}`).get();
+      if (item.itemType === 'course') {
+        const courseSnap = await admin.database().ref(`courses/${item.itemId}`).get();
 
-      if (!courseSnap.exists()) {
-        return send(res, 404, { message: `Course not found: ${item.courseId}` });
+        if (!courseSnap.exists()) {
+          return send(res, 404, { message: `Course not found: ${item.itemId}` });
+        }
+
+        const course = courseSnap.val() || {};
+        const resolvedPlan = resolvePlanFromEntity(course, item.planId);
+
+        if (!resolvedPlan) {
+          return send(res, 400, {
+            message: `Pricing plan not found or invalid for course: ${item.itemId}`,
+          });
+        }
+
+        const enrollmentSnap = await admin
+          .database()
+          .ref(`enrollments/${uid}/${item.itemId}`)
+          .get();
+
+        if (enrollmentSnap.exists()) {
+          return send(res, 400, {
+            message: 'أنت مشترك بالفعل في أحد الكورسات المحددة.',
+          });
+        }
+
+        totalAmount += resolvedPlan.price;
+        grantedCourseIdsMap[item.itemId] = true;
+        purchasedKeys.push(`course:${item.itemId}__${resolvedPlan.planId}`);
+
+        resolvedItems.push({
+          id: item.itemId,
+          itemType: 'course',
+          title: getEntityTitle(course),
+          price: resolvedPlan.price,
+          priceText: resolvedPlan.priceText,
+          planId: resolvedPlan.planId,
+          planName: resolvedPlan.planName,
+          badge: resolvedPlan.badge,
+          note: resolvedPlan.note,
+          features: resolvedPlan.features,
+        });
+
+        continue;
       }
 
-      const course = courseSnap.val() || {};
-      const resolvedPlan = resolvePlanFromCourse(course, item.planId);
+      const diplomaSnap = await admin.database().ref(`diplomas/${item.itemId}`).get();
+
+      if (!diplomaSnap.exists()) {
+        return send(res, 404, { message: `Diploma not found: ${item.itemId}` });
+      }
+
+      const diploma = diplomaSnap.val() || {};
+      const resolvedPlan = resolvePlanFromEntity(diploma, item.planId);
 
       if (!resolvedPlan) {
         return send(res, 400, {
-          message: `Pricing plan not found or invalid for course: ${item.courseId}`,
+          message: `Pricing plan not found or invalid for diploma: ${item.itemId}`,
         });
       }
 
-      const enrollmentSnap = await admin
-        .database()
-        .ref(`enrollments/${uid}/${item.courseId}`)
-        .get();
-
-      if (enrollmentSnap.exists()) {
+      const diplomaCourseIds = Object.keys(diploma.courseIds || {}).filter(Boolean);
+      if (!diplomaCourseIds.length) {
         return send(res, 400, {
-          message: 'أنت مشترك بالفعل في أحد الكورسات المحددة.',
+          message: `Diploma does not contain any courses: ${item.itemId}`,
+        });
+      }
+
+      const alreadyOwnAllCourses = await hasAnyEnrollment(admin, uid, diplomaCourseIds);
+      if (alreadyOwnAllCourses) {
+        return send(res, 400, {
+          message: 'أنت مشترك بالفعل في جميع كورسات هذه الدبلومة.',
         });
       }
 
       totalAmount += resolvedPlan.price;
+      diplomaCourseIds.forEach((courseId) => {
+        grantedCourseIdsMap[courseId] = true;
+      });
+      purchasedKeys.push(`diploma:${item.itemId}__${resolvedPlan.planId}`);
 
-      resolvedCourses.push({
-        id: item.courseId,
-        title: getCourseTitle(course),
+      resolvedItems.push({
+        id: item.itemId,
+        itemType: 'diploma',
+        title: getEntityTitle(diploma),
         price: resolvedPlan.price,
         priceText: resolvedPlan.priceText,
         planId: resolvedPlan.planId,
@@ -353,10 +432,11 @@ module.exports = async function handler(req, res) {
         badge: resolvedPlan.badge,
         note: resolvedPlan.note,
         features: resolvedPlan.features,
+        grantedCourseIds: diplomaCourseIds,
       });
     }
 
-    if (!resolvedCourses.length || totalAmount <= 0) {
+    if (!resolvedItems.length || totalAmount <= 0) {
       return send(res, 400, {
         message: 'No valid purchasable items were found.',
       });
@@ -375,11 +455,9 @@ module.exports = async function handler(req, res) {
       amount: totalAmount,
       amountCents,
       currency: 'EGP',
-      courseIds: resolvedCourses.reduce((acc, item) => {
-        acc[item.id] = true;
-        return acc;
-      }, {}),
-      items: resolvedCourses,
+      courseIds: grantedCourseIdsMap,
+      purchasedKeys,
+      items: resolvedItems,
       status: 'pending',
       paymentProvider: isMockModeEnabled() ? 'paymob-mock' : 'paymob',
       createdAt: Date.now(),

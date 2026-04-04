@@ -39,12 +39,12 @@ export class PaymentResultComponent implements OnInit {
     return this.isEnglish ? 'Amount' : 'المبلغ';
   }
 
-  get coursesLabel(): string {
-    return this.isEnglish ? 'Courses' : 'الكورسات';
+  get itemsCountLabel(): string {
+    return this.isEnglish ? 'Items' : 'العناصر';
   }
 
-  get purchasedCoursesLabel(): string {
-    return this.isEnglish ? 'Purchased courses' : 'الكورسات المشتراة';
+  get purchasedItemsLabel(): string {
+    return this.isEnglish ? 'Purchased items' : 'العناصر المشتراة';
   }
 
   get transactionIdLabel(): string {
@@ -108,8 +108,11 @@ export class PaymentResultComponent implements OnInit {
     try {
       this.result = await this.ordersService.getPaymentResult(merchantOrderId);
 
-      if (this.result?.status === 'paid' && this.result.courseIds?.length) {
-        this.cartService.removePurchasedCourses(this.result.courseIds);
+      if (this.result?.status === 'paid') {
+        this.cartService.removePurchasedItems(
+          this.result.purchasedKeys || [],
+          this.result.courseIds || []
+        );
       }
     } catch (e: any) {
       this.error = e?.error?.message || e?.message || this.loadErrorText;

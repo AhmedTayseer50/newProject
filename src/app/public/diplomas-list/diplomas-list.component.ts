@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DiplomasService } from '../services/diplomas.service';
 import { Diploma } from 'src/app/shared/models/diploma.model';
-import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
 
 @Component({
   selector: 'app-diplomas-list',
@@ -10,6 +10,8 @@ import { WhatsAppService } from 'src/app/core/services/whatsapp.service';
   styleUrls: ['./diplomas-list.component.css']
 })
 export class DiplomasListComponent implements OnInit, OnDestroy {
+  private router = inject(Router);
+
   loading = true;
   error?: string;
 
@@ -18,10 +20,7 @@ export class DiplomasListComponent implements OnInit, OnDestroy {
 
   private sub?: Subscription;
 
-  constructor(
-    private diplomasSvc: DiplomasService,
-    private wa: WhatsAppService
-  ) {}
+  constructor(private diplomasSvc: DiplomasService) {}
 
   get isEnglish(): boolean {
     return window.location.pathname.startsWith('/en');
@@ -62,7 +61,7 @@ export class DiplomasListComponent implements OnInit, OnDestroy {
   }
 
   get enrollNowText(): string {
-    return this.isEnglish ? 'Enroll now' : 'اشترك الآن';
+    return this.isEnglish ? 'Start this path' : 'ابدأ هذا المسار';
   }
 
   get categoryFallback(): string {
@@ -113,13 +112,9 @@ export class DiplomasListComponent implements OnInit, OnDestroy {
     return this.isEnglish ? `Level: ${level || '—'}` : `المستوى: ${level || '—'}`;
   }
 
-  joinNow(d: { id: string } & Diploma) {
-    const diplomaTitle = (d?.title || '').trim() || (this.isEnglish ? 'Untitled diploma' : 'بدون اسم');
-
-    const message = this.isEnglish
-      ? `I would like to enroll in the diploma: ${diplomaTitle}`
-      : `أريد الاشتراك في الدبلومة: ${diplomaTitle}`;
-
-    this.wa.open(message);
+  openDetails(d: { id: string } & Diploma, focusPricing = false): void {
+    this.router.navigate(['/diplomas', d.id], {
+      fragment: focusPricing ? 'diploma-pricing' : undefined,
+    });
   }
 }

@@ -23,6 +23,7 @@ export interface DiplomaTestimonial {
 }
 
 export interface DiplomaPricingPlan {
+  id?: string;
   name: string;
   badge?: string;
   priceText: string;

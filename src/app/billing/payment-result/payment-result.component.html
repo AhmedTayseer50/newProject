@@ -25,14 +25,17 @@
         <div class="card-body">
           <p><strong>{{ referenceLabel }}:</strong> {{ result.merchantOrderId }}</p>
           <p><strong>{{ amountLabel }}:</strong> {{ result.amount }} EGP</p>
-          <p><strong>{{ coursesLabel }}:</strong> {{ result.courseIds.length }}</p>
+          <p><strong>{{ itemsCountLabel }}:</strong> {{ result.items?.length || 0 }}</p>
 
           <div *ngIf="result.items?.length" class="mb-3">
-            <strong class="d-block mb-2">{{ purchasedCoursesLabel }}:</strong>
+            <strong class="d-block mb-2">{{ purchasedItemsLabel }}:</strong>
             <ul class="mb-0 ps-3">
               <li *ngFor="let item of result.items">
                 {{ item.title || item.id }}
                 <span *ngIf="item.planName">- {{ item.planName }}</span>
+                <span *ngIf="item.itemType === 'diploma'">
+                  ({{ isEnglish ? 'Diploma' : 'دبلومة' }})
+                </span>
               </li>
             </ul>
           </div>

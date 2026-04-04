@@ -62,10 +62,10 @@
       </div>
 
       <div class="course-footer">
-        <button class="btn" [routerLink]="['/diplomas', d.id]">
+        <button class="btn" type="button" (click)="openDetails(d)">
           {{ detailsText }}
         </button>
-        <button class="btn btn-primary" type="button" (click)="joinNow(d)">
+        <button class="btn btn-primary" type="button" (click)="openDetails(d, true)">
           {{ enrollNowText }}
         </button>
       </div>

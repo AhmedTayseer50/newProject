@@ -22,6 +22,7 @@ type LocalizedStringList =
   | undefined;
 
 type RawDiplomaPricingPlan = {
+  id?: string | number;
   name?: LocalizedText;
   badge?: LocalizedText;
   priceText?: LocalizedText;
@@ -161,6 +162,7 @@ export class DiplomasService {
       Array.isArray(raw.pricingPlans) ? raw.pricingPlans : []
     )
       .map((plan) => ({
+        id: plan?.id != null ? String(plan.id) : undefined,
         name: this.pickText(plan?.name, lang, ''),
         badge: this.pickText(plan?.badge, lang, ''),
         priceText: this.pickText(plan?.priceText, lang, ''),

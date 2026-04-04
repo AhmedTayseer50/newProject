@@ -6,8 +6,8 @@
         <p class="text-muted mb-0">
           {{
             isEnglish
-              ? 'Review your selected pricing plans before checkout.'
-              : 'راجع الخطط السعرية التي اخترتها قبل إتمام الشراء.'
+              ? 'Review your selected plans before checkout.'
+              : 'راجع الخطط التي اخترتها قبل إتمام الشراء.'
           }}
         </p>
       </div>
@@ -27,13 +27,13 @@
       <p class="text-muted mb-4">
         {{
           isEnglish
-            ? 'Choose a pricing plan first, then come back here to complete your purchase.'
-            : 'اختر خطة سعرية أولًا ثم عد هنا لإتمام الشراء.'
+            ? 'Choose a plan first, then come back here to complete your purchase.'
+            : 'اختر خطة أولًا ثم عد هنا لإتمام الشراء.'
         }}
       </p>
 
       <button class="btn btn-primary" type="button" (click)="continueShopping()">
-        {{ isEnglish ? 'Browse courses' : 'تصفح الكورسات' }}
+        {{ isEnglish ? 'Browse available programs' : 'تصفح البرامج المتاحة' }}
       </button>
     </div>
 
@@ -47,18 +47,24 @@
               [class.border-bottom]="!last"
             >
               <img
-                [src]="item.thumbnail || 'https://via.placeholder.com/120x90?text=Course'"
+                [src]="item.thumbnail || 'https://via.placeholder.com/120x90?text=Item'"
                 [alt]="item.title"
                 class="cart-thumb"
               />
 
               <div class="flex-grow-1 min-w-0">
-                <button type="button" class="course-link-btn" (click)="viewCourse(item.courseId)">
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                  <span class="badge text-bg-light cart-badge">
+                    {{ item.itemType === 'diploma' ? (isEnglish ? 'Diploma' : 'دبلومة') : (isEnglish ? 'Course' : 'كورس') }}
+                  </span>
+                </div>
+
+                <button type="button" class="course-link-btn" (click)="viewItem(item)">
                   {{ item.title }}
                 </button>
 
                 <p class="text-muted small mb-2 cart-desc">
-                  {{ item.description || (isEnglish ? 'Selected course' : 'كورس محدد للشراء') }}
+                  {{ item.description || (item.itemType === 'diploma' ? (isEnglish ? 'Selected diploma' : 'دبلومة محددة للشراء') : (isEnglish ? 'Selected course' : 'كورس محدد للشراء')) }}
                 </p>
 
                 <div class="mb-2">
@@ -78,9 +84,13 @@
                   <li *ngFor="let feature of item.planFeatures">{{ feature }}</li>
                 </ul>
 
+                <div class="small text-muted mb-2" *ngIf="item.itemType === 'diploma' && item.includedCourseIds?.length">
+                  {{ isEnglish ? 'Includes' : 'تشمل' }} {{ item.includedCourseIds?.length }} {{ isEnglish ? 'course(s)' : 'كورس/كورسات' }}
+                </div>
+
                 <div class="d-flex flex-wrap align-items-center gap-2">
                   <span class="badge text-bg-light cart-badge">
-                    {{ isEnglish ? 'Pricing plan' : 'خطة سعرية' }}
+                    {{ isEnglish ? 'Selected plan' : 'الخطة المختارة' }}
                   </span>
                   <strong class="price-text">{{ item.priceText || (item.price | number:'1.0-0') + ' EGP' }}</strong>
                 </div>

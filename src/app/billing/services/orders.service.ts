@@ -8,8 +8,10 @@ export interface PaymentResultResponse {
   status: 'pending' | 'paid' | 'failed';
   amount: number;
   courseIds: string[];
+  purchasedKeys?: string[];
   items?: Array<{
     id: string;
+    itemType?: 'course' | 'diploma';
     title?: string;
     price?: number;
     priceText?: string;

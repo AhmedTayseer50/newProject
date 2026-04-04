@@ -65,6 +65,10 @@ export class PurchaseCourseComponent implements OnInit {
     return this.isEnglish ? 'WhatsApp / Phone' : 'رقم الواتساب / الهاتف';
   }
 
+  get itemsLabel(): string {
+    return this.isEnglish ? 'Selected items' : 'العناصر المختارة';
+  }
+
   get payButtonText(): string {
     if (this.submitting) {
       return this.isEnglish
@@ -109,14 +113,12 @@ export class PurchaseCourseComponent implements OnInit {
     }
   }
 
-
-
   private normalizeCheckoutPlanId(planId: string): string {
     const normalized = `${planId || ''}`
       .trim()
       .toLowerCase()
       .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString())
-      .replace(/[^a-z0-9-_]+/g, '-')
+      .replace(/[^\u0621-\u064Aa-z0-9-_]+/gi, '-')
       .replace(/-+/g, '-')
       .replace(/^-+|-+$/g, '');
 
@@ -161,15 +163,13 @@ export class PurchaseCourseComponent implements OnInit {
     this.submitting = true;
 
     try {
-      const uniqueCourseIds = Array.from(new Set(this.items.map((item) => item.courseId).filter(Boolean)));
-
       const selectedItems: StartPaymobCheckoutItem[] = this.items.map((item) => ({
-        courseId: item.courseId,
+        itemType: item.itemType,
+        itemId: item.itemId,
         planId: this.normalizeCheckoutPlanId(item.planId),
       }));
 
       const result = await this.paymentsService.startCheckout({
-        courseIds: uniqueCourseIds,
         customerName: this.customerName.trim(),
         customerEmail: this.customerEmail.trim(),
         customerPhone: this.customerPhone.trim(),
