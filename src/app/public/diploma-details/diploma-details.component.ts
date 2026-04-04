@@ -291,13 +291,13 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/courses', courseId]);
   }
 
-  planTrackBy(index: number, plan: DiplomaPricingPlan): string {
+  planTrackBy = (index: number, plan: DiplomaPricingPlan): string => {
     return this.resolvePlanId(plan) || `${index}`;
-  }
+  };
 
-  trackByIndex(index: number): number {
+  trackByIndex = (index: number): number => {
     return index;
-  }
+  };
 
   private getFeaturedPlan(): DiplomaPricingPlan | null {
     return this.pricingPlans.find((plan) => !!plan.highlighted) || null;
