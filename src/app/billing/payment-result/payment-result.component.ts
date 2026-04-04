@@ -113,6 +113,10 @@ export class PaymentResultComponent implements OnInit {
           this.result.purchasedKeys || [],
           this.result.courseIds || []
         );
+
+        if (!this.cartService.getItems().length) {
+          this.cartService.clear();
+        }
       }
     } catch (e: any) {
       this.error = e?.error?.message || e?.message || this.loadErrorText;

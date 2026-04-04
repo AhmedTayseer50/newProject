@@ -46,8 +46,12 @@ export class CartService {
   }
 
   hasItem(itemId: string, planId: string, itemType: CartItemType = 'course'): boolean {
+    const normalizedPlanId = `${planId || ''}`.trim();
     return this.itemsSubject.value.some(
-      (item) => item.itemType === itemType && item.itemId === itemId && item.planId === planId,
+      (item) =>
+        item.itemType === itemType &&
+        item.itemId === itemId &&
+        (!normalizedPlanId || item.planId === normalizedPlanId),
     );
   }
 
@@ -142,7 +146,9 @@ export class CartService {
 
   private upsertItem(newItem: CartItem): void {
     const items = [...this.itemsSubject.value];
-    const existingIndex = items.findIndex((item) => item.key === newItem.key);
+    const existingIndex = items.findIndex(
+      (item) => item.itemType === newItem.itemType && item.itemId === newItem.itemId,
+    );
 
     if (existingIndex >= 0) {
       items[existingIndex] = newItem;

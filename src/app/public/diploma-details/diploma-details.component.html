@@ -29,17 +29,10 @@
         </span>
       </div>
 
-      <div class="hero-chip-list" *ngIf="lectureNames.length">
-        <span class="hero-chip" *ngFor="let item of lectureNames; trackBy: trackByIndex">{{ item }}</span>
-      </div>
-
       <div class="hero-actions">
         <ng-container *ngIf="auth.currentUser; else loginToBuyHero">
           <button class="btn btn-primary" type="button" (click)="buyNow()">
             {{ buyNowText }}
-          </button>
-          <button class="btn btn-outline-primary" type="button" (click)="addToCart()">
-            {{ addToCartText }}
           </button>
         </ng-container>
 
@@ -48,6 +41,15 @@
             {{ loginToPurchaseText }}
           </button>
         </ng-template>
+
+        <button
+          *ngIf="introVideoSafeUrl"
+          class="btn btn-outline-primary"
+          type="button"
+          (click)="scrollToVideo()"
+        >
+          {{ watchIntroVideoText }}
+        </button>
       </div>
     </div>
 
@@ -235,36 +237,50 @@
       <p class="section-subtitle">{{ pricingSubtitle }}</p>
     </div>
 
-    <div class="card-grid three-cols pricing-grid">
-      <article class="pricing-card" *ngFor="let plan of pricingPlans; trackBy: planTrackBy" [class.highlight]="isPlanSelected(plan)">
-        <div class="pricing-badge-top" *ngIf="plan.badge">{{ plan.badge }}</div>
-        <h3>{{ plan.name }}</h3>
-        <div class="pricing-price">{{ plan.priceText }} <span>EGP</span></div>
-        <p class="pricing-note" *ngIf="plan.note">{{ plan.note }}</p>
+    <div class="pricing-grid">
+      <article
+        class="pricing-card"
+        *ngFor="let plan of pricingPlans; trackBy: planTrackBy"
+        [class.highlight]="plan.highlighted || isPlanSelected(plan)"
+      >
+        <div class="pricing-ribbon" *ngIf="plan.highlighted">
+          {{ plan.badge || (isEnglish ? 'Most selected' : 'الأكثر اختيارًا') }}
+        </div>
 
-        <ul class="pricing-features" *ngIf="plan.features.length">
-          <li *ngFor="let feature of plan.features">{{ feature }}</li>
-        </ul>
+        <div class="pricing-card-inner">
+          <div class="pricing-card-top">
+            <div class="pricing-name">{{ plan.name }}</div>
+            <div class="pricing-badge" *ngIf="plan.badge && !plan.highlighted">{{ plan.badge }}</div>
+            <div class="pricing-price">{{ plan.priceText }}</div>
+            <div class="pricing-note" *ngIf="plan.note">{{ plan.note }}</div>
+          </div>
 
-        <div class="pricing-actions">
-          <button class="btn btn-outline-primary w-100" type="button" (click)="selectPlan(plan)">
-            {{ isPlanSelected(plan) ? (isEnglish ? 'Selected' : 'تم الاختيار') : (isEnglish ? 'Choose this plan' : 'اختر هذه الخطة') }}
-          </button>
+          <ul class="pricing-features" *ngIf="plan.features.length">
+            <li *ngFor="let feature of plan.features">{{ feature }}</li>
+          </ul>
 
-          <ng-container *ngIf="auth.currentUser; else planLoginBlock">
-            <button class="btn btn-light border w-100" type="button" *ngIf="isPlanSelected(plan)" (click)="addToCart()">
-              {{ addToCartText }}
+          <div class="pricing-actions">
+            <button class="btn btn-outline-primary w-100" type="button" (click)="selectPlan(plan)">
+              {{ isPlanSelected(plan) ? selectedPlanText : choosePlanText }}
             </button>
-            <button class="btn btn-primary w-100" type="button" *ngIf="isPlanSelected(plan)" (click)="buyNow()">
-              {{ buyNowText }}
-            </button>
-          </ng-container>
 
-          <ng-template #planLoginBlock>
-            <button class="btn btn-primary w-100" type="button" *ngIf="isPlanSelected(plan)" (click)="goToPurchase()">
-              {{ loginToPurchaseText }}
-            </button>
-          </ng-template>
+            <ng-container *ngIf="auth.currentUser; else planLoginBlock">
+              <div *ngIf="isPlanSelected(plan)" class="pricing-cta-group">
+                <button class="btn btn-primary flex-fill" type="button" (click)="buyPlan(plan)">
+                  {{ buyNowText }}
+                </button>
+                <button class="btn btn-outline-primary flex-fill" type="button" (click)="addToCart()">
+                  {{ addToCartText }}
+                </button>
+              </div>
+            </ng-container>
+
+            <ng-template #planLoginBlock>
+              <button class="btn btn-primary w-100" type="button" *ngIf="isPlanSelected(plan)" (click)="goToPurchase()">
+                {{ loginToPurchaseText }}
+              </button>
+            </ng-template>
+          </div>
         </div>
       </article>
     </div>

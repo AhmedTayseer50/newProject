@@ -199,6 +199,18 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     return this.isEnglish ? 'Buy now' : 'اشترِ الآن';
   }
 
+  get watchIntroVideoText(): string {
+    return this.isEnglish ? 'Watch intro video' : 'شاهد الفيديو التعريفي';
+  }
+
+  get choosePlanText(): string {
+    return this.isEnglish ? 'Choose this plan' : 'اختر هذه الخطة';
+  }
+
+  get selectedPlanText(): string {
+    return this.isEnglish ? 'Selected' : 'تم الاختيار';
+  }
+
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroyed$)).subscribe(async (pm) => {
       const id = pm.get('id');
@@ -264,7 +276,11 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
   }
 
   buyNow(): void {
-    if (!this.diploma || !this.selectedPlan) {
+    this.scrollToPricing();
+  }
+
+  buyPlan(plan: DiplomaPricingPlan | null): void {
+    if (!this.diploma || !plan) {
       return;
     }
 
@@ -273,10 +289,9 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.cartSvc.addDiploma(this.diploma, this.selectedPlan);
-    this.router.navigate(['/cart'], {
-      queryParams: { buyNow: 1, itemType: 'diploma', itemId: this.diploma.id },
-    });
+    this.selectPlan(plan);
+    this.cartSvc.addDiploma(this.diploma, plan);
+    this.router.navigate(['/cart']);
   }
 
   goToPurchase(): void {
@@ -284,6 +299,21 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login'], {
       queryParams: { redirect: returnUrl },
     });
+  }
+
+
+  scrollToPricing(): void {
+    const pricingSection = document.getElementById('diploma-pricing');
+    if (!pricingSection) return;
+
+    pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  scrollToVideo(): void {
+    const videoSection = document.getElementById('diploma-video');
+    if (!videoSection) return;
+
+    videoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   openCourseDetails(courseId: string): void {

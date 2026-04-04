@@ -56,17 +56,14 @@
           </div>
 
           <span class="course-price">
-            {{ d.price | currency: "EGP" : "symbol" : "1.0-0" }}
+            {{ diplomaPriceLabel(d) }}
           </span>
         </div>
       </div>
 
       <div class="course-footer">
-        <button class="btn" type="button" (click)="openDetails(d)">
+        <button class="btn btn-primary" type="button" (click)="openDetails(d)">
           {{ detailsText }}
-        </button>
-        <button class="btn btn-primary" type="button" (click)="openDetails(d, true)">
-          {{ enrollNowText }}
         </button>
       </div>
     </article>

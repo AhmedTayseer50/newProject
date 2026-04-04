@@ -60,9 +60,6 @@ export class DiplomasListComponent implements OnInit, OnDestroy {
     return this.isEnglish ? 'View details' : 'عرض التفاصيل';
   }
 
-  get enrollNowText(): string {
-    return this.isEnglish ? 'Start this path' : 'ابدأ هذا المسار';
-  }
 
   get categoryFallback(): string {
     return this.isEnglish ? 'General' : 'عام';
@@ -110,6 +107,22 @@ export class DiplomasListComponent implements OnInit, OnDestroy {
 
   levelLabel(level?: string): string {
     return this.isEnglish ? `Level: ${level || '—'}` : `المستوى: ${level || '—'}`;
+  }
+
+  diplomaPriceLabel(d: ({ id: string } & Diploma)): string {
+    const highlightedPlan = d.pricingPlans?.find((plan) => !!plan.highlighted)
+      || d.pricingPlans?.[0]
+      || null;
+
+    if (highlightedPlan?.priceText?.trim()) {
+      return highlightedPlan.priceText;
+    }
+
+    if (d.price) {
+      return this.isEnglish ? `${d.price} EGP` : `${d.price} جنيه`;
+    }
+
+    return this.isEnglish ? 'Contact us' : 'تواصل معنا';
   }
 
   openDetails(d: { id: string } & Diploma, focusPricing = false): void {
