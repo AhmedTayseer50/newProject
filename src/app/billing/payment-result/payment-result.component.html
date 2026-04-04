@@ -47,6 +47,7 @@
 
           <a
             routerLink="/my-courses"
+            [queryParams]="{ refresh: 1, order: result.merchantOrderId }"
             class="btn btn-primary me-2"
             *ngIf="result.status === 'paid'"
           >

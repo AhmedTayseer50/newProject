@@ -118,30 +118,68 @@ export class MyCoursesService {
 
         return new Observable<Course[]>((subscriber) => {
           const enrRef = ref(this.db, `enrollments/${u.uid}`);
+          let latestRequestId = 0;
 
-          const unsubscribe = onValue(
+          const stopListening = onValue(
             enrRef,
             async (snap) => {
+              const requestId = ++latestRequestId;
+
               try {
                 if (!snap.exists()) {
-                  subscriber.next([]);
+                  if (requestId === latestRequestId) {
+                    subscriber.next([]);
+                  }
                   return;
                 }
 
-                const enrollObj = snap.val() as Record<string, any>;
-                const courseIds = Object.keys(enrollObj || {}).filter(Boolean);
-                const courses: Course[] = [];
+                const enrollObj = (snap.val() || {}) as Record<string, any>;
+                const courseIds = Object.keys(enrollObj).filter(Boolean);
 
-                for (const id of courseIds) {
-                  const cSnap = await get(ref(this.db, `courses/${id}`));
-                  if (cSnap.exists()) {
-                    courses.push(this.normalizeCourse(id, cSnap.val() as RawCourse));
+                if (!courseIds.length) {
+                  if (requestId === latestRequestId) {
+                    subscriber.next([]);
                   }
+                  return;
                 }
 
-                courses.sort(
-                  (a: any, b: any) => Number(b.createdAt || 0) - Number(a.createdAt || 0)
+                const enrolledAtMap = courseIds.reduce<Record<string, number>>((acc, courseId) => {
+                  const rawValue = enrollObj?.[courseId];
+                  if (typeof rawValue === 'number') {
+                    acc[courseId] = rawValue;
+                  } else if (rawValue && typeof rawValue === 'object' && typeof rawValue.enrolledAt === 'number') {
+                    acc[courseId] = rawValue.enrolledAt;
+                  } else {
+                    acc[courseId] = 0;
+                  }
+                  return acc;
+                }, {});
+
+                const courseSnapshots = await Promise.all(
+                  courseIds.map((id) => get(ref(this.db, `courses/${id}`)))
                 );
+
+                if (requestId !== latestRequestId) {
+                  return;
+                }
+
+                const courses = courseSnapshots
+                  .map((courseSnap, index) => {
+                    if (!courseSnap.exists()) return null;
+
+                    const courseId = courseIds[index];
+                    const course = this.normalizeCourse(courseId, courseSnap.val() as RawCourse) as Course & {
+                      enrolledAt?: number;
+                    };
+                    course.enrolledAt = enrolledAtMap[courseId] || 0;
+                    return course;
+                  })
+                  .filter((course): course is Course & { enrolledAt?: number } => !!course)
+                  .sort((a, b) => {
+                    const enrolledDiff = Number(b.enrolledAt || 0) - Number(a.enrolledAt || 0);
+                    if (enrolledDiff !== 0) return enrolledDiff;
+                    return Number(b.createdAt || 0) - Number(a.createdAt || 0);
+                  });
 
                 subscriber.next(courses);
               } catch (err) {
@@ -152,10 +190,10 @@ export class MyCoursesService {
           );
 
           return () => {
-            off(enrRef);
             try {
-              (unsubscribe as any)?.();
+              (stopListening as () => void)?.();
             } catch {}
+            off(enrRef);
           };
         });
       })
