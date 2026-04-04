@@ -32,7 +32,7 @@
       <div class="hero-actions">
         <ng-container *ngIf="auth.currentUser; else loginToBuyHero">
           <button class="btn btn-primary" type="button" (click)="buyNow()">
-            {{ buyNowText }}
+            {{ heroPrimaryButtonText }}
           </button>
         </ng-container>
 
@@ -130,7 +130,7 @@
           <h3>{{ course.title }}</h3>
           <p>{{ course.description }}</p>
           <button class="btn btn-outline-primary btn-sm" type="button" (click)="openCourseDetails(course.id)">
-            {{ isEnglish ? 'View course details' : 'عرض تفاصيل الكورس' }}
+            {{ courseActionText() }}
           </button>
         </div>
       </article>
@@ -294,7 +294,7 @@
       <p>{{ d.bottomCta?.text || heroTagline }}</p>
     </div>
     <ng-container *ngIf="auth.currentUser; else bottomLoginBlock">
-      <button class="btn btn-primary" type="button" (click)="buyNow()">{{ buyNowText }}</button>
+      <button class="btn btn-primary" type="button" (click)="buyNow()">{{ heroPrimaryButtonText }}</button>
     </ng-container>
     <ng-template #bottomLoginBlock>
       <button class="btn btn-primary" type="button" (click)="goToPurchase()">{{ loginToPurchaseText }}</button>

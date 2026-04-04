@@ -109,13 +109,20 @@ export class PaymentResultComponent implements OnInit {
       this.result = await this.ordersService.getPaymentResult(merchantOrderId);
 
       if (this.result?.status === 'paid') {
-        this.cartService.removePurchasedItems(
-          this.result.purchasedKeys || [],
-          this.result.courseIds || []
-        );
+        const purchasedItems = Array.isArray(this.result.items) ? this.result.items : [];
+        const hasDiplomaPurchase = purchasedItems.some((item) => item?.itemType === 'diploma');
 
-        if (!this.cartService.getItems().length) {
+        if (hasDiplomaPurchase) {
           this.cartService.clear();
+        } else {
+          this.cartService.removePurchasedItems(
+            this.result.purchasedKeys || [],
+            this.result.courseIds || []
+          );
+
+          if (!this.cartService.getItems().length) {
+            this.cartService.clear();
+          }
         }
       }
     } catch (e: any) {

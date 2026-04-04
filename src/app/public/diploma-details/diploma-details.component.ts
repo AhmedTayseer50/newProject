@@ -15,6 +15,7 @@ import {
   DiplomaTestimonial,
 } from 'src/app/shared/models/diploma.model';
 import { CartService } from 'src/app/billing/services/cart.service';
+import { EnrollmentsService } from 'src/app/core/services/enrollments.service';
 
 @Component({
   selector: 'app-diploma-details',
@@ -34,6 +35,7 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
 
   introVideoSafeUrl: SafeResourceUrl | null = null;
   includedCourses: any[] = [];
+  ownsDiplomaCourses = false;
 
   private destroyed$ = new Subject<void>();
 
@@ -44,7 +46,8 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     private diplomasSvc: DiplomasService,
     private coursesSvc: CoursesService,
     private sanitizer: DomSanitizer,
-    private cartSvc: CartService
+    private cartSvc: CartService,
+    private enrollmentsSvc: EnrollmentsService
   ) {}
 
   get isEnglish(): boolean {
@@ -203,6 +206,22 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     return this.isEnglish ? 'Watch intro video' : 'شاهد الفيديو التعريفي';
   }
 
+  get goToMyCoursesText(): string {
+    return this.isEnglish ? 'Go to my courses' : 'اذهب إلى كورساتي';
+  }
+
+  get watchCourseText(): string {
+    return this.isEnglish ? 'Click to watch the course' : 'اضغط لمشاهدة الكورس';
+  }
+
+  get viewCourseDetailsText(): string {
+    return this.isEnglish ? 'View course details' : 'عرض تفاصيل الكورس';
+  }
+
+  get heroPrimaryButtonText(): string {
+    return this.ownsDiplomaCourses ? this.goToMyCoursesText : this.buyNowText;
+  }
+
   get choosePlanText(): string {
     return this.isEnglish ? 'Choose this plan' : 'اختر هذه الخطة';
   }
@@ -223,6 +242,7 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
       this.includedCourses = [];
       this.introVideoSafeUrl = null;
       this.selectedPlanId = '';
+      this.ownsDiplomaCourses = false;
 
       try {
         const diploma = await this.diplomasSvc.getDiplomaById(id);
@@ -246,6 +266,8 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
           );
           this.includedCourses = courses.filter(Boolean);
         }
+
+        await this.refreshOwnership(courseIds);
       } catch (error: any) {
         this.error =
           error?.message ||
@@ -276,6 +298,11 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
   }
 
   buyNow(): void {
+    if (this.ownsDiplomaCourses) {
+      this.goToMyCourses();
+      return;
+    }
+
     this.scrollToPricing();
   }
 
@@ -292,6 +319,11 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     this.selectPlan(plan);
     this.cartSvc.addDiploma(this.diploma, plan);
     this.router.navigate(['/cart']);
+  }
+
+
+  goToMyCourses(): void {
+    this.router.navigate(['/my-courses']);
   }
 
   goToPurchase(): void {
@@ -321,6 +353,10 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/courses', courseId]);
   }
 
+  courseActionText(): string {
+    return this.ownsDiplomaCourses ? this.watchCourseText : this.viewCourseDetailsText;
+  }
+
   planTrackBy = (index: number, plan: DiplomaPricingPlan): string => {
     return this.resolvePlanId(plan) || `${index}`;
   };
@@ -329,6 +365,22 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     return index;
   };
 
+
+  private async refreshOwnership(courseIds: string[]): Promise<void> {
+    const uid = this.auth.currentUser?.uid;
+    if (!uid || !courseIds.length) {
+      this.ownsDiplomaCourses = false;
+      return;
+    }
+
+    try {
+      const userEnrollments = await this.enrollmentsSvc.listUserEnrollments(uid);
+      const enrolledIds = new Set((userEnrollments || []).map((id) => `${id || ''}`.trim()).filter(Boolean));
+      this.ownsDiplomaCourses = courseIds.every((courseId) => enrolledIds.has(`${courseId || ''}`.trim()));
+    } catch {
+      this.ownsDiplomaCourses = false;
+    }
+  }
   private getFeaturedPlan(): DiplomaPricingPlan | null {
     return this.pricingPlans.find((plan) => !!plan.highlighted) || null;
   }
