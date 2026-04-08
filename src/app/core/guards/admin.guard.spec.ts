@@ -1,17 +1,23 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
 
-import { adminGuard } from './admin.guard';
+import { AdminGuard } from './admin.guard';
+import { UserService } from '../services/user.service';
 
-describe('adminGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => adminGuard(...guardParameters));
-
+describe('AdminGuard', () => {
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        AdminGuard,
+        { provide: Router, useValue: jasmine.createSpyObj('Router', ['createUrlTree']) },
+        { provide: Auth, useValue: { currentUser: null } },
+        { provide: UserService, useValue: jasmine.createSpyObj('UserService', ['isAdmin']) },
+      ],
+    });
   });
 
   it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+    expect(TestBed.inject(AdminGuard)).toBeTruthy();
   });
 });

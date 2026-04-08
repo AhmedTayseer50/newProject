@@ -21,6 +21,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Course, CoursePricingPlan } from 'src/app/shared/models/course.model';
 import { TelegramJoinService } from '../services/telegram-join.service';
 import { CartService } from 'src/app/billing/services/cart.service';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-course-details',
@@ -63,7 +64,8 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     private diplomasSvc: DiplomasService,
     private wa: WhatsAppService,
     private telegramJoin: TelegramJoinService,
-    private cartSvc: CartService
+    private cartSvc: CartService,
+    private seo: SeoService
   ) {}
 
   get isEnglish(): boolean {
@@ -237,6 +239,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         try {
           this.course = await this.courses.getCourseById(this.courseId);
           this.lectureNames = (this.course?.lectureNames ?? []) as string[];
+          this.updateSeo();
 
           const introUrl = this.course?.introVideoUrl as string | undefined;
           this.introVideoSafeUrl = introUrl
@@ -533,5 +536,74 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     if (this.canViewLessons) return;
     this.closeOffer();
     this.scrollToPricing();
+  }
+
+  private updateSeo(): void {
+    if (!this.course) return;
+
+    const description = this.buildSeoDescription();
+    const image = (this.course.thumbnail || '').trim() || this.defaultThumbnail;
+    const origin = window.location.origin;
+    const url = `${origin}${this.router.url}`;
+
+    this.seo.apply({
+      title: this.course.title || undefined,
+      description,
+      image,
+      type: 'article',
+      pathname: this.router.url,
+      structuredData: {
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        name: this.course.title,
+        description,
+        image,
+        url,
+        inLanguage: this.currentLang,
+        provider: {
+          '@type': 'Organization',
+          name: this.isEnglish ? 'Nabdah Hayah' : 'نبضة حياة',
+          url: `${origin}/${this.currentLang}/`,
+        },
+        offers:
+          this.course.price > 0
+            ? {
+                '@type': 'Offer',
+                price: this.course.price,
+                priceCurrency: 'EGP',
+                availability: 'https://schema.org/InStock',
+                url,
+              }
+            : undefined,
+      },
+    });
+  }
+
+  private buildSeoDescription(): string {
+    const candidates = [
+      this.course?.description,
+      this.course?.heroTagline,
+      this.course?.goalDescription,
+      this.course?.targetAudience,
+    ]
+      .map((value) => `${value || ''}`.trim())
+      .filter(Boolean);
+
+    if (candidates.length) {
+      return candidates[0];
+    }
+
+    const outcomes = (this.course?.outcomes || [])
+      .map((item) => `${item || ''}`.trim())
+      .filter(Boolean)
+      .slice(0, 3);
+
+    if (outcomes.length) {
+      return outcomes.join(' - ');
+    }
+
+    return this.isEnglish
+      ? 'A practical mental health course from Nabdah Hayah.'
+      : 'كورس نفسي عملي من منصة نبضة حياة.';
   }
 }

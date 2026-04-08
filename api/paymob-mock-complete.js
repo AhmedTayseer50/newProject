@@ -1,4 +1,5 @@
 const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
+const { assertMockModeAllowed } = require('./_lib/paymobSecurity');
 
 
 function resolveOrderLanguage(orderData) {
@@ -39,6 +40,8 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    assertMockModeAllowed();
+
     const merchantOrderId = String(req.query.merchantOrderId || '').trim();
     const status = String(req.query.status || 'paid').trim();
 
@@ -82,6 +85,8 @@ module.exports = async function handler(req, res) {
     );
   } catch (error) {
     console.error('[paymob-mock-complete] ERROR:', error);
-    return res.status(500).send(error?.message || 'FUNCTION_INVOCATION_FAILED');
+    return res
+      .status(error?.statusCode || 500)
+      .send(error?.message || 'FUNCTION_INVOCATION_FAILED');
   }
 };

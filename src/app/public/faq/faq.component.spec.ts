@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FaqComponent } from './faq.component';
+import {
+  componentTestImports,
+  createComponentProviders,
+  testSchemas,
+} from 'src/app/testing/spec-helpers';
 
 describe('FaqComponent', () => {
   let component: FaqComponent;
@@ -8,14 +13,17 @@ describe('FaqComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [FaqComponent]
+      imports: [...componentTestImports],
+      declarations: [FaqComponent],
+      providers: [...createComponentProviders()],
+      schemas: testSchemas,
     });
     fixture = TestBed.createComponent(FaqComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
+

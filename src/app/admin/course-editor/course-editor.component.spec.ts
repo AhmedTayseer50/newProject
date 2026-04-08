@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CourseEditorComponent } from './course-editor.component';
+import {
+  componentTestImports,
+  createComponentProviders,
+  testSchemas,
+} from 'src/app/testing/spec-helpers';
 
 describe('CourseEditorComponent', () => {
   let component: CourseEditorComponent;
@@ -8,14 +13,17 @@ describe('CourseEditorComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CourseEditorComponent]
+      imports: [...componentTestImports],
+      declarations: [CourseEditorComponent],
+      providers: [...createComponentProviders()],
+      schemas: testSchemas,
     });
     fixture = TestBed.createComponent(CourseEditorComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
+

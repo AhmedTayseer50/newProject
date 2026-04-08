@@ -1,18 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { Database } from '@angular/fire/database';
+import { Auth } from '@angular/fire/auth';
 
-import { CasesAdminComponent } from './cases-admin.component';
+import { AdminCasesComponent } from './cases-admin.component';
+import { CasesService } from '../services/cases.service';
+import { AdminService } from '../services/admin.service';
 
-describe('CasesAdminComponent', () => {
-  let component: CasesAdminComponent;
-  let fixture: ComponentFixture<CasesAdminComponent>;
+describe('AdminCasesComponent', () => {
+  let component: AdminCasesComponent;
+  let fixture: ComponentFixture<AdminCasesComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CasesAdminComponent]
+      declarations: [AdminCasesComponent],
+      providers: [
+        { provide: CasesService, useValue: jasmine.createSpyObj('CasesService', ['listAll', 'sumProcessedAmount', 'markProcessed']) },
+        { provide: AdminService, useValue: jasmine.createSpyObj('AdminService', ['listCourses']) },
+        { provide: Database, useValue: {} },
+        { provide: Auth, useValue: { currentUser: null } },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     });
-    fixture = TestBed.createComponent(CasesAdminComponent);
+
+    fixture = TestBed.createComponent(AdminCasesComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

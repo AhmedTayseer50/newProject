@@ -1,14 +1,11 @@
 const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
+const {
+  assertProtectedPaymobCallback,
+  getTransactionObject,
+} = require('./_lib/paymobSecurity');
 
 function boolify(value) {
   return value === true || value === 'true' || value === '1' || value === 1;
-}
-
-function getTransactionObject(req) {
-  if (req.body?.obj) return req.body.obj;
-  if (req.body && typeof req.body === 'object' && req.body.id) return req.body;
-  if (req.query && req.query.id) return req.query;
-  return null;
 }
 
 function resolveOrderLanguage(orderData) {
@@ -61,6 +58,8 @@ module.exports = async function handler(req, res) {
       return res.status(400).send('Missing merchantOrderId');
     }
 
+    assertProtectedPaymobCallback(req, txn);
+
     const success = boolify(txn?.success);
     const isVoided = boolify(txn?.is_voided);
     const isRefunded = boolify(txn?.is_refunded);
@@ -109,6 +108,8 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error('[paymob-callback] ERROR:', error);
-    return res.status(500).send(error?.message || 'FUNCTION_INVOCATION_FAILED');
+    return res
+      .status(error?.statusCode || 500)
+      .send(error?.message || 'FUNCTION_INVOCATION_FAILED');
   }
 };

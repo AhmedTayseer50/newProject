@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CoursesListComponent } from './courses-list.component';
+import {
+  componentTestImports,
+  createComponentProviders,
+  testSchemas,
+} from 'src/app/testing/spec-helpers';
 
 describe('CoursesListComponent', () => {
   let component: CoursesListComponent;
@@ -8,14 +13,17 @@ describe('CoursesListComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CoursesListComponent]
+      imports: [...componentTestImports],
+      declarations: [CoursesListComponent],
+      providers: [...createComponentProviders()],
+      schemas: testSchemas,
     });
     fixture = TestBed.createComponent(CoursesListComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
+

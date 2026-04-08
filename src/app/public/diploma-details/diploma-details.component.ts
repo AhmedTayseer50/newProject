@@ -16,6 +16,7 @@ import {
 } from 'src/app/shared/models/diploma.model';
 import { CartService } from 'src/app/billing/services/cart.service';
 import { EnrollmentsService } from 'src/app/core/services/enrollments.service';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-diploma-details',
@@ -47,7 +48,8 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
     private coursesSvc: CoursesService,
     private sanitizer: DomSanitizer,
     private cartSvc: CartService,
-    private enrollmentsSvc: EnrollmentsService
+    private enrollmentsSvc: EnrollmentsService,
+    private seo: SeoService
   ) {}
 
   get isEnglish(): boolean {
@@ -252,6 +254,7 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
         }
 
         this.diploma = diploma;
+        this.updateSeo();
         this.introVideoSafeUrl = diploma.introVideoUrl
           ? this.sanitizer.bypassSecurityTrustResourceUrl(diploma.introVideoUrl)
           : null;
@@ -268,6 +271,7 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
         }
 
         await this.refreshOwnership(courseIds);
+        this.updateSeo();
       } catch (error: any) {
         this.error =
           error?.message ||
@@ -407,5 +411,77 @@ export class DiplomaDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
+  }
+
+  private updateSeo(): void {
+    if (!this.diploma) return;
+
+    const diploma = this.diploma;
+    const description = this.buildSeoDescription();
+    const image = (diploma.thumbnail || '').trim() || this.defaultThumbnail;
+    const diplomaPrice = Number(diploma.price || 0);
+    const origin = window.location.origin;
+    const url = `${origin}${this.router.url}`;
+
+    this.seo.apply({
+      title: diploma.title || undefined,
+      description,
+      image,
+      type: 'article',
+      pathname: this.router.url,
+      structuredData: {
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        name: diploma.title,
+        description,
+        image,
+        url,
+        inLanguage: this.currentLang,
+        provider: {
+          '@type': 'Organization',
+          name: this.isEnglish ? 'Nabdah Hayah' : 'نبضة حياة',
+          url: `${origin}/${this.currentLang}/`,
+        },
+        numberOfCredits: this.includedCourses.length || undefined,
+        offers:
+          diplomaPrice > 0
+            ? {
+                '@type': 'Offer',
+                price: diplomaPrice,
+                priceCurrency: 'EGP',
+                availability: 'https://schema.org/InStock',
+                url,
+              }
+            : undefined,
+      },
+    });
+  }
+
+  private buildSeoDescription(): string {
+    const candidates = [
+      this.diploma?.description,
+      this.diploma?.heroTagline,
+      this.diploma?.goalDescription,
+      this.diploma?.targetAudience,
+    ]
+      .map((value) => `${value || ''}`.trim())
+      .filter(Boolean);
+
+    if (candidates.length) {
+      return candidates[0];
+    }
+
+    const outcomes = (this.diploma?.outcomes || [])
+      .map((item) => `${item || ''}`.trim())
+      .filter(Boolean)
+      .slice(0, 3);
+
+    if (outcomes.length) {
+      return outcomes.join(' - ');
+    }
+
+    return this.isEnglish
+      ? 'A structured diploma path from Nabdah Hayah.'
+      : 'مسار دبلومة متكامل من منصة نبضة حياة.';
   }
 }

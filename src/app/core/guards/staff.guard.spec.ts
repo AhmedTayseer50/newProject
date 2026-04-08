@@ -1,17 +1,23 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
 
-import { staffGuard } from './staff.guard';
+import { StaffGuard } from './staff.guard';
+import { UserService } from '../services/user.service';
 
-describe('staffGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => staffGuard(...guardParameters));
-
+describe('StaffGuard', () => {
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        StaffGuard,
+        { provide: Router, useValue: jasmine.createSpyObj('Router', ['createUrlTree']) },
+        { provide: Auth, useValue: { currentUser: null } },
+        { provide: UserService, useValue: jasmine.createSpyObj('UserService', ['isAdmin', 'isStaff']) },
+      ],
+    });
   });
 
   it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+    expect(TestBed.inject(StaffGuard)).toBeTruthy();
   });
 });

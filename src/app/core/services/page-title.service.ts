@@ -1,25 +1,35 @@
 import { Injectable } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { NavigationEnd, ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { SeoService } from './seo.service';
 
 @Injectable({ providedIn: 'root' })
 export class PageTitleService {
-  constructor(private router: Router, private title: Title) {}
+  constructor(private router: Router, private seo: SeoService) {}
 
   init(): void {
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => {
-        const routeTitle = this.getDeepestTitle(this.router.routerState.root);
-        const appName = $localize`:@@app_name:نبضة حياة`;
-        this.title.setTitle(routeTitle ? `${routeTitle} | ${appName}` : appName);
+        const current = this.getDeepestRoute(this.router.routerState.root);
+        const routeTitle = current?.snapshot?.data?.['title'] ?? '';
+        const seoData = current?.snapshot?.data?.['seo'] || {};
+
+        this.seo.apply({
+          title: routeTitle,
+          description: seoData?.description,
+          image: seoData?.image,
+          type: seoData?.type,
+          noindex: seoData?.noindex,
+          structuredData: seoData?.structuredData,
+          pathname: this.router.url,
+        });
       });
   }
 
-  private getDeepestTitle(route: ActivatedRoute): string | null {
+  private getDeepestRoute(route: ActivatedRoute): ActivatedRoute {
     let current: ActivatedRoute = route;
     while (current.firstChild) current = current.firstChild;
-    return current.snapshot?.data?.['title'] ?? null;
+    return current;
   }
 }

@@ -1,81 +1,48 @@
 # Testing Instructions
 
-To test the internationalization (i18n) functionality of the application, follow these steps:
+## 1. Frontend smoke test
 
-## 1. Install `http-server`
-
-If you don't have `http-server` installed, you can install it globally using npm:
+Run the local frontend:
 
 ```bash
-npm install -g http-server
+npm start
 ```
 
-## 2. Build the Application
+Open `http://localhost:4200`, then verify:
 
-Build the application for both Arabic and English languages:
+- Arabic pages load from right to left.
+- English pages load under `/en/`.
+- Cart, checkout, payment result, course details, and lesson pages render without console errors.
+
+## 2. Production build
+
+Build both locales exactly as Vercel does:
 
 ```bash
-ng build --configuration=production,ar
-ng build --configuration=production,en
+npm run build:vercel
 ```
 
-This will create a `dist/dr-enam` directory containing the production-ready builds for both languages in `ar` and `en` subdirectories.
+This should generate:
 
-## 3. Serve the Application
+- `dist/dr-enam/ar`
+- `dist/dr-enam/en`
 
-The easiest way to test the language switching is to use a simple Node.js server that can direct traffic to the correct language folder.
+## 3. Unit tests
 
-1.  Create a file named `server.js` in the root of your project.
-2.  Copy and paste the following code into `server.js`:
-
-```javascript
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-
-const port = 8080;
-const projectRoot = 'dist/dr-enam'; // Adjust this to your project's output directory
-
-const server = http.createServer((req, res) => {
-  let filePath = req.url;
-  let lang = 'ar'; // Default language
-
-  if (req.url.startsWith('/en/')) {
-    lang = 'en';
-    filePath = req.url.substring(3); // Remove /en
-  } else if (req.url.startsWith('/ar/')) {
-    lang = 'ar';
-    filePath = req.url.substring(3); // Remove /ar
-  }
-
-  // If the path is a file, serve it. Otherwise, serve the index.html of the respective language.
-  let fullPath = path.join(__dirname, projectRoot, lang, filePath);
-  if (!fs.existsSync(fullPath) || fs.lstatSync(fullPath).isDirectory()) {
-    fullPath = path.join(__dirname, projectRoot, lang, 'index.html');
-  }
-
-  fs.readFile(fullPath, (err, content) => {
-    if (err) {
-      res.writeHead(404);
-      res.end('File not found');
-    } else {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(content);
-    }
-  });
-});
-
-server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-  console.log('Open http://localhost:8080/ar/ to see the Arabic version.');
-  console.log('Open http://localhost:8080/en/ to see the English version.');
-});
-```
-
-3.  Start the server:
+Run the Angular unit tests:
 
 ```bash
-node server.js
+npm test -- --watch=false
 ```
 
-4.  Open your web browser and go to `http://localhost:8080`. It should show the Arabic version of the site. Click the "EN" button to switch to English. The URL will change to `http://localhost:8080/en/`, and you should see the English version.
+## 4. Serverless integration checklist
+
+Before testing payment and protected content flows, configure the required environment variables described in `README.md`.
+
+Then verify:
+
+- `POST /api/paymob-create-session` returns a real Paymob iframe URL when mock mode is disabled.
+- `POST /api/paymob-callback` rejects requests without callback protection in production.
+- `POST /api/player-session` creates a short-lived cookie for enrolled users only.
+- `/api/player` and `/api/drive-stream` reject missing or expired player cookies.
+- `POST /api/telegram-join-session` only works for enrolled users with unused Telegram access.

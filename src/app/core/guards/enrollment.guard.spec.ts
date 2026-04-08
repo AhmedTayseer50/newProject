@@ -1,17 +1,23 @@
 import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
+import { Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
+import { Database } from '@angular/fire/database';
 
-import { enrollmentGuard } from './enrollment.guard';
+import { EnrollmentGuard } from './enrollment.guard';
 
-describe('enrollmentGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => enrollmentGuard(...guardParameters));
-
+describe('EnrollmentGuard', () => {
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        EnrollmentGuard,
+        { provide: Router, useValue: jasmine.createSpyObj('Router', ['parseUrl', 'createUrlTree']) },
+        { provide: Auth, useValue: { currentUser: null } },
+        { provide: Database, useValue: {} },
+      ],
+    });
   });
 
   it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+    expect(TestBed.inject(EnrollmentGuard)).toBeTruthy();
   });
 });

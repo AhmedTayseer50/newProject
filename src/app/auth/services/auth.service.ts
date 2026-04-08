@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import {
   Auth,
-  authState,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -18,9 +17,20 @@ import { UserService } from 'src/app/core/services/user.service';
 export class AuthService {
   private auth = inject(Auth);
   private userSvc = inject(UserService);
+  private observeAuthUser(): Observable<User | null> {
+    return new Observable<User | null>((subscriber) => {
+      const unsubscribe = this.auth.onAuthStateChanged(
+        (user) => subscriber.next(user),
+        (error) => subscriber.error(error),
+        () => subscriber.complete(),
+      );
+
+      return () => unsubscribe();
+    });
+  }
 
   /** تدفق حالة المستخدم (null لو مفيش تسجيل) */
-  user$: Observable<User | null> = authState(this.auth);
+  user$: Observable<User | null> = this.observeAuthUser();
 
   /** هل المستخدم مسجّل دخول؟ */
   isLoggedIn$: Observable<boolean> = this.user$.pipe(map((u) => !!u));

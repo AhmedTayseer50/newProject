@@ -1,11 +1,8 @@
 const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
+const { isMockModeAllowed } = require('./_lib/paymobSecurity');
 
 function send(res, status, payload) {
   res.status(status).json(payload);
-}
-
-function isMockModeEnabled() {
-  return String(process.env.PAYMOB_MOCK_MODE || 'true').toLowerCase() === 'true';
 }
 
 async function paymobAuth(apiKey) {
@@ -459,13 +456,13 @@ module.exports = async function handler(req, res) {
       purchasedKeys,
       items: resolvedItems,
       status: 'pending',
-      paymentProvider: isMockModeEnabled() ? 'paymob-mock' : 'paymob',
+      paymentProvider: isMockModeAllowed() ? 'paymob-mock' : 'paymob',
       createdAt: Date.now(),
     };
 
     await admin.database().ref(`paymentOrders/${merchantOrderId}`).set(pendingOrder);
 
-    if (isMockModeEnabled()) {
+    if (isMockModeAllowed()) {
       const mockUrl = `/api/paymob-mock-complete?merchantOrderId=${encodeURIComponent(
         merchantOrderId
       )}&status=paid`;

@@ -1,12 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';
+import { createServiceProviders, serviceTestImports } from 'src/app/testing/spec-helpers';
 
 describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [...serviceTestImports],
+      providers: [...createServiceProviders(), AuthService],
+    });
     service = TestBed.inject(AuthService);
   });
 
@@ -14,3 +18,4 @@ describe('AuthService', () => {
     expect(service).toBeTruthy();
   });
 });
+

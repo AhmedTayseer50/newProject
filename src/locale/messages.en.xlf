@@ -58,6 +58,13 @@
           <context context-type="linenumber">90</context>
         </context-group>
       <target>Checkout</target></trans-unit>
+      <trans-unit id="title_cart" datatype="html">
+        <source>سلة المشتريات</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app-routing.module.ts</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+      <target>Cart</target></trans-unit>
       <trans-unit id="title_payment_result" datatype="html">
         <source>نتيجة الدفع</source>
         <context-group purpose="location">
@@ -1068,6 +1075,13 @@
           <context context-type="linenumber">15</context>
         </context-group>
       <target>Nabdah Hayah</target></trans-unit>
+      <trans-unit id="seo_default_description" datatype="html">
+        <source>منصة نبضة حياة تقدم كورسات نفسية ودبلومات وجلسات واستشارات تساعدك على النمو النفسي وبناء حياة أكثر توازنًا ووعيًا.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/services/seo.service.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      <target>Nabdah Hayah offers mental health courses, diplomas, sessions, and consultations that support psychological growth and a more balanced, aware life.</target></trans-unit>
       <trans-unit id="8552151554085198864" datatype="html">
         <source>الدكتورة إنعام عبدالله</source>
         <context-group purpose="location">

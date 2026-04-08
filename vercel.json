@@ -3,6 +3,8 @@
   "outputDirectory": "dist/dr-enam",
   "framework": "angular",
   "rewrites": [
+    { "source": "/robots.txt", "destination": "/api/robots.txt" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
     { "source": "/ar/:path*", "destination": "/ar/" },
     { "source": "/en/:path*", "destination": "/en/" },
     { "source": "/", "destination": "/ar/" }

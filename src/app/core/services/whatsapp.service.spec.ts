@@ -1,16 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 
-import { WhatsappService } from './whatsapp.service';
+import { WhatsAppService } from './whatsapp.service';
+import { createServiceProviders, serviceTestImports } from 'src/app/testing/spec-helpers';
 
-describe('WhatsappService', () => {
-  let service: WhatsappService;
+describe('WhatsAppService', () => {
+  let service: WhatsAppService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(WhatsappService);
+    TestBed.configureTestingModule({
+      imports: [...serviceTestImports],
+      providers: [...createServiceProviders(), WhatsAppService],
+    });
+    service = TestBed.inject(WhatsAppService);
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 });
+

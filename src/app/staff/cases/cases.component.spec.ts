@@ -1,21 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CasesComponent } from './cases.component';
+import { StaffCasesComponent } from './cases.component';
+import {
+  componentTestImports,
+  createComponentProviders,
+  testSchemas,
+} from 'src/app/testing/spec-helpers';
 
-describe('CasesComponent', () => {
-  let component: CasesComponent;
-  let fixture: ComponentFixture<CasesComponent>;
+describe('StaffCasesComponent', () => {
+  let component: StaffCasesComponent;
+  let fixture: ComponentFixture<StaffCasesComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CasesComponent]
+      imports: [...componentTestImports],
+      declarations: [StaffCasesComponent],
+      providers: [...createComponentProviders()],
+      schemas: testSchemas,
     });
-    fixture = TestBed.createComponent(CasesComponent);
+    fixture = TestBed.createComponent(StaffCasesComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
+

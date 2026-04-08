@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SalesAnalyticsComponent } from './sales-analytics.component';
+import {
+  componentTestImports,
+  createComponentProviders,
+  testSchemas,
+} from 'src/app/testing/spec-helpers';
 
 describe('SalesAnalyticsComponent', () => {
   let component: SalesAnalyticsComponent;
@@ -8,14 +13,17 @@ describe('SalesAnalyticsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [SalesAnalyticsComponent]
+      imports: [...componentTestImports],
+      declarations: [SalesAnalyticsComponent],
+      providers: [...createComponentProviders()],
+      schemas: testSchemas,
     });
     fixture = TestBed.createComponent(SalesAnalyticsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
+

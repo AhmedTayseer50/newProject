@@ -1,51 +1,92 @@
 # DrEnam
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.16.
+Angular 16 application with Vercel serverless endpoints for:
 
-## Development server
+- Firebase authentication and data access
+- Paymob checkout and payment confirmation
+- Google Drive protected lesson streaming
+- Telegram one-time join flow
+- Arabic and English localized builds
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Local development
 
-## Code scaffolding
+- Start the frontend: `npm start`
+- Production build for both locales: `npm run build:vercel`
+- Run unit tests: `npm test`
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Deployment target
 
-## Build
+The project is configured for Vercel:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- Build command: `npm run build:vercel`
+- Output directory: `dist/dr-enam`
+- Localized entry points: `/ar/` and `/en/`
 
-## Running unit tests
+## Environment variables
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Firebase
 
-## Running end-to-end tests
+- `FIREBASE_SERVICE_ACCOUNT_JSON`: Firebase service account JSON, either plain JSON or base64 encoded.
+- `FIREBASE_DATABASE_URL`: Firebase Realtime Database URL.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Lesson player
 
-## Further help
+- `PLAYER_SESSION_SECRET`: secret used to sign the short-lived player session cookie.
+- `PLAYER_SESSION_TTL_SEC`: optional session lifetime in seconds. Default is `300`.
+- `GOOGLE_DRIVE_SA_EMAIL`: service account email with access to lesson files.
+- `GOOGLE_DRIVE_SA_PRIVATE_KEY`: service account private key for Google Drive access.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Paymob
 
----
+- `PAYMOB_API_KEY`: Paymob API key.
+- `PAYMOB_INTEGRATION_ID`: Paymob integration ID.
+- `PAYMOB_IFRAME_ID`: Paymob iframe ID.
+- `PAYMOB_HMAC_SECRET`: recommended. Used to validate the Paymob processed callback.
+- `PAYMOB_CALLBACK_TOKEN`: recommended fallback or extra protection. Add it as a fixed query parameter in the callback URL configured inside Paymob.
+- `PAYMOB_REQUIRE_PROTECTED_CALLBACK`: optional. Defaults to enforced in production. Keeps callback protection mandatory outside production too when set to `true`.
+- `PAYMOB_MOCK_MODE`: optional. Must be `true` to enable the local mock checkout flow. Mock mode is blocked automatically in production.
 
-## Video protection (YouTube + short-lived session)
+### Telegram
 
-The lesson page requests a **short-lived internal player URL** for each lesson video.
+- `TELEGRAM_JOIN_SESSION_SECRET`: secret used to sign the short-lived Telegram join cookie.
 
-Flow:
-1. Lesson data contains `videoProvider: "youtube"` and `videoRef: "<videoId>"`.
-2. Angular calls `POST /api/player-session` with the user's Firebase ID token.
-3. The backend verifies enrollment and returns `playerUrl` like `/api/player?token=...`.
-4. The lesson page embeds the returned URL in an `<iframe>`.
+## Paymob callback configuration
 
-### Required Vercel environment variables
+The processed callback endpoint is:
 
-- `PLAYER_SESSION_SECRET`: strong random secret used to sign the short-lived session token.
-- `PLAYER_SESSION_TTL_SEC` (optional): default `300` (5 minutes).
-- `FIREBASE_SERVICE_ACCOUNT_JSON`: service account JSON as **plain JSON** or **base64**.
-- `FIREBASE_DATABASE_URL`: Firebase RTDB URL.
+- `/api/paymob-callback`
 
-### Presence check (anti-recording friction)
+Recommended secure configuration:
 
-While the video is **playing**, the lesson page shows an occasional overlay asking the user to confirm they are still watching.
-If the user does not confirm within 30 seconds, playback is paused until they confirm.
+1. Configure `PAYMOB_HMAC_SECRET` in Vercel.
+2. Configure `PAYMOB_CALLBACK_TOKEN` in Vercel.
+3. In Paymob dashboard, set the processed callback URL to:
+   `/api/paymob-callback?token=YOUR_CALLBACK_TOKEN`
+
+The backend now rejects unprotected production callbacks.
+
+## Payment flow
+
+1. Angular calls `POST /api/paymob-create-session` with the signed-in Firebase user token.
+2. The backend validates the selected items and stores a pending order in Firebase.
+3. If mock mode is explicitly enabled in non-production, the order uses `/api/paymob-mock-complete`.
+4. Otherwise the backend creates the Paymob order and returns the real iframe URL.
+5. Paymob calls `/api/paymob-callback` after payment completion.
+6. The backend updates order status and grants course plus Telegram access only after callback validation succeeds.
+
+## Protected lesson video flow
+
+1. Lesson data uses `videoProvider: "gdrive"` and `videoRef: "<googleDriveFileId>"`.
+2. Angular calls `POST /api/player-session` with the Firebase ID token.
+3. The backend verifies enrollment and writes a short-lived signed cookie.
+4. The frontend loads `/api/player` inside an iframe.
+5. `/api/player` streams the video through `/api/drive-stream` using the signed cookie.
+
+## Release checklist
+
+- Set all required Vercel environment variables.
+- Keep `PAYMOB_MOCK_MODE` unset in production unless you explicitly need a sandbox environment.
+- Confirm the Paymob processed callback includes either a valid `hmac` or the configured callback token.
+- Verify Google Drive service account access to protected lesson files.
+- Run `npm run build:vercel`.
+- Run `npm test`.
