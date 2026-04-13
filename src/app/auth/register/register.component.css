@@ -58,6 +58,59 @@ body.dark-theme .auth-page {
   margin-bottom: 14px;
 }
 
+
+.auth-brand {
+  margin-bottom: 14px;
+}
+
+.auth-logo {
+  width: 160px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.08));
+}
+
+body.dark-theme .auth-logo {
+  filter: brightness(0) invert(1) drop-shadow(0 8px 18px rgba(255, 255, 255, 0.08));
+}
+
+.auth-divider {
+  position: relative;
+  margin: 18px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.auth-divider::before { left: 0; }
+.auth-divider::after { right: 0; }
+
+.google-btn {
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  border-color: var(--border-color);
+}
+
+.google-btn:hover {
+  border-color: var(--primary-color);
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
 .auth-title {
   margin: 0 0 8px;
   font-size: 1.5rem;

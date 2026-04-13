@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 })
 export class RegisterComponent implements OnInit {
   loading = false;
+  googleLoading = false;
   error?: string;
   currentLang: 'ar' | 'en' = 'ar';
 
@@ -128,12 +129,36 @@ export class RegisterComponent implements OnInit {
         displayName: displayName!,
         whatsapp: whatsapp!,
       });
-      this.router.navigateByUrl('/courses');
+      await this.router.navigateByUrl('/courses');
     } catch (e: any) {
       this.error =
         e?.message ?? $localize`:@@register_error_default:حدث خطأ أثناء إنشاء الحساب`;
     } finally {
       this.loading = false;
+    }
+  }
+
+
+
+  async onGoogleRegister() {
+    this.googleLoading = true;
+    this.error = undefined;
+
+    try {
+      await this.auth.loginWithGoogle();
+      await this.router.navigateByUrl('/courses');
+    } catch (e: any) {
+      const msg = (e?.message || '').toString();
+
+      if (msg.includes('popup') || msg.includes('Popup')) {
+        this.error = $localize`:@@register_google_popup_error:تعذر فتح نافذة Google. جرّب السماح بالنوافذ المنبثقة ثم أعد المحاولة.`;
+      } else {
+        this.error =
+          e?.message ??
+          $localize`:@@register_google_error_default:حدث خطأ أثناء إنشاء الحساب عبر Google`;
+      }
+    } finally {
+      this.googleLoading = false;
     }
   }
 

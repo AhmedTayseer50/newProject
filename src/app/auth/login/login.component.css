@@ -57,6 +57,23 @@ body.dark-theme .auth-page {
   margin-bottom: 14px;
 }
 
+
+.auth-brand {
+  margin-bottom: 14px;
+}
+
+.auth-logo {
+  width: 160px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.08));
+}
+
+body.dark-theme .auth-logo {
+  filter: brightness(0) invert(1) drop-shadow(0 8px 18px rgba(255, 255, 255, 0.08));
+}
+
 .auth-title {
   margin: 0 0 8px;
   font-size: 1.5rem;
