@@ -1,76 +1,273 @@
 <div class="checkout-page" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">
-  <div class="container py-5">
-    <div *ngIf="loading" class="text-center py-5">
+  <div class="container py-4 py-lg-5">
+    <div *ngIf="loading" class="checkout-loading text-center py-5">
       <div class="spinner-border" role="status"></div>
     </div>
 
-    <div *ngIf="!loading && items.length" class="row g-4">
-      <div class="col-lg-7">
-        <div class="card shadow-sm border-0 checkout-card">
-          <div class="card-body p-4">
-            <h2 class="mb-3">{{ pageTitle }}</h2>
+    <ng-container *ngIf="!loading && items.length">
+      <section class="checkout-hero mb-4">
+        <div class="checkout-hero__content">
+          <span class="checkout-hero__eyebrow">{{ securePaymentLabel }}</span>
+          <h1 class="checkout-hero__title">{{ pageTitle }}</h1>
+          <p class="checkout-hero__subtitle">{{ pageSubtitle }}</p>
 
-            <div *ngIf="error" class="alert alert-danger">
-              {{ error }}
+          <div class="checkout-steps">
+            <div class="checkout-step" *ngFor="let step of checkoutSteps; let i = index">
+              <span class="checkout-step__index">{{ i + 1 }}</span>
+              <span>{{ step }}</span>
             </div>
-
-            <div class="mb-3">
-              <label class="form-label">{{ fullNameLabel }}</label>
-              <input type="text" class="form-control" [(ngModel)]="customerName" />
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">{{ emailLabel }}</label>
-              <input type="email" class="form-control" [(ngModel)]="customerEmail" />
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">{{ phoneLabel }}</label>
-              <input type="text" class="form-control" [(ngModel)]="customerPhone" />
-            </div>
-
-            <button class="btn btn-primary w-100" type="button" [disabled]="submitting" (click)="payNow()">
-              {{ payButtonText }}
-            </button>
           </div>
         </div>
-      </div>
 
-      <div class="col-lg-5">
-        <div class="card shadow-sm border-0 checkout-summary">
-          <div class="card-body p-4">
-            <h5 class="mb-3">{{ summaryTitle }}</h5>
-
-            <div class="course-box d-flex gap-3 align-items-start mb-3" *ngFor="let item of items">
-              <img
-                [src]="item.thumbnail || 'https://via.placeholder.com/120x90'"
-                [alt]="item.title"
-                class="course-thumb"
-              />
-
-              <div class="flex-grow-1">
-                <h6 class="mb-1">{{ item.title }}</h6>
-                <p class="text-muted small mb-2">{{ item.description }}</p>
-                <div class="small fw-semibold mb-1">
-                  {{ isEnglish ? 'Plan:' : 'الخطة:' }} {{ item.planName }}
-                </div>
-                <div class="small text-muted mb-1" *ngIf="item.planBadge">{{ item.planBadge }}</div>
-                <div class="small text-muted mb-2" *ngIf="item.planNote">{{ item.planNote }}</div>
-                <div class="price-line">
-                  <strong>{{ item.priceText || ((item.price | number:'1.0-0') + ' EGP') }}</strong>
-                </div>
+        <div class="checkout-hero__visual">
+          <div class="payment-card-preview">
+            <div class="payment-card-preview__top">
+              <span>{{ securePaymentLabel }}</span>
+              <div class="payment-brands">
+                <span class="payment-brand payment-brand--visa">VISA</span>
+                <span class="payment-brand payment-brand--master">MC</span>
+                <span class="payment-brand payment-brand--meeza">Meeza</span>
               </div>
             </div>
 
-            <hr />
+            <div class="payment-card-preview__number">
+              4242 4242 4242 4242
+            </div>
 
-            <div class="d-flex justify-content-between fw-bold">
-              <span>{{ totalLabel }}</span>
-              <span>{{ totalPrice | number:'1.0-0' }} EGP</span>
+            <div class="payment-card-preview__footer">
+              <div>
+                <span class="payment-card-preview__label">{{ fullNameLabel }}</span>
+                <strong>{{ customerName || (isEnglish ? 'Card holder' : 'اسم حامل البطاقة') }}</strong>
+              </div>
+
+              <div class="payment-card-preview__expiry">
+                <span class="payment-card-preview__label">CVV</span>
+                <strong>•••</strong>
+              </div>
             </div>
           </div>
         </div>
+      </section>
+
+      <div *ngIf="error" class="alert alert-danger mb-4">
+        {{ error }}
       </div>
-    </div>
+
+      <div class="row g-4 align-items-start">
+        <div class="col-xl-7">
+          <div class="checkout-stack">
+            <article class="card border-0 shadow-sm checkout-panel">
+              <div class="card-body p-4 p-lg-5">
+                <div class="checkout-panel__header">
+                  <div>
+                    <h2 class="checkout-panel__title mb-1">{{ customerCardTitle }}</h2>
+                    <p class="checkout-panel__subtitle mb-0">{{ customerCardSubtitle }}</p>
+                  </div>
+
+                  <div class="checkout-badges">
+                    <span class="checkout-badge">{{ trustedGatewayLabel }}</span>
+                    <span class="checkout-badge">{{ instantActivationLabel }}</span>
+                  </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                  <div class="col-12">
+                    <label class="form-label">{{ fullNameLabel }}</label>
+                    <input
+                      type="text"
+                      class="form-control checkout-input"
+                      [(ngModel)]="customerName"
+                      [placeholder]="isEnglish ? 'Your full name' : 'الاسم كما تريد ظهوره على الطلب'"
+                    />
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">{{ emailLabel }}</label>
+                    <input
+                      type="email"
+                      class="form-control checkout-input"
+                      [(ngModel)]="customerEmail"
+                      [placeholder]="isEnglish ? 'name@example.com' : 'example@email.com'"
+                    />
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">{{ phoneLabel }}</label>
+                    <input
+                      type="text"
+                      class="form-control checkout-input"
+                      [(ngModel)]="customerPhone"
+                      [placeholder]="isEnglish ? '01xxxxxxxxx' : 'رقم الهاتف أو الواتساب'"
+                    />
+                  </div>
+                </div>
+
+                <div class="payment-info-band mt-4">
+                  <div class="payment-info-band__copy">
+                    <h3 class="payment-info-band__title mb-1">{{ paymentSectionTitle }}</h3>
+                    <p class="payment-info-band__text mb-0">{{ paymentSectionSubtitle }}</p>
+                  </div>
+
+                  <button
+                    class="btn btn-primary checkout-submit"
+                    type="button"
+                    [disabled]="submitting"
+                    (click)="payNow()"
+                  >
+                    {{ paymentButtonText }}
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <article class="card border-0 shadow-sm checkout-panel" id="payment-frame-section">
+              <div class="card-body p-4 p-lg-5">
+                <div class="checkout-panel__header mb-3">
+                  <div>
+                    <h2 class="checkout-panel__title mb-1">{{ paymentSectionTitle }}</h2>
+                    <p class="checkout-panel__subtitle mb-0">{{ paymentFrameHint }}</p>
+                  </div>
+
+                  <div class="payment-methods">
+                    <span class="payment-methods__label">{{ supportedCardsLabel }}</span>
+                    <div class="payment-brands">
+                      <span class="payment-brand payment-brand--visa">VISA</span>
+                      <span class="payment-brand payment-brand--master">Mastercard</span>
+                      <span class="payment-brand payment-brand--meeza">Meeza</span>
+                    </div>
+                  </div>
+                </div>
+
+                <ng-container *ngIf="hasPaymentFrame; else paymentPlaceholder">
+                  <div class="payment-ready-banner">
+                    <div>
+                      <div class="payment-ready-banner__title">{{ paymentReadyTitle }}</div>
+                      <p class="mb-0">{{ paymentReadyText }}</p>
+                    </div>
+
+                    <div class="payment-ready-banner__actions">
+                      <button
+                        class="btn btn-outline-primary"
+                        type="button"
+                        (click)="openPaymentInNewTab()"
+                      >
+                        {{ openNewTabText }}
+                      </button>
+
+                      <button
+                        class="btn btn-outline-dark"
+                        type="button"
+                        [disabled]="!merchantOrderId"
+                        (click)="goToPaymentResult()"
+                      >
+                        {{ viewResultText }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="payment-reference" *ngIf="merchantOrderId">
+                    <span>{{ orderReferenceLabel }}</span>
+                    <strong>{{ merchantOrderId }}</strong>
+                  </div>
+
+                  <div class="payment-frame-shell">
+                    <div class="payment-frame-loader" *ngIf="paymentFrameLoading">
+                      <div class="spinner-border spinner-border-sm" role="status"></div>
+                      <span>{{ paymentFrameLoadingText }}</span>
+                    </div>
+
+                    <iframe
+                      class="payment-frame"
+                      [src]="paymentIframeUrl"
+                      [title]="frameTitle"
+                      allow="payment *"
+                      loading="eager"
+                      (load)="onPaymentFrameLoad()"
+                    ></iframe>
+                  </div>
+                </ng-container>
+
+                <ng-template #paymentPlaceholder>
+                  <div class="payment-placeholder">
+                    <div class="payment-placeholder__icon">CARD</div>
+                    <h3>{{ paymentSectionTitle }}</h3>
+                    <p>{{ paymentSectionSubtitle }}</p>
+                    <button
+                      class="btn btn-primary checkout-submit"
+                      type="button"
+                      [disabled]="submitting"
+                      (click)="payNow()"
+                    >
+                      {{ paymentButtonText }}
+                    </button>
+                  </div>
+                </ng-template>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="col-xl-5">
+          <div class="checkout-sidebar">
+            <article class="card border-0 shadow-sm checkout-panel checkout-summary">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h2 class="checkout-panel__title mb-0">{{ summaryTitle }}</h2>
+                  <span class="summary-count">
+                    {{ items.length }} {{ itemsLabel }}
+                  </span>
+                </div>
+
+                <div class="summary-items">
+                  <div class="summary-item" *ngFor="let item of items">
+                    <img
+                      [src]="item.thumbnail || 'https://via.placeholder.com/120x90'"
+                      [alt]="item.title"
+                      class="summary-item__thumb"
+                    />
+
+                    <div class="summary-item__content">
+                      <div class="summary-item__top">
+                        <span class="summary-item__type">{{ getItemTypeLabel(item) }}</span>
+                        <strong class="summary-item__price">
+                          {{ item.priceText || ((item.price | number:'1.0-0') + ' EGP') }}
+                        </strong>
+                      </div>
+
+                      <h3 class="summary-item__title">{{ item.title }}</h3>
+                      <p class="summary-item__desc">{{ item.description }}</p>
+
+                      <div class="summary-meta">
+                        <span>{{ isEnglish ? 'Plan:' : 'الخطة:' }} {{ item.planName }}</span>
+                        <span *ngIf="item.planBadge">{{ item.planBadge }}</span>
+                      </div>
+
+                      <div class="summary-note" *ngIf="item.planNote">
+                        {{ item.planNote }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="summary-total">
+                  <span>{{ totalLabel }}</span>
+                  <strong>{{ totalPrice | number:'1.0-0' }} EGP</strong>
+                </div>
+              </div>
+            </article>
+
+            <article class="card border-0 shadow-sm checkout-panel checkout-trust">
+              <div class="card-body p-4">
+                <h2 class="checkout-panel__title mb-3">{{ secureListTitle }}</h2>
+
+                <ul class="trust-list">
+                  <li *ngFor="let item of trustBullets">{{ item }}</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </div>

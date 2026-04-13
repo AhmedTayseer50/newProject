@@ -1,0 +1,169 @@
+.certificates-page {
+  min-height: calc(100vh - 180px);
+}
+
+.page-hero {
+  max-width: 760px;
+  margin-bottom: 1.5rem;
+}
+
+.page-hero__eyebrow {
+  display: inline-flex;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(14, 116, 144, 0.12);
+  color: #0f766e;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.page-hero__title {
+  margin: 0.9rem 0 0.5rem;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: 800;
+}
+
+.page-hero__subtitle {
+  color: var(--text-muted);
+  line-height: 1.9;
+  margin: 0;
+}
+
+.certificate-card {
+  background: var(--bg-color-soft);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  box-shadow: var(--card-shadow);
+  padding: 1.35rem;
+}
+
+.stats-grid,
+.certificates-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.certificates-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.stat-card__label {
+  display: block;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+}
+
+.stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.item-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.item-card__media {
+  aspect-ratio: 16 / 8;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(15, 23, 42, 0.08);
+}
+
+.item-card__body {
+  padding: 1.35rem;
+}
+
+.item-card__header,
+.actions-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.item-card__header {
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.item-card__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.item-card__meta,
+.item-card__footer {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.item-card__description {
+  color: var(--text-color);
+  line-height: 1.85;
+  margin-bottom: 1rem;
+}
+
+.item-card__footer {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.status-chip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+  white-space: nowrap;
+}
+
+.status-chip.is-issued {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+
+.note-list {
+  margin: 0;
+  padding-inline-start: 1.1rem;
+  line-height: 1.9;
+  color: var(--text-muted);
+}
+
+.empty-card__title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.empty-card__text {
+  color: var(--text-muted);
+  max-width: 640px;
+  margin: 0 auto 1rem;
+  line-height: 1.8;
+}
+
+.actions-row {
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (max-width: 767px) {
+  .item-card__header {
+    flex-direction: column;
+  }
+
+  .actions-row {
+    flex-direction: column;
+  }
+
+  .actions-row .btn {
+    width: 100%;
+  }
+}

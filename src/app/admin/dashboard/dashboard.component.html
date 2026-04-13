@@ -1,4 +1,75 @@
 <div class="dashboard-page container py-4" dir="rtl">
+  <section class="dashboard-card dashboard-card--full">
+    <div class="dashboard-section-head">
+      <div>
+        <h3 class="dashboard-title mb-2">ملخص المنصة</h3>
+        <p class="dashboard-subtitle mb-0">
+          أرقام مباشرة عن المستخدمين والمحتوى والطلبات وحالة التشغيل داخل لوحة الإدارة.
+        </p>
+      </div>
+
+      <button class="btn btn-outline-dark" type="button" (click)="refreshOverview()" [disabled]="overviewLoading">
+        {{ overviewLoading ? 'جارٍ التحديث...' : 'تحديث الملخص' }}
+      </button>
+    </div>
+
+    <div *ngIf="overviewError" class="alert alert-danger mt-3 mb-0">
+      {{ overviewError }}
+    </div>
+
+    <div *ngIf="overviewLoading" class="dashboard-hint mt-3">جارٍ تحميل ملخص لوحة التحكم...</div>
+
+    <div *ngIf="!overviewLoading" class="overview-grid mt-3">
+      <article class="overview-stat">
+        <span class="overview-stat__label">إجمالي المستخدمين</span>
+        <strong class="overview-stat__value">{{ overview.totalUsers }}</strong>
+        <small class="overview-stat__meta">
+          أدمن: {{ overview.adminsCount }} | معطل: {{ overview.disabledUsersCount }}
+        </small>
+      </article>
+
+      <article class="overview-stat">
+        <span class="overview-stat__label">الكورسات</span>
+        <strong class="overview-stat__value">{{ overview.publishedCourses }} / {{ overview.totalCourses }}</strong>
+        <small class="overview-stat__meta">المنشور من إجمالي الكورسات</small>
+      </article>
+
+      <article class="overview-stat">
+        <span class="overview-stat__label">الدبلومات</span>
+        <strong class="overview-stat__value">{{ overview.publishedDiplomas }} / {{ overview.totalDiplomas }}</strong>
+        <small class="overview-stat__meta">المنشور من إجمالي الدبلومات</small>
+      </article>
+
+      <article class="overview-stat">
+        <span class="overview-stat__label">إجمالي الإيراد</span>
+        <strong class="overview-stat__value">{{ formatCurrency(overview.totalRevenue) }} جنيه</strong>
+        <small class="overview-stat__meta">
+          هذا الشهر: {{ formatCurrency(overview.currentMonthRevenue) }} جنيه
+        </small>
+      </article>
+
+      <article class="overview-stat">
+        <span class="overview-stat__label">الطلبات</span>
+        <strong class="overview-stat__value">{{ overview.paidOrdersCount }}</strong>
+        <small class="overview-stat__meta">
+          مدفوع: {{ overview.paidOrdersCount }} | معلّق: {{ overview.pendingOrdersCount }} | فشل: {{ overview.failedOrdersCount }}
+        </small>
+      </article>
+
+      <article class="overview-stat">
+        <span class="overview-stat__label">التشغيل والمتابعة</span>
+        <strong class="overview-stat__value">{{ overview.newSessionRequests + overview.openCases }}</strong>
+        <small class="overview-stat__meta">
+          جلسات جديدة: {{ overview.newSessionRequests }} | حالات مفتوحة: {{ overview.openCases }}
+        </small>
+      </article>
+    </div>
+
+    <div *ngIf="!overviewLoading" class="dashboard-hint mt-3">
+      آخر نشاط بيع مسجل: {{ formatDate(overview.latestOrderAt) }}
+    </div>
+  </section>
+
   <div class="dashboard-grid">
     <section class="dashboard-card">
       <h3 class="dashboard-title">لوحة التحكم</h3>

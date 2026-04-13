@@ -1,26 +1,96 @@
-<div class="page-container py-4">
-  <div class="profile-wrapper">
-    <div class="profile-card">
-      <div class="profile-header">
-        <h2 class="profile-title">الملف الشخصي</h2>
-        <p class="profile-subtitle">بيانات الحساب الأساسية</p>
+<section class="profile-page" [attr.dir]="pageDir">
+  <div class="container py-4">
+    <div class="page-hero">
+      <div class="page-hero__eyebrow">
+        {{ isEnglish ? 'Account hub' : 'مركز الحساب' }}
       </div>
-
-      <div class="profile-body">
-        <ng-container *ngIf="email$ | async as email; else notLoggedIn">
-          <div class="info-row">
-            <span class="label">البريد الإلكتروني</span>
-            <span class="value">{{ email }}</span>
-          </div>
-        </ng-container>
-
-        <ng-template #notLoggedIn>
-          <div class="empty-state">
-            <div class="empty-title">غير مسجل الدخول</div>
-            <div class="empty-subtitle">من فضلك سجّل الدخول لعرض بيانات الحساب.</div>
-          </div>
-        </ng-template>
-      </div>
+      <h1 class="page-hero__title">
+        {{ isEnglish ? 'Profile' : 'الملف الشخصي' }}
+      </h1>
+      <p class="page-hero__subtitle">
+        {{
+          isEnglish
+            ? 'Use your account page as the starting point for settings, billing, certificates, and course feedback.'
+            : 'استخدم صفحة الحساب كنقطة بداية للوصول إلى الإعدادات والفوترة والشهادات وتقييمات الكورسات.'
+        }}
+      </p>
     </div>
+
+    <ng-container *ngIf="user$ | async as user; else notLoggedIn">
+      <div class="profile-layout">
+        <section class="profile-card profile-card--summary">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              {{ (user.displayName || user.email || 'U').charAt(0) | uppercase }}
+            </div>
+
+            <div>
+              <h2 class="profile-title">
+                {{ user.displayName || (isEnglish ? 'Account owner' : 'صاحب الحساب') }}
+              </h2>
+              <p class="profile-subtitle">
+                {{ isEnglish ? 'Primary account details' : 'بيانات الحساب الأساسية' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <span class="label">{{ isEnglish ? 'Email' : 'البريد الإلكتروني' }}</span>
+              <span class="value">{{ user.email || '--' }}</span>
+            </div>
+
+            <div class="info-row">
+              <span class="label">{{ isEnglish ? 'Account ID' : 'معرّف الحساب' }}</span>
+              <span class="value value--small">{{ user.uid }}</span>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <a class="btn btn-outline-dark" routerLink="/my-courses">
+              {{ isEnglish ? 'Open my courses' : 'فتح كورساتي' }}
+            </a>
+            <a class="btn btn-dark" routerLink="/settings">
+              {{ isEnglish ? 'Manage settings' : 'إدارة الإعدادات' }}
+            </a>
+          </div>
+        </section>
+
+        <section class="profile-card">
+          <div class="section-heading">
+            <h2 class="section-title">
+              {{ isEnglish ? 'Account sections' : 'أقسام الحساب' }}
+            </h2>
+            <p class="section-subtitle">
+              {{
+                isEnglish
+                  ? 'Only completed internal pages are exposed here.'
+                  : 'الصفحات الداخلية المكتملة فقط هي التي تظهر هنا.'
+              }}
+            </p>
+          </div>
+
+          <div class="shortcut-grid">
+            <a class="shortcut-card" *ngFor="let shortcut of shortcuts" [routerLink]="shortcut.route">
+              <strong class="shortcut-card__title">{{ shortcut.title }}</strong>
+              <span class="shortcut-card__description">{{ shortcut.description }}</span>
+            </a>
+          </div>
+        </section>
+      </div>
+    </ng-container>
+
+    <ng-template #notLoggedIn>
+      <div class="profile-card empty-state">
+        <div class="empty-title">{{ isEnglish ? 'You are not signed in' : 'أنت غير مسجل الدخول' }}</div>
+        <div class="empty-subtitle">
+          {{
+            isEnglish
+              ? 'Sign in to open your profile and all internal account pages.'
+              : 'سجل الدخول لفتح الملف الشخصي وكل الصفحات الداخلية المرتبطة بالحساب.'
+          }}
+        </div>
+      </div>
+    </ng-template>
   </div>
-</div>
+</section>

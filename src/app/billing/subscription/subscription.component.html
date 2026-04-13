@@ -1,10 +1,124 @@
-<section class="page-section" [attr.dir]="pageDir">
-  <div class="container py-5">
-    <div class="text-center mx-auto" style="max-width: 720px">
-      <h1 class="mb-3">{{ titleText }}</h1>
-      <p class="text-muted mb-4">
-        {{ subtitleText }}
-      </p>
+<section class="billing-page" [attr.dir]="pageDir">
+  <div class="container py-4">
+    <div class="page-hero">
+      <div class="page-hero__eyebrow">{{ isEnglish ? 'Billing center' : 'مركز الفوترة' }}</div>
+      <h1 class="page-hero__title">{{ titleText }}</h1>
+      <p class="page-hero__subtitle">{{ subtitleText }}</p>
     </div>
+
+    <div *ngIf="loading" class="billing-card text-center py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <div *ngIf="!loading && !overview.isAuthenticated" class="billing-card empty-card text-center">
+      <h2 class="empty-card__title">{{ authTitle }}</h2>
+      <p class="empty-card__text">{{ authText }}</p>
+      <a class="btn btn-dark" routerLink="/login">
+        {{ isEnglish ? 'Go to login' : 'الذهاب لتسجيل الدخول' }}
+      </a>
+    </div>
+
+    <ng-container *ngIf="!loading && overview.isAuthenticated">
+      <div class="stats-grid">
+        <article class="billing-card stat-card">
+          <span class="stat-card__label">{{ isEnglish ? 'Active courses' : 'الكورسات النشطة' }}</span>
+          <strong class="stat-card__value">{{ overview.activeCoursesCount }}</strong>
+        </article>
+
+        <article class="billing-card stat-card">
+          <span class="stat-card__label">{{ isEnglish ? 'Paid orders' : 'الطلبات المدفوعة' }}</span>
+          <strong class="stat-card__value">{{ overview.paidOrdersCount }}</strong>
+        </article>
+
+        <article class="billing-card stat-card">
+          <span class="stat-card__label">{{ isEnglish ? 'Total paid' : 'إجمالي المدفوع' }}</span>
+          <strong class="stat-card__value">{{ totalPaidText }}</strong>
+        </article>
+      </div>
+
+      <div *ngIf="overview.hasReadError" class="alert alert-warning mt-3">
+        {{
+          isEnglish
+            ? 'Some billing records could not be loaded from the database right now. Your access summary is still shown correctly.'
+            : 'تعذر تحميل بعض سجلات الفوترة من قاعدة البيانات الآن، لكن ملخص الوصول للمحتوى ما زال ظاهرًا بشكل صحيح.'
+        }}
+      </div>
+
+      <div *ngIf="!overview.recentOrders.length" class="billing-card empty-card text-center mt-3">
+        <h2 class="empty-card__title">{{ emptyTitle }}</h2>
+        <p class="empty-card__text">{{ emptyText }}</p>
+      </div>
+
+      <div *ngIf="overview.recentOrders.length" class="orders-grid mt-3">
+        <article class="billing-card order-card" *ngFor="let order of overview.recentOrders">
+          <div class="order-card__header">
+            <div>
+              <div class="order-card__title">#{{ order.merchantOrderId }}</div>
+              <div class="order-card__meta">
+                {{ isEnglish ? 'Created:' : 'تم الإنشاء:' }} {{ formatDate(order.createdAt) }}
+              </div>
+            </div>
+
+            <span class="order-status" [class.is-paid]="order.status === 'paid'" [class.is-failed]="order.status === 'failed'">
+              {{ orderStatusLabel(order) }}
+            </span>
+          </div>
+
+          <div class="order-card__amount">
+            {{ isEnglish ? 'Order amount' : 'قيمة الطلب' }}: <strong>{{ order.amount }} EGP</strong>
+          </div>
+
+          <div class="order-items" *ngIf="order.items.length">
+            <div class="order-item" *ngFor="let item of order.items">
+              <div>
+                <strong>{{ item.title || (isEnglish ? 'Purchased item' : 'عنصر تم شراؤه') }}</strong>
+                <div class="order-item__meta">
+                  {{ item.planName || (isEnglish ? 'Default plan' : 'الخطة الأساسية') }}
+                </div>
+              </div>
+              <span>{{ item.priceText || '--' }}</span>
+            </div>
+          </div>
+
+          <div class="order-card__footer">
+            <span *ngIf="order.transactionId">
+              {{ isEnglish ? 'Transaction:' : 'رقم العملية:' }} {{ order.transactionId }}
+            </span>
+            <span>
+              {{ isEnglish ? 'Paid at:' : 'تم الدفع:' }} {{ formatDate(order.paidAt) }}
+            </span>
+          </div>
+        </article>
+      </div>
+
+      <div class="billing-card policy-card mt-3">
+        <h2 class="account-card__title">{{ isEnglish ? 'Billing notes' : 'ملاحظات الفوترة' }}</h2>
+        <ul class="policy-list">
+          <li>
+            {{
+              isEnglish
+                ? 'Completed payment orders are activated after payment verification and access processing.'
+                : 'يتم تفعيل الطلبات المدفوعة بعد التحقق من الدفع ومعالجة الوصول للمحتوى.'
+            }}
+          </li>
+          <li>
+            {{
+              isEnglish
+                ? 'For refund or cancellation questions, review the refund policy or contact support with your order reference.'
+                : 'في حالة وجود استفسار عن الاسترجاع أو الإلغاء، راجع سياسة الاسترجاع أو تواصل مع الدعم مع رقم الطلب.'
+            }}
+          </li>
+        </ul>
+
+        <div class="actions-row">
+          <a class="btn btn-outline-dark" routerLink="/refund-policy">
+            {{ isEnglish ? 'Refund policy' : 'سياسة الاسترجاع' }}
+          </a>
+          <a class="btn btn-dark" routerLink="/contact">
+            {{ isEnglish ? 'Contact support' : 'التواصل مع الدعم' }}
+          </a>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </section>

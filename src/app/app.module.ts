@@ -12,6 +12,7 @@ import { CourseDetailsComponent } from './public/course-details/course-details.c
 import { AboutComponent } from './public/about/about.component';
 import { ContactComponent } from './public/contact/contact.component';
 import { FaqComponent } from './public/faq/faq.component';
+import { LegalPageComponent } from './public/legal-page/legal-page.component';
 
 // ====== Auth / Account ======
 import { LoginComponent } from './auth/login/login.component';
@@ -68,6 +69,7 @@ import { CartComponent } from './billing/cart/cart.component';
     AboutComponent,
     ContactComponent,
     FaqComponent,
+    LegalPageComponent,
     LoginComponent,
     RegisterComponent,
     ForgotPasswordComponent,

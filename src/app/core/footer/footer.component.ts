@@ -16,6 +16,20 @@ export class FooterComponent implements OnInit {
     this.currentLang = this.detectLangFromPath();
   }
 
+  get privacyLabel(): string {
+    return this.currentLang === 'en' ? 'Privacy Policy' : 'سياسة الخصوصية';
+  }
+
+  get termsLabel(): string {
+    return this.currentLang === 'en' ? 'Terms and Conditions' : 'الشروط والأحكام';
+  }
+
+  get refundLabel(): string {
+    return this.currentLang === 'en'
+      ? 'Refund and Cancellation Policy'
+      : 'سياسة الاسترجاع والإلغاء';
+  }
+
   private detectLangFromPath(): 'ar' | 'en' {
     const seg = window.location.pathname.split('/')[1];
     return seg === 'en' ? 'en' : 'ar';

@@ -9,7 +9,7 @@
         </p>
       </div>
 
-      <button class="btn btn-primary refresh-btn" type="button" (click)="loadData()" [disabled]="loading">
+      <button class="btn btn-primary refresh-btn" type="button" (click)="loadData(true)" [disabled]="loading">
         {{ loading ? 'جاري التحديث...' : 'تحديث البيانات' }}
       </button>
     </div>

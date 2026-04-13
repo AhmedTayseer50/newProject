@@ -192,7 +192,7 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="!loading && !error && course && course.outcomes?.length"
 >
   <div class="container">
     <div class="section-header">
@@ -208,7 +208,7 @@
       </p>
     </div>
 
-    <div class="cards-grid" *ngIf="course.outcomes?.length; else noOutcomesCards">
+    <div class="cards-grid">
       <article class="feature-card outcome-card" *ngFor="let item of course.outcomes">
         <div class="feature-icon">✓</div>
         <h3 class="feature-card__title">{{ item }}</h3>
@@ -222,11 +222,6 @@
       </article>
     </div>
 
-    <ng-template #noOutcomesCards>
-      <div class="simple-list-card">
-        <p class="m-0">{{ defaultOutcomesEmpty }}</p>
-      </div>
-    </ng-template>
   </div>
 </section>
 
@@ -296,7 +291,7 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="!loading && !error && course && (course.curriculum?.length || lectureNames.length)"
 >
   <div class="container">
     <div class="section-header">
@@ -310,10 +305,7 @@
       </p>
     </div>
 
-    <div
-      class="curriculum-grid"
-      *ngIf="course.curriculum?.length; else noCurriculum"
-    >
+    <div class="curriculum-grid" *ngIf="course.curriculum?.length; else noCurriculum">
       <article
         class="curriculum-card"
         *ngFor="let item of course.curriculum; let i = index"
@@ -333,19 +325,13 @@
     </div>
 
     <ng-template #noCurriculum>
-      <div class="simple-list-card" *ngIf="lectureNames.length; else curriculumEmpty">
+      <div class="simple-list-card" *ngIf="lectureNames.length">
         <ul class="check-list">
           <li *ngFor="let name of lectureNames; let i = index">
             {{ lessonLabel(i) }} — {{ name || (isEnglish ? 'Untitled' : 'بدون عنوان') }}
           </li>
         </ul>
       </div>
-
-      <ng-template #curriculumEmpty>
-        <div class="simple-list-card">
-          <p class="m-0">{{ defaultCurriculumEmpty }}</p>
-        </div>
-      </ng-template>
     </ng-template>
   </div>
 </section>
@@ -354,7 +340,7 @@
 <section
   class="section study-highlights"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="!loading && !error && course && (course.programDuration || course.expectedStudyTimeDescription || course.prerequisitesDescription || course.targetAudience)"
 >
   <div class="container">
     <div class="section-header">
@@ -405,7 +391,7 @@
 <section
   class="section section--light"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="!loading && !error && course && (course.audienceItems?.length || course.prerequisitesDescription || course.targetAudience)"
 >
   <div class="container">
     <div class="section-header">
@@ -422,26 +408,22 @@
     </div>
 
     <div class="audience-fit-grid">
-      <article class="fit-card">
+      <article class="fit-card" *ngIf="course.audienceItems?.length">
         <div class="fit-card__badge">
           {{ isEnglish ? 'Who it is for' : 'لمن صُمم' }}
         </div>
 
-        <ul class="check-list" *ngIf="course.audienceItems?.length; else noAudience">
+        <ul class="check-list" *ngIf="course.audienceItems?.length">
           <li *ngFor="let item of course.audienceItems">{{ item }}</li>
         </ul>
-
-        <ng-template #noAudience>
-          <p class="m-0 overview-text">{{ defaultAudienceEmpty }}</p>
-        </ng-template>
       </article>
 
-      <article class="fit-card">
+      <article class="fit-card" *ngIf="course.prerequisitesDescription || course.targetAudience">
         <div class="fit-card__badge">
           {{ isEnglish ? 'Before you start' : 'قبل أن تبدأ' }}
         </div>
         <p class="overview-text m-0">
-          {{ course.prerequisitesDescription || course.targetAudience || defaultAudienceEmpty }}
+          {{ course.prerequisitesDescription || course.targetAudience }}
         </p>
       </article>
     </div>
@@ -486,7 +468,7 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="!loading && !error && course && course.testimonials?.length"
 >
   <div class="container">
     <div class="section-header">
@@ -500,7 +482,7 @@
       </p>
     </div>
 
-    <div class="testimonials-grid" *ngIf="course.testimonials?.length; else noTestimonials">
+    <div class="testimonials-grid">
       <article
         class="testimonial-card"
         *ngFor="let item of course.testimonials"
@@ -523,11 +505,6 @@
       </article>
     </div>
 
-    <ng-template #noTestimonials>
-      <div class="simple-list-card">
-        <p class="m-0">{{ defaultTestimonialsEmpty }}</p>
-      </div>
-    </ng-template>
   </div>
 </section>
 
@@ -689,25 +666,20 @@
 <section
   class="section"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course"
+  *ngIf="!loading && !error && course && course.faqs?.length"
 >
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">{{ sectionTitleFaqs }}</h2>
     </div>
 
-    <div class="faq-list" *ngIf="course.faqs?.length; else noFaqs">
+    <div class="faq-list">
       <article class="faq-item" *ngFor="let item of course.faqs">
         <h3 class="faq-question">{{ item.question }}</h3>
         <p class="faq-answer">{{ item.answer }}</p>
       </article>
     </div>
 
-    <ng-template #noFaqs>
-      <div class="simple-list-card">
-        <p class="m-0">{{ defaultFaqEmpty }}</p>
-      </div>
-    </ng-template>
   </div>
 </section>
 

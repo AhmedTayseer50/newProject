@@ -388,6 +388,14 @@ export class CourseEditorComponent implements OnInit {
     >;
   }
 
+  get publishReadinessIssues(): string[] {
+    return this.getCoursePublishReadinessIssues(this.buildCoursePayload());
+  }
+
+  get canPublishCourse(): boolean {
+    return this.publishReadinessIssues.length === 0;
+  }
+
   private createLangTextGroup(required = false): LangTextGroup {
     return this.fb.group({
       ar: this.fb.nonNullable.control(
@@ -680,6 +688,46 @@ export class CourseEditorComponent implements OnInit {
       .filter(Boolean);
   }
 
+  private hasText(value?: Partial<LocalizedText> | null): boolean {
+    return !!value?.ar?.trim() || !!value?.en?.trim();
+  }
+
+  private hasListItems(value?: Partial<LocalizedStringList> | null): boolean {
+    const safeValue = value ?? {};
+    const arItems = Array.isArray(safeValue.ar) ? safeValue.ar : [];
+    const enItems = Array.isArray(safeValue.en) ? safeValue.en : [];
+
+    return [...arItems, ...enItems].some((item) => `${item || ''}`.trim());
+  }
+
+  private getCoursePublishReadinessIssues(course: AdminCourse): string[] {
+    const issues: string[] = [];
+    const hasAudienceContent =
+      this.hasListItems(course.audienceItems) ||
+      this.hasText(course.targetAudience) ||
+      this.hasText(course.prerequisitesDescription);
+    const hasCurriculumContent =
+      this.hasListItems(course.lectureNames) ||
+      (course.curriculum || []).some(
+        (item) => this.hasText(item.title) || this.hasListItems(item.points),
+      );
+    const hasPricingContent =
+      (course.pricingPlans || []).length > 0 || Number(course.price || 0) > 0;
+
+    if (!this.hasText(course.title)) issues.push('عنوان الكورس');
+    if (!this.hasText(course.description)) issues.push('وصف مختصر للكورس');
+    if (!(course.thumbnail || '').trim()) issues.push('الصورة المصغرة');
+    if (!this.hasText(course.categoryId)) issues.push('التصنيف');
+    if (!this.hasListItems(course.outcomes)) issues.push('مخرجات التعلم');
+    if (!hasAudienceContent) issues.push('الفئة المستهدفة أو متطلبات البداية');
+    if (!hasCurriculumContent) issues.push('المنهج أو أسماء الدروس');
+    if (!(course.testimonials || []).length) issues.push('آراء وتجارب المتعلمين');
+    if (!(course.faqs || []).length) issues.push('الأسئلة الشائعة');
+    if (!hasPricingContent) issues.push('خطة سعر أو سعر أساسي');
+
+    return issues;
+  }
+
   private buildCoursePayload(): AdminCourse {
     const formValue = this.courseForm.controls;
 
@@ -836,8 +884,17 @@ export class CourseEditorComponent implements OnInit {
 
     try {
       const payload = this.buildCoursePayload();
+      const publishIssues = payload.published
+        ? this.getCoursePublishReadinessIssues(payload)
+        : [];
       const telegramInviteUrl =
         this.courseForm.controls.telegramInviteUrl.value.trim();
+
+      if (publishIssues.length) {
+        throw new Error(
+          `لا يمكن نشر الكورس قبل استكمال: ${publishIssues.join('، ')}.`,
+        );
+      }
 
       let targetCourseId = this.courseId;
 

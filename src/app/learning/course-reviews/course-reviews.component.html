@@ -1,10 +1,169 @@
-<section class="page-section" [attr.dir]="pageDir">
-  <div class="container py-5">
-    <div class="text-center mx-auto" style="max-width: 720px">
-      <h1 class="mb-3">{{ titleText }}</h1>
-      <p class="text-muted mb-4">
-        {{ subtitleText }}
-      </p>
+<section class="reviews-page" [attr.dir]="pageDir">
+  <div class="container py-4">
+    <div class="page-hero">
+      <div class="page-hero__eyebrow">
+        {{ isEnglish ? 'Learner feedback' : 'تقييمات المتعلمين' }}
+      </div>
+      <h1 class="page-hero__title">{{ titleText }}</h1>
+      <p class="page-hero__subtitle">{{ subtitleText }}</p>
     </div>
+
+    <div *ngIf="loading" class="review-card text-center py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <div *ngIf="!loading && !overview.isAuthenticated" class="review-card empty-card text-center">
+      <h2 class="empty-card__title">{{ authTitle }}</h2>
+      <p class="empty-card__text">{{ authText }}</p>
+      <a class="btn btn-dark" routerLink="/login">
+        {{ isEnglish ? 'Go to login' : 'الذهاب لتسجيل الدخول' }}
+      </a>
+    </div>
+
+    <ng-container *ngIf="!loading && overview.isAuthenticated">
+      <div *ngIf="!overview.items.length" class="review-card empty-card text-center">
+        <h2 class="empty-card__title">{{ emptyTitle }}</h2>
+        <p class="empty-card__text">{{ emptyText }}</p>
+      </div>
+
+      <div *ngIf="overview.items.length" class="reviews-grid">
+        <article class="review-card item-card" *ngFor="let item of overview.items">
+          <div
+            class="item-card__media"
+            [style.background-image]="'url(' + (item.thumbnail || 'assets/images/Asset1.png') + ')'"
+          ></div>
+
+          <div class="item-card__body">
+            <div class="item-card__header">
+              <div>
+                <h2 class="item-card__title">{{ item.title }}</h2>
+                <p class="item-card__description">
+                  {{
+                    item.description ||
+                      (isEnglish
+                        ? 'Share a short, practical review that helps future learners understand your experience.'
+                        : 'اكتب تقييمًا مختصرًا وعمليًا يساعد المتعلمين الجدد على فهم تجربتك مع الكورس.')
+                  }}
+                </p>
+              </div>
+
+              <a class="btn btn-outline-dark btn-sm" [routerLink]="['/courses', item.courseId]">
+                {{ isEnglish ? 'Open course' : 'فتح الكورس' }}
+              </a>
+            </div>
+
+            <div class="stats-row">
+              <div class="stat-box">
+                <span class="stat-box__label">{{ isEnglish ? 'Public rating' : 'متوسط التقييم العام' }}</span>
+                <strong class="stat-box__value">
+                  {{ item.publicAverageRating ? (item.publicAverageRating | number:'1.1-1') : '0.0' }}
+                </strong>
+              </div>
+
+              <div class="stat-box">
+                <span class="stat-box__label">{{ isEnglish ? 'Visible reviews' : 'عدد التقييمات الظاهرة' }}</span>
+                <strong class="stat-box__value">{{ item.publicReviewsCount }}</strong>
+              </div>
+
+              <div class="stat-box">
+                <span class="stat-box__label">{{ isEnglish ? 'Last saved' : 'آخر حفظ' }}</span>
+                <strong class="stat-box__value stat-box__value--small">
+                  {{ formatDate(item.draft.updatedAt) }}
+                </strong>
+              </div>
+            </div>
+
+            <div class="rating-picker">
+              <label class="section-label">
+                {{ isEnglish ? 'Your rating' : 'تقييمك' }}
+              </label>
+
+              <div class="rating-buttons">
+                <button
+                  *ngFor="let rating of [1, 2, 3, 4, 5]"
+                  type="button"
+                  class="rating-button"
+                  [class.is-active]="item.draft.rating === rating"
+                  (click)="item.draft.rating = rating"
+                >
+                  {{ ratingLabel(rating) }}
+                </button>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div>
+                <label class="section-label">{{ isEnglish ? 'Short headline' : 'عنوان مختصر' }}</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  [(ngModel)]="item.draft.headline"
+                  [name]="'headline-' + item.courseId"
+                  [placeholder]="isEnglish ? 'Example: Useful and practical course' : 'مثال: كورس عملي ومفيد'"
+                />
+              </div>
+
+              <div class="form-grid__full">
+                <label class="section-label">{{ isEnglish ? 'Review details' : 'تفاصيل التقييم' }}</label>
+                <textarea
+                  class="form-control"
+                  rows="4"
+                  [(ngModel)]="item.draft.comment"
+                  [name]="'comment-' + item.courseId"
+                  [placeholder]="isEnglish ? 'What did you benefit from? What stood out for you?' : 'ما الذي استفدت منه؟ وما أبرز نقطة كانت مهمة بالنسبة لك؟'"
+                ></textarea>
+              </div>
+            </div>
+
+            <label class="recommend-row">
+              <input
+                type="checkbox"
+                [(ngModel)]="item.draft.recommend"
+                [name]="'recommend-' + item.courseId"
+              />
+              <span>
+                {{
+                  isEnglish
+                    ? 'I would recommend this course to learners with a similar need.'
+                    : 'أوصي بهذا الكورس لمن لديه احتياج مشابه.'
+                }}
+              </span>
+            </label>
+
+            <div
+              *ngIf="saveMessages[item.courseId]"
+              class="alert mt-3 mb-0"
+              [class.alert-success]="saveStatus[item.courseId] === 'success'"
+              [class.alert-danger]="saveStatus[item.courseId] === 'error'"
+            >
+              {{ saveMessages[item.courseId] }}
+            </div>
+
+            <div class="actions-row">
+              <span class="helper-text">
+                {{
+                  isEnglish
+                    ? 'Your review is saved to your account and can be reused later.'
+                    : 'يتم حفظ تقييمك داخل حسابك ويمكن الرجوع إليه أو تعديله لاحقًا.'
+                }}
+              </span>
+
+              <button
+                class="btn btn-dark"
+                type="button"
+                [disabled]="savingStates[item.courseId]"
+                (click)="saveReview(item)"
+              >
+                {{
+                  savingStates[item.courseId]
+                    ? (isEnglish ? 'Saving...' : 'جارٍ الحفظ...')
+                    : (isEnglish ? 'Save review' : 'حفظ التقييم')
+                }}
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </ng-container>
   </div>
 </section>

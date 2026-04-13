@@ -4,6 +4,8 @@ import {
   SalesAnalyticsSummaryRow,
   SalesOrderRecord,
 } from '../services/sales-analytics.service';
+import { HttpErrorService } from 'src/app/core/services/http-error.service';
+import { NotificationsService } from 'src/app/core/services/notifications.service';
 
 @Component({
   selector: 'app-sales-analytics',
@@ -12,6 +14,8 @@ import {
 })
 export class SalesAnalyticsComponent implements OnInit {
   private salesAnalyticsService = inject(SalesAnalyticsService);
+  private httpErrorService = inject(HttpErrorService);
+  private notificationsService = inject(NotificationsService);
 
   loading = true;
   error = '';
@@ -36,7 +40,7 @@ export class SalesAnalyticsComponent implements OnInit {
     this.loadData();
   }
 
-  async loadData(): Promise<void> {
+  async loadData(showSuccessNotification = false): Promise<void> {
     this.loading = true;
     this.error = '';
 
@@ -46,8 +50,19 @@ export class SalesAnalyticsComponent implements OnInit {
       this.dailySummary = this.salesAnalyticsService.buildDailySummary(this.allOrders);
       this.calculateTopStats();
       this.applyFilters();
+      if (showSuccessNotification) {
+        this.notificationsService.info(
+          'تم تحديث بيانات المبيعات',
+          'تم تحميل أحدث بيانات المبيعات والإحصائيات بنجاح.',
+          3500,
+        );
+      }
     } catch (error: any) {
-      this.error = error?.message || 'تعذر تحميل بيانات المبيعات.';
+      this.error = this.httpErrorService.resolve(error, {
+        locale: 'ar',
+        fallbackAr: 'تعذر تحميل بيانات المبيعات.',
+      });
+      this.notificationsService.error('تعذر تحميل المبيعات', this.error);
     } finally {
       this.loading = false;
     }

@@ -1,7 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
-import { PaymentsService, StartPaymobCheckoutItem } from '../services/payments.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  PaymentsService,
+  StartPaymobCheckoutItem,
+} from '../services/payments.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { CartItem, CartService } from '../services/cart.service';
 
@@ -17,6 +21,7 @@ export class PurchaseCourseComponent implements OnInit {
   private paymentsService = inject(PaymentsService);
   private userService = inject(UserService);
   private cartService = inject(CartService);
+  private sanitizer = inject(DomSanitizer);
 
   courseId = '';
   items: CartItem[] = [];
@@ -28,6 +33,10 @@ export class PurchaseCourseComponent implements OnInit {
   loading = true;
   submitting = false;
   error = '';
+  paymentIframeUrl: SafeResourceUrl | null = null;
+  paymentIframeRawUrl = '';
+  merchantOrderId = '';
+  paymentFrameLoading = false;
 
   get currentLang(): 'ar' | 'en' {
     return window.location.pathname.startsWith('/en') ? 'en' : 'ar';
@@ -41,8 +50,18 @@ export class PurchaseCourseComponent implements OnInit {
     return this.items.reduce((sum, item) => sum + Number(item.price || 0), 0);
   }
 
+  get hasPaymentFrame(): boolean {
+    return !!this.paymentIframeUrl;
+  }
+
   get pageTitle(): string {
     return this.isEnglish ? 'Checkout' : 'إتمام الشراء';
+  }
+
+  get pageSubtitle(): string {
+    return this.isEnglish
+      ? 'Review your order, confirm your details, then complete card payment securely through Paymob without leaving the page.'
+      : 'راجع طلبك، أكّد بياناتك، ثم أكمل دفع البطاقة بشكل آمن عبر Paymob بدون مغادرة الصفحة.';
   }
 
   get summaryTitle(): string {
@@ -69,14 +88,118 @@ export class PurchaseCourseComponent implements OnInit {
     return this.isEnglish ? 'Selected items' : 'العناصر المختارة';
   }
 
-  get payButtonText(): string {
+  get customerCardTitle(): string {
+    return this.isEnglish ? 'Billing details' : 'بيانات الفاتورة';
+  }
+
+  get customerCardSubtitle(): string {
+    return this.isEnglish
+      ? 'Use the same details you want linked to your order and access activation.'
+      : 'استخدم نفس البيانات التي تريد ربطها بطلبك وتفعيل الوصول بها.';
+  }
+
+  get paymentSectionTitle(): string {
+    return this.isEnglish ? 'Card payment' : 'الدفع بالبطاقة';
+  }
+
+  get paymentSectionSubtitle(): string {
+    return this.isEnglish
+      ? 'Enter your Visa or bank card details inside the secure Paymob payment frame.'
+      : 'أدخل بيانات الفيزا أو البطاقة البنكية داخل نافذة الدفع الآمنة الخاصة بـ Paymob.';
+  }
+
+  get paymentButtonText(): string {
     if (this.submitting) {
       return this.isEnglish
-        ? 'Redirecting to payment...'
-        : 'جارٍ التحويل إلى الدفع...';
+        ? 'Preparing payment form...'
+        : 'جارٍ تجهيز نموذج الدفع...';
     }
 
-    return this.isEnglish ? 'Pay with Paymob' : 'الدفع عبر Paymob';
+    if (this.hasPaymentFrame) {
+      return this.isEnglish ? 'Reload payment form' : 'إعادة تحميل نموذج الدفع';
+    }
+
+    return this.isEnglish
+      ? 'Continue to card payment'
+      : 'المتابعة إلى دفع البطاقة';
+  }
+
+  get securePaymentLabel(): string {
+    return this.isEnglish ? 'Secure payment' : 'دفع آمن';
+  }
+
+  get trustedGatewayLabel(): string {
+    return this.isEnglish ? 'Paymob gateway' : 'بوابة Paymob';
+  }
+
+  get instantActivationLabel(): string {
+    return this.isEnglish ? 'Order tracking' : 'تتبع الطلب';
+  }
+
+  get supportedCardsLabel(): string {
+    return this.isEnglish ? 'Accepted cards' : 'البطاقات المقبولة';
+  }
+
+  get secureListTitle(): string {
+    return this.isEnglish ? 'Why this step is trusted' : 'لماذا هذه الخطوة موثوقة';
+  }
+
+  get paymentFrameHint(): string {
+    return this.isEnglish
+      ? 'Once the secure form appears, complete the card details there. The card data is not stored inside this website.'
+      : 'بمجرد ظهور النموذج الآمن، أكمل بيانات البطاقة هناك. بيانات البطاقة لا يتم تخزينها داخل هذا الموقع.';
+  }
+
+  get paymentFrameLoadingText(): string {
+    return this.isEnglish
+      ? 'Preparing the secure payment form...'
+      : 'جارٍ تجهيز نموذج الدفع الآمن...';
+  }
+
+  get paymentReadyTitle(): string {
+    return this.isEnglish ? 'The secure form is ready' : 'النموذج الآمن جاهز';
+  }
+
+  get paymentReadyText(): string {
+    return this.isEnglish
+      ? 'Complete the payment inside the frame below. If the frame does not work properly, open it in a separate tab.'
+      : 'أكمل عملية الدفع داخل النافذة بالأسفل. إذا لم تعمل النافذة بالشكل الصحيح، افتحها في تبويب منفصل.';
+  }
+
+  get openNewTabText(): string {
+    return this.isEnglish ? 'Open in new tab' : 'فتح في تبويب جديد';
+  }
+
+  get viewResultText(): string {
+    return this.isEnglish ? 'Check payment result' : 'مراجعة نتيجة الدفع';
+  }
+
+  get orderReferenceLabel(): string {
+    return this.isEnglish ? 'Order reference' : 'مرجع الطلب';
+  }
+
+  get frameTitle(): string {
+    return this.isEnglish ? 'Secure Paymob card form' : 'نموذج بطاقة Paymob الآمن';
+  }
+
+  get checkoutSteps(): string[] {
+    return this.isEnglish
+      ? ['Review order', 'Confirm details', 'Enter card details securely']
+      : ['مراجعة الطلب', 'تأكيد البيانات', 'إدخال بيانات البطاقة بأمان'];
+  }
+
+  get trustBullets(): string[] {
+    return this.isEnglish
+      ? [
+          'Card data is entered inside Paymob secure infrastructure.',
+          'The same email and phone shown here are linked to your order.',
+          'You can verify activation immediately from the payment result page.',
+        ]
+      : [
+          'بيانات البطاقة يتم إدخالها داخل البنية الآمنة الخاصة بـ Paymob.',
+          'نفس البريد والهاتف الظاهرين هنا يتم ربطهما بطلبك.',
+          'يمكنك التحقق من التفعيل مباشرة من صفحة نتيجة الدفع.',
+        ];
   }
 
   async ngOnInit(): Promise<void> {
@@ -131,6 +254,9 @@ export class PurchaseCourseComponent implements OnInit {
 
   async payNow(): Promise<void> {
     this.error = '';
+    this.paymentIframeUrl = null;
+    this.paymentIframeRawUrl = '';
+    this.merchantOrderId = '';
 
     if (!this.items.length) {
       this.error = this.isEnglish
@@ -161,6 +287,7 @@ export class PurchaseCourseComponent implements OnInit {
     }
 
     this.submitting = true;
+    this.paymentFrameLoading = true;
 
     try {
       const selectedItems: StartPaymobCheckoutItem[] = this.items.map((item) => ({
@@ -177,7 +304,17 @@ export class PurchaseCourseComponent implements OnInit {
         language: this.currentLang,
       });
 
-      window.location.href = result.iframeUrl;
+      this.paymentIframeRawUrl = result.iframeUrl;
+      this.paymentIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        result.iframeUrl
+      );
+      this.merchantOrderId = result.merchantOrderId;
+
+      setTimeout(() => {
+        document
+          .getElementById('payment-frame-section')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
     } catch (e: any) {
       this.error =
         e?.error?.message ||
@@ -185,8 +322,34 @@ export class PurchaseCourseComponent implements OnInit {
         (this.isEnglish
           ? 'Unable to start payment right now. Please try again.'
           : 'تعذر بدء عملية الدفع الآن، حاول مرة أخرى');
+      this.paymentFrameLoading = false;
     } finally {
       this.submitting = false;
     }
+  }
+
+  onPaymentFrameLoad(): void {
+    this.paymentFrameLoading = false;
+  }
+
+  openPaymentInNewTab(): void {
+    if (!this.paymentIframeRawUrl) return;
+    window.open(this.paymentIframeRawUrl, '_blank', 'noopener');
+  }
+
+  goToPaymentResult(): void {
+    if (!this.merchantOrderId) return;
+
+    this.router.navigate(['/payment-result'], {
+      queryParams: { merchantOrderId: this.merchantOrderId },
+    });
+  }
+
+  getItemTypeLabel(item: CartItem): string {
+    if (item.itemType === 'diploma') {
+      return this.isEnglish ? 'Diploma' : 'دبلومة';
+    }
+
+    return this.isEnglish ? 'Course' : 'كورس';
   }
 }

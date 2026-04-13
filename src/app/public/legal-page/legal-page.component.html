@@ -1,0 +1,19 @@
+<section class="legal-page" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
+  <div class="container py-5">
+    <div class="legal-hero">
+      <span class="legal-eyebrow">{{ content.eyebrow }}</span>
+      <h1 class="legal-title">{{ content.title }}</h1>
+      <p class="legal-intro">{{ content.intro }}</p>
+      <div class="legal-updated">{{ content.updatedAt }}</div>
+    </div>
+
+    <div class="legal-sections">
+      <article class="legal-card" *ngFor="let section of content.sections">
+        <h2 class="legal-card__title">{{ section.heading }}</h2>
+        <p class="legal-card__text" *ngFor="let paragraph of section.paragraphs">
+          {{ paragraph }}
+        </p>
+      </article>
+    </div>
+  </div>
+</section>

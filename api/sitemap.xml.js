@@ -116,10 +116,12 @@ module.exports = async function handler(req, res) {
     '/',
     '/about',
     '/courses',
-    '/faq',
     '/consultations',
     '/contact',
     '/book-session',
+    '/privacy-policy',
+    '/terms-and-conditions',
+    '/refund-policy',
     '/diplomas',
   ];
 

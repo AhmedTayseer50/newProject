@@ -197,6 +197,41 @@ export class SeoService {
           description:
             'ابدأ حجز جلستك النفسية أونلاين عبر منصة نبضة حياة وحدد التفاصيل المناسبة لك بسهولة وخصوصية.',
         },
+        '/privacy-policy': {
+          title: 'سياسة الخصوصية',
+          description:
+            'اطلع على كيفية جمع بياناتك واستخدامها وحمايتها عند استخدام منصة نبضة حياة أو شراء الكورسات أو حجز الجلسات.',
+        },
+        '/terms-and-conditions': {
+          title: 'الشروط والأحكام',
+          description:
+            'تعرف على الشروط والأحكام التي تنظم استخدام منصة نبضة حياة وعمليات الشراء والوصول للمحتوى والخدمات.',
+        },
+        '/refund-policy': {
+          title: 'سياسة الاسترجاع والإلغاء',
+          description:
+            'راجع سياسة الاسترجاع والإلغاء الخاصة بالكورسات والخدمات الرقمية والجلسات داخل منصة نبضة حياة.',
+        },
+        '/settings': {
+          title: 'الإعدادات',
+          description:
+            'حدّث بيانات الحساب وتفضيلات اللغة ووضع العرض وإشعارات التواصل من صفحة داخلية مخصصة لإدارة الحساب.',
+        },
+        '/subscription': {
+          title: 'الاشتراك والفوترة',
+          description:
+            'راجع حالة الطلبات المدفوعة والوصول النشط إلى المحتوى وسجل المشتريات من داخل حسابك.',
+        },
+        '/certificates': {
+          title: 'الشهادات',
+          description:
+            'تابع الشهادات الصادرة وسجل الكورسات التي ما زالت تحت المتابعة حتى اكتمال الإصدار.',
+        },
+        '/course-reviews': {
+          title: 'تقييمات الكورسات',
+          description:
+            'أدر تقييماتك الخاصة بالكورسات واحفظ مراجعاتك المحدثة من داخل الحساب التعليمي.',
+        },
         '/diplomas': {
           title: 'الدبلومات',
           description:
@@ -238,6 +273,41 @@ export class SeoService {
           title: 'Book a Session',
           description:
             'Start booking your online psychological session through Nabdah Hayah with a clear, simple, and confidential flow.',
+        },
+        '/privacy-policy': {
+          title: 'Privacy Policy',
+          description:
+            'Read how Nabdah Hayah collects, uses, stores, and protects your information when using the platform or purchasing services.',
+        },
+        '/terms-and-conditions': {
+          title: 'Terms and Conditions',
+          description:
+            'Review the terms governing the use of Nabdah Hayah, including account use, purchases, content access, and platform rights.',
+        },
+        '/refund-policy': {
+          title: 'Refund and Cancellation Policy',
+          description:
+            'Understand the refund and cancellation rules for courses, digital services, and booked sessions on Nabdah Hayah.',
+        },
+        '/settings': {
+          title: 'Settings',
+          description:
+            'Manage your profile details, language preference, theme, and communication settings from your account area.',
+        },
+        '/subscription': {
+          title: 'Subscription and Billing',
+          description:
+            'Review paid orders, active learning access, and recent billing activity from your account.',
+        },
+        '/certificates': {
+          title: 'Certificates',
+          description:
+            'Track issued certificates and course records that are still being followed until certificate release.',
+        },
+        '/course-reviews': {
+          title: 'Course Reviews',
+          description:
+            'Write, save, and manage your course review drafts directly from your learning account.',
         },
         '/diplomas': {
           title: 'Diplomas',
@@ -324,6 +394,9 @@ export class SeoService {
       '/forgot-password',
       '/profile',
       '/settings',
+      '/subscription',
+      '/certificates',
+      '/course-reviews',
       '/checkout',
       '/cart',
       '/payment-result',

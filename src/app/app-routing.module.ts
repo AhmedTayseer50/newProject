@@ -42,8 +42,12 @@ import { LessonMaterialViewComponent } from './learning/lesson-material-view/les
 
 import { PurchaseCourseComponent } from './billing/purchase-course/purchase-course.component';
 import { PaymentResultComponent } from './billing/payment-result/payment-result.component';
+import { SubscriptionComponent } from './billing/subscription/subscription.component';
 import { FaqComponent } from './public/faq/faq.component';
 import { CartComponent } from './billing/cart/cart.component';
+import { LegalPageComponent } from './public/legal-page/legal-page.component';
+import { CertificatesComponent } from './learning/certificates/certificates.component';
+import { CourseReviewsComponent } from './learning/course-reviews/course-reviews.component';
 
 const routes: Routes = [
   {
@@ -61,7 +65,13 @@ const routes: Routes = [
     component: CoursesListComponent,
     data: { title: $localize`:@@title_courses:الكورسات` },
   },
-  { path: 'faq', component: FaqComponent },
+  {
+    path: 'faq',
+    component: FaqComponent,
+    data: {
+      seo: { noindex: true },
+    },
+  },
   {
     path: 'courses/:id',
     component: CourseDetailsComponent,
@@ -81,6 +91,21 @@ const routes: Routes = [
     path: 'book-session',
     component: ConsultationBookingComponent,
     data: { title: $localize`:@@title_book_session:حجز جلسة` },
+  },
+  {
+    path: 'privacy-policy',
+    component: LegalPageComponent,
+    data: { legalPage: 'privacy' },
+  },
+  {
+    path: 'terms-and-conditions',
+    component: LegalPageComponent,
+    data: { legalPage: 'terms' },
+  },
+  {
+    path: 'refund-policy',
+    component: LegalPageComponent,
+    data: { legalPage: 'refund' },
   },
 
   {
@@ -138,6 +163,21 @@ const routes: Routes = [
     component: SettingsComponent,
     canActivate: [AuthGuard],
     data: { title: $localize`:@@title_settings:الإعدادات` },
+  },
+  {
+    path: 'subscription',
+    component: SubscriptionComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'certificates',
+    component: CertificatesComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'course-reviews',
+    component: CourseReviewsComponent,
+    canActivate: [AuthGuard],
   },
   {
     path: 'diplomas',

@@ -25,7 +25,6 @@
         <a routerLink="/consultations" class="footer-link" i18n>الاستشارات</a>
         <a routerLink="/about" class="footer-link" i18n>عن الدكتورة</a>
         <a routerLink="/contact" class="footer-link" i18n>التواصل وطرق الدفع</a>
-        <a routerLink="/faq" class="footer-link" i18n>الأسئلة الشائعة</a>
       </div>
 
       <div class="footer-col">
@@ -125,9 +124,11 @@
       <div class="footer-copy" i18n>© {{ year }} نبضة حياة — جميع الحقوق محفوظة</div>
 
       <div class="footer-mini-links">
-        <a class="footer-mini-link" href="#" i18n>سياسة الخصوصية</a>
+        <a class="footer-mini-link" routerLink="/privacy-policy">{{ privacyLabel }}</a>
         <span class="dot">•</span>
-        <a class="footer-mini-link" href="#" i18n>الشروط والأحكام</a>
+        <a class="footer-mini-link" routerLink="/terms-and-conditions">{{ termsLabel }}</a>
+        <span class="dot">•</span>
+        <a class="footer-mini-link" routerLink="/refund-policy">{{ refundLabel }}</a>
       </div>
     </div>
   </div>

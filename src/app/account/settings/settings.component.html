@@ -1,10 +1,128 @@
-<section class="page-section" [attr.dir]="pageDir">
-  <div class="container py-5">
-    <div class="text-center mx-auto" style="max-width: 720px">
-      <h1 class="mb-3">{{ titleText }}</h1>
-      <p class="text-muted mb-4">
-        {{ subtitleText }}
-      </p>
+<section class="account-page" [attr.dir]="pageDir">
+  <div class="container py-4">
+    <div class="page-hero">
+      <div class="page-hero__eyebrow">{{ eyebrowText }}</div>
+      <h1 class="page-hero__title">{{ titleText }}</h1>
+      <p class="page-hero__subtitle">{{ subtitleText }}</p>
     </div>
+
+    <div *ngIf="loading" class="account-card text-center py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <div *ngIf="!loading && !isAuthenticated" class="account-card empty-card text-center">
+      <h2 class="empty-card__title">{{ emptyTitle }}</h2>
+      <p class="empty-card__text">{{ emptyText }}</p>
+      <a class="btn btn-dark" routerLink="/login">
+        {{ isEnglish ? 'Go to login' : 'الذهاب لتسجيل الدخول' }}
+      </a>
+    </div>
+
+    <form *ngIf="!loading && isAuthenticated" class="settings-grid" (ngSubmit)="save()">
+      <section class="account-card">
+        <h2 class="account-card__title">
+          {{ isEnglish ? 'Account details' : 'بيانات الحساب' }}
+        </h2>
+
+        <label class="form-label">{{ isEnglish ? 'Display name' : 'الاسم الظاهر' }}</label>
+        <input
+          class="form-control"
+          type="text"
+          name="displayName"
+          [(ngModel)]="form.displayName"
+          [placeholder]="isEnglish ? 'Your display name' : 'اسمك الظاهر داخل الحساب'"
+        />
+
+        <label class="form-label mt-3">{{ isEnglish ? 'Email' : 'البريد الإلكتروني' }}</label>
+        <input class="form-control" type="email" [value]="form.email" readonly />
+
+        <label class="form-label mt-3">{{ isEnglish ? 'WhatsApp number' : 'رقم واتساب' }}</label>
+        <input
+          class="form-control"
+          type="text"
+          name="whatsapp"
+          [(ngModel)]="form.whatsapp"
+          [placeholder]="isEnglish ? 'e.g. 201234567890' : 'مثال: 201234567890'"
+        />
+      </section>
+
+      <section class="account-card">
+        <h2 class="account-card__title">
+          {{ isEnglish ? 'Experience preferences' : 'تفضيلات الاستخدام' }}
+        </h2>
+
+        <label class="form-label">{{ isEnglish ? 'Preferred language' : 'اللغة المفضلة' }}</label>
+        <select class="form-select" name="preferredLanguage" [(ngModel)]="form.preferredLanguage">
+          <option value="ar">{{ isEnglish ? 'Arabic' : 'العربية' }}</option>
+          <option value="en">{{ isEnglish ? 'English' : 'الإنجليزية' }}</option>
+        </select>
+
+        <label class="form-label mt-3">{{ isEnglish ? 'Appearance mode' : 'وضع العرض' }}</label>
+        <select class="form-select" name="theme" [(ngModel)]="form.theme">
+          <option value="light">{{ isEnglish ? 'Light mode' : 'الوضع الفاتح' }}</option>
+          <option value="dark">{{ isEnglish ? 'Dark mode' : 'الوضع الداكن' }}</option>
+        </select>
+
+        <p class="helper-text mt-3 mb-0">
+          {{
+            isEnglish
+              ? 'Theme is applied immediately after saving. Language preference is saved to your account for future sessions.'
+              : 'يتم تطبيق الثيم فورًا بعد الحفظ، ويتم حفظ تفضيل اللغة داخل الحساب لاستخدامه لاحقًا.'
+          }}
+        </p>
+      </section>
+
+      <section class="account-card settings-grid__full">
+        <h2 class="account-card__title">
+          {{ isEnglish ? 'Communication preferences' : 'تفضيلات التواصل' }}
+        </h2>
+
+        <label class="toggle-row">
+          <input type="checkbox" name="emailUpdates" [(ngModel)]="form.emailUpdates" />
+          <span>
+            <strong>{{ isEnglish ? 'Email updates' : 'تحديثات البريد الإلكتروني' }}</strong>
+            <small>
+              {{
+                isEnglish
+                  ? 'Receive important account and purchase updates by email.'
+                  : 'استقبل تحديثات الحساب والشراء المهمة عبر البريد الإلكتروني.'
+              }}
+            </small>
+          </span>
+        </label>
+
+        <label class="toggle-row">
+          <input type="checkbox" name="whatsappUpdates" [(ngModel)]="form.whatsappUpdates" />
+          <span>
+            <strong>{{ isEnglish ? 'WhatsApp follow-up' : 'متابعة واتساب' }}</strong>
+            <small>
+              {{
+                isEnglish
+                  ? 'Allow support-related WhatsApp follow-up when needed.'
+                  : 'السماح بمتابعة مرتبطة بالدعم أو الخدمة عبر واتساب عند الحاجة.'
+              }}
+            </small>
+          </span>
+        </label>
+
+        <div
+          *ngIf="saveMessage"
+          class="alert mt-3 mb-0"
+          [class.alert-success]="saveState === 'success'"
+          [class.alert-danger]="saveState === 'error'"
+        >
+          {{ saveMessage }}
+        </div>
+
+        <div class="actions-row">
+          <a class="btn btn-outline-dark" routerLink="/profile">
+            {{ isEnglish ? 'Back to profile' : 'العودة إلى الملف الشخصي' }}
+          </a>
+          <button class="btn btn-dark" type="submit" [disabled]="saving">
+            {{ saving ? (isEnglish ? 'Saving...' : 'جارٍ الحفظ...') : (isEnglish ? 'Save settings' : 'حفظ الإعدادات') }}
+          </button>
+        </div>
+      </section>
+    </form>
   </div>
 </section>

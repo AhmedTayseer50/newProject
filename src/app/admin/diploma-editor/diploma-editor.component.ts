@@ -93,6 +93,14 @@ export class DiplomaEditorComponent implements OnInit {
     return this.activeLang === 'en';
   }
 
+  get publishReadinessIssues(): string[] {
+    return this.getDiplomaPublishReadinessIssues(this.buildDiplomaPayload());
+  }
+
+  get canPublishDiploma(): boolean {
+    return this.publishReadinessIssues.length === 0;
+  }
+
   async deleteDiplomaItem(id: string): Promise<void> {
     const ok = window.confirm('هل تريد حذف هذه الدبلومة نهائيًا؟');
     if (!ok) return;
@@ -486,128 +494,17 @@ export class DiplomaEditorComponent implements OnInit {
         throw new Error('اكتب عنوان الدبلومة على الأقل بإحدى اللغتين');
       }
 
-      const payload: AdminDiploma = {
-        ...this.data,
-        title: this.normText(this.data.title),
-        description: this.normText(this.data.description),
-        categoryId: this.normText(this.data.categoryId),
-        heroEyebrow: this.normText(this.data.heroEyebrow),
-        heroTagline: this.normText(this.data.heroTagline),
-        heroTitleHighlight: this.normText(this.data.heroTitleHighlight),
-        programDuration: this.normText(this.data.programDuration),
-        targetAudience: this.normText(this.data.targetAudience),
-        goalTitle: this.normText(this.data.goalTitle),
-        goalDescription: this.normText(this.data.goalDescription),
-        expectedStudyTimeTitle: this.normText(this.data.expectedStudyTimeTitle),
-        expectedStudyTimeDescription: this.normText(
-          this.data.expectedStudyTimeDescription
-        ),
-        prerequisitesTitle: this.normText(this.data.prerequisitesTitle),
-        prerequisitesDescription: this.normText(
-          this.data.prerequisitesDescription
-        ),
-        lectureNames: this.cleanList(this.data.lectureNames),
-        outcomes: this.cleanList(this.data.outcomes),
-        audienceItems: this.cleanList(this.data.audienceItems),
-        communityPerks: this.cleanList(this.data.communityPerks),
-        meta: (this.data.meta || [])
-          .map((item) => ({
-            label: this.normText(item.label),
-            value: this.normText(item.value),
-          }))
-          .filter(
-            (item) =>
-              item.label.ar ||
-              item.label.en ||
-              item.value.ar ||
-              item.value.en
-          ),
-        sectionCards: (this.data.sectionCards || [])
-          .map((item) => ({
-            title: this.normText(item.title),
-            description: this.normText(item.description),
-          }))
-          .filter(
-            (item) =>
-              item.title.ar ||
-              item.title.en ||
-              item.description.ar ||
-              item.description.en
-          ),
-        curriculum: (this.data.curriculum || [])
-          .map((item) => ({
-            title: this.normText(item.title),
-            points: this.cleanList(item.points),
-          }))
-          .filter(
-            (item) =>
-              item.title.ar ||
-              item.title.en ||
-              item.points.ar.length ||
-              item.points.en.length
-          ),
-        faqs: (this.data.faqs || [])
-          .map((item) => ({
-            question: this.normText(item.question),
-            answer: this.normText(item.answer),
-          }))
-          .filter(
-            (item) =>
-              item.question.ar ||
-              item.question.en ||
-              item.answer.ar ||
-              item.answer.en
-          ),
-        testimonials: (this.data.testimonials || [])
-          .map((item) => ({
-            name: this.normText(item.name),
-            tag: this.normText(item.tag),
-            rating: Number(item.rating || 5) || 5,
-            text: this.normText(item.text),
-          }))
-          .filter(
-            (item) =>
-              item.name.ar ||
-              item.name.en ||
-              item.text.ar ||
-              item.text.en
-          ),
-        pricingPlans: (this.data.pricingPlans || [])
-          .map((item) => ({
-            name: this.normText(item.name),
-            badge: this.normText(item.badge),
-            priceText: this.normText(item.priceText),
-            note: this.normText(item.note),
-            highlighted: !!item.highlighted,
-            features: this.cleanList(item.features),
-          }))
-          .filter(
-            (item) =>
-              item.name.ar ||
-              item.name.en ||
-              item.priceText.ar ||
-              item.priceText.en ||
-              item.features.ar.length ||
-              item.features.en.length
-          ),
-        offer: {
-          percent: Number(this.data.offer?.percent || 0) || 30,
-          heading: this.normText(this.data.offer?.heading),
-          text: this.normText(this.data.offer?.text),
-          ctaText: this.normText(this.data.offer?.ctaText),
-        },
-        bottomCta: {
-          text: this.normText(this.data.bottomCta?.text),
-          buttonText: this.normText(this.data.bottomCta?.buttonText),
-        },
-        courseIds: this.normalizeCourseIds(this.data.courseIds),
-        thumbnail: (this.data.thumbnail || '').trim(),
-        introVideoUrl: (this.data.introVideoUrl || '').trim(),
-        price: Number(this.data.price || 0) || 0,
-        published: !!this.data.published,
-      };
-
       this.syncMetaFromCourses();
+      const payload = this.buildDiplomaPayload();
+      const publishIssues = payload.published
+        ? this.getDiplomaPublishReadinessIssues(payload)
+        : [];
+
+      if (publishIssues.length) {
+        throw new Error(
+          `لا يمكن نشر الدبلومة قبل استكمال: ${publishIssues.join('، ')}.`,
+        );
+      }
 
       if (this.diplomaId) {
         await this.diplomasAdmin.updateDiploma(this.diplomaId, payload);
@@ -686,6 +583,164 @@ export class DiplomaEditorComponent implements OnInit {
       text: this.lt(),
       buttonText: this.lt(),
     };
+  }
+
+  private buildDiplomaPayload(): AdminDiploma {
+    return {
+      ...this.data,
+      title: this.normText(this.data.title),
+      description: this.normText(this.data.description),
+      categoryId: this.normText(this.data.categoryId),
+      heroEyebrow: this.normText(this.data.heroEyebrow),
+      heroTagline: this.normText(this.data.heroTagline),
+      heroTitleHighlight: this.normText(this.data.heroTitleHighlight),
+      programDuration: this.normText(this.data.programDuration),
+      targetAudience: this.normText(this.data.targetAudience),
+      goalTitle: this.normText(this.data.goalTitle),
+      goalDescription: this.normText(this.data.goalDescription),
+      expectedStudyTimeTitle: this.normText(this.data.expectedStudyTimeTitle),
+      expectedStudyTimeDescription: this.normText(
+        this.data.expectedStudyTimeDescription
+      ),
+      prerequisitesTitle: this.normText(this.data.prerequisitesTitle),
+      prerequisitesDescription: this.normText(
+        this.data.prerequisitesDescription
+      ),
+      lectureNames: this.cleanList(this.data.lectureNames),
+      outcomes: this.cleanList(this.data.outcomes),
+      audienceItems: this.cleanList(this.data.audienceItems),
+      communityPerks: this.cleanList(this.data.communityPerks),
+      meta: (this.data.meta || [])
+        .map((item) => ({
+          label: this.normText(item.label),
+          value: this.normText(item.value),
+        }))
+        .filter(
+          (item) =>
+            item.label.ar || item.label.en || item.value.ar || item.value.en
+        ),
+      sectionCards: (this.data.sectionCards || [])
+        .map((item) => ({
+          title: this.normText(item.title),
+          description: this.normText(item.description),
+        }))
+        .filter(
+          (item) =>
+            item.title.ar ||
+            item.title.en ||
+            item.description.ar ||
+            item.description.en
+        ),
+      curriculum: (this.data.curriculum || [])
+        .map((item) => ({
+          title: this.normText(item.title),
+          points: this.cleanList(item.points),
+        }))
+        .filter(
+          (item) =>
+            item.title.ar ||
+            item.title.en ||
+            item.points.ar.length ||
+            item.points.en.length
+        ),
+      faqs: (this.data.faqs || [])
+        .map((item) => ({
+          question: this.normText(item.question),
+          answer: this.normText(item.answer),
+        }))
+        .filter(
+          (item) =>
+            item.question.ar ||
+            item.question.en ||
+            item.answer.ar ||
+            item.answer.en
+        ),
+      testimonials: (this.data.testimonials || [])
+        .map((item) => ({
+          name: this.normText(item.name),
+          tag: this.normText(item.tag),
+          rating: Number(item.rating || 5) || 5,
+          text: this.normText(item.text),
+        }))
+        .filter(
+          (item) =>
+            item.name.ar || item.name.en || item.text.ar || item.text.en
+        ),
+      pricingPlans: (this.data.pricingPlans || [])
+        .map((item) => ({
+          name: this.normText(item.name),
+          badge: this.normText(item.badge),
+          priceText: this.normText(item.priceText),
+          note: this.normText(item.note),
+          highlighted: !!item.highlighted,
+          features: this.cleanList(item.features),
+        }))
+        .filter(
+          (item) =>
+            item.name.ar ||
+            item.name.en ||
+            item.priceText.ar ||
+            item.priceText.en ||
+            item.features.ar.length ||
+            item.features.en.length
+        ),
+      offer: {
+        percent: Number(this.data.offer?.percent || 0) || 30,
+        heading: this.normText(this.data.offer?.heading),
+        text: this.normText(this.data.offer?.text),
+        ctaText: this.normText(this.data.offer?.ctaText),
+      },
+      bottomCta: {
+        text: this.normText(this.data.bottomCta?.text),
+        buttonText: this.normText(this.data.bottomCta?.buttonText),
+      },
+      courseIds: this.normalizeCourseIds(this.data.courseIds),
+      thumbnail: (this.data.thumbnail || '').trim(),
+      introVideoUrl: (this.data.introVideoUrl || '').trim(),
+      price: Number(this.data.price || 0) || 0,
+      published: !!this.data.published,
+    };
+  }
+
+  private hasText(value?: Partial<LocalizedText> | null): boolean {
+    return !!value?.ar?.trim() || !!value?.en?.trim();
+  }
+
+  private hasListItems(value?: Partial<LocalizedStringList> | null): boolean {
+    const safeValue = value ?? {};
+    const arItems = Array.isArray(safeValue.ar) ? safeValue.ar : [];
+    const enItems = Array.isArray(safeValue.en) ? safeValue.en : [];
+
+    return [...arItems, ...enItems].some((item) => `${item || ''}`.trim());
+  }
+
+  private getDiplomaPublishReadinessIssues(diploma: AdminDiploma): string[] {
+    const issues: string[] = [];
+    const hasAudienceContent =
+      this.hasListItems(diploma.audienceItems) ||
+      this.hasText(diploma.targetAudience) ||
+      this.hasText(diploma.prerequisitesDescription);
+    const hasCurriculumContent =
+      this.hasListItems(diploma.lectureNames) ||
+      (diploma.curriculum || []).some(
+        (item) => this.hasText(item.title) || this.hasListItems(item.points)
+      );
+    const hasPricingContent =
+      (diploma.pricingPlans || []).length > 0 || Number(diploma.price || 0) > 0;
+
+    if (!this.hasText(diploma.title)) issues.push('عنوان الدبلومة');
+    if (!this.hasText(diploma.description)) issues.push('وصف الدبلومة');
+    if (!(diploma.thumbnail || '').trim()) issues.push('الصورة المصغرة');
+    if (!this.hasText(diploma.categoryId)) issues.push('التصنيف');
+    if (!Object.keys(diploma.courseIds || {}).length) issues.push('الكورسات المضمنة');
+    if (!this.hasListItems(diploma.outcomes)) issues.push('مخرجات التعلم');
+    if (!hasAudienceContent) issues.push('الفئة المستهدفة أو متطلبات البداية');
+    if (!hasCurriculumContent) issues.push('المنهج أو أسماء المحاور');
+    if (!(diploma.testimonials || []).length) issues.push('آراء وتجارب المشتركين');
+    if (!(diploma.faqs || []).length) issues.push('الأسئلة الشائعة');
+    if (!hasPricingContent) issues.push('خطة سعر أو سعر أساسي');
+
+    return issues;
   }
 
   private normText(value?: Partial<LocalizedText> | null): LocalizedText {

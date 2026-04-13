@@ -3,11 +3,34 @@
     <app-navbar></app-navbar>
   </header>
 
+  <div class="app-notifications" *ngIf="notifications.length">
+    <article
+      class="app-notification"
+      *ngFor="let notification of notifications"
+      [class.is-success]="notification.type === 'success'"
+      [class.is-error]="notification.type === 'error'"
+      [class.is-info]="notification.type === 'info'"
+      [class.is-warning]="notification.type === 'warning'"
+    >
+      <div class="app-notification__body">
+        <strong class="app-notification__title">{{ notification.title }}</strong>
+        <p class="app-notification__message">{{ notification.message }}</p>
+      </div>
+
+      <button
+        class="app-notification__close"
+        type="button"
+        (click)="dismissNotification(notification.id)"
+        aria-label="Dismiss notification"
+      >
+        ×
+      </button>
+    </article>
+  </div>
+
   <main class="flex-grow-1">
     <router-outlet></router-outlet>
   </main>
 
-
-    <app-footer></app-footer>
-  
+  <app-footer></app-footer>
 </div>

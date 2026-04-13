@@ -3,6 +3,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppComponent } from './app.component';
+import { NotificationsService } from './core/services/notifications.service';
 import { PageTitleService } from './core/services/page-title.service';
 
 describe('AppComponent', () => {
@@ -11,7 +12,10 @@ describe('AppComponent', () => {
   beforeEach(() => TestBed.configureTestingModule({
     imports: [RouterTestingModule],
     declarations: [AppComponent],
-    providers: [{ provide: PageTitleService, useValue: pageTitleSpy }],
+    providers: [
+      { provide: PageTitleService, useValue: pageTitleSpy },
+      NotificationsService,
+    ],
     schemas: [NO_ERRORS_SCHEMA],
   }));
 

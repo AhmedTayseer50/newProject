@@ -1,10 +1,106 @@
-<section class="page-section" [attr.dir]="pageDir">
-  <div class="container py-5">
-    <div class="text-center mx-auto" style="max-width: 720px">
-      <h1 class="mb-3">{{ titleText }}</h1>
-      <p class="text-muted mb-4">
-        {{ subtitleText }}
-      </p>
+<section class="certificates-page" [attr.dir]="pageDir">
+  <div class="container py-4">
+    <div class="page-hero">
+      <div class="page-hero__eyebrow">{{ isEnglish ? 'Learning records' : 'سجل التعلّم' }}</div>
+      <h1 class="page-hero__title">{{ titleText }}</h1>
+      <p class="page-hero__subtitle">{{ subtitleText }}</p>
     </div>
+
+    <div *ngIf="loading" class="certificate-card text-center py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+
+    <div *ngIf="!loading && !overview.isAuthenticated" class="certificate-card empty-card text-center">
+      <h2 class="empty-card__title">{{ authTitle }}</h2>
+      <p class="empty-card__text">{{ authText }}</p>
+      <a class="btn btn-dark" routerLink="/login">
+        {{ isEnglish ? 'Go to login' : 'الذهاب لتسجيل الدخول' }}
+      </a>
+    </div>
+
+    <ng-container *ngIf="!loading && overview.isAuthenticated">
+      <div class="stats-grid">
+        <article class="certificate-card stat-card">
+          <span class="stat-card__label">{{ isEnglish ? 'Issued certificates' : 'شهادات صادرة' }}</span>
+          <strong class="stat-card__value">{{ overview.issuedCount }}</strong>
+        </article>
+
+        <article class="certificate-card stat-card">
+          <span class="stat-card__label">{{ isEnglish ? 'Tracked courses' : 'كورسات قيد المتابعة' }}</span>
+          <strong class="stat-card__value">{{ overview.trackingCount }}</strong>
+        </article>
+      </div>
+
+      <div *ngIf="!overview.items.length" class="certificate-card empty-card text-center mt-3">
+        <h2 class="empty-card__title">{{ emptyTitle }}</h2>
+        <p class="empty-card__text">{{ emptyText }}</p>
+      </div>
+
+      <div *ngIf="overview.items.length" class="certificates-grid mt-3">
+        <article class="certificate-card item-card" *ngFor="let item of overview.items">
+          <div class="item-card__media" [style.background-image]="'url(' + (item.thumbnail || 'assets/images/Asset1.png') + ')'"></div>
+
+          <div class="item-card__body">
+            <div class="item-card__header">
+              <div>
+                <h2 class="item-card__title">{{ item.title }}</h2>
+                <div class="item-card__meta">
+                  {{ isEnglish ? 'Lessons tracked' : 'عدد الدروس المتتبعة' }}: {{ item.lecturesCount }}
+                </div>
+              </div>
+
+              <span class="status-chip" [class.is-issued]="item.status === 'issued'">
+                {{ statusLabel(item) }}
+              </span>
+            </div>
+
+            <p class="item-card__description">
+              {{
+                item.description ||
+                  (isEnglish
+                    ? 'Certificate status is linked to your course progress and course completion workflow.'
+                    : 'حالة الشهادة مرتبطة بمتابعة الكورس وآلية استكمال البرنامج.')
+              }}
+            </p>
+
+            <div class="item-card__footer">
+              <span>
+                {{ isEnglish ? 'Issue date' : 'تاريخ الإصدار' }}: {{ formatDate(item.issuedAt) }}
+              </span>
+            </div>
+
+            <div class="actions-row">
+              <a class="btn btn-outline-dark" [routerLink]="['/courses', item.courseId]">
+                {{ isEnglish ? 'Open course' : 'فتح الكورس' }}
+              </a>
+
+              <a *ngIf="item.certificateUrl" class="btn btn-dark" [href]="item.certificateUrl" target="_blank" rel="noopener">
+                {{ isEnglish ? 'Open certificate' : 'فتح الشهادة' }}
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="certificate-card note-card mt-3">
+        <h2 class="account-card__title">{{ isEnglish ? 'How certificate tracking works' : 'كيف يعمل تتبع الشهادات' }}</h2>
+        <ul class="note-list">
+          <li>
+            {{
+              isEnglish
+                ? 'When a certificate is issued and linked to your account, it will move from tracking to issued automatically.'
+                : 'عند إصدار الشهادة وربطها بحسابك ستنتقل تلقائيًا من حالة المتابعة إلى حالة الإصدار.'
+            }}
+          </li>
+          <li>
+            {{
+              isEnglish
+                ? 'If you believe a certificate should already be available, contact support with your course name and account email.'
+                : 'إذا كنت ترى أن الشهادة يجب أن تكون متاحة بالفعل، تواصل مع الدعم مع اسم الكورس والبريد المرتبط بالحساب.'
+            }}
+          </li>
+        </ul>
+      </div>
+    </ng-container>
   </div>
 </section>
