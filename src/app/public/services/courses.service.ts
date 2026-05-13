@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Database } from '@angular/fire/database';
+import { Auth } from '@angular/fire/auth';
 import { ref, get, onValue, off } from 'firebase/database';
 import { Observable } from 'rxjs';
 import {
@@ -101,45 +102,106 @@ type RawCourse = {
 
 @Injectable({ providedIn: 'root' })
 export class CoursesService {
+  private readonly adminPreviewEmail = 'admin@gmail.com';
+
   private db = inject(Database);
+  private auth = inject(Auth);
 
   async getCoursesOnce(): Promise<Course[]> {
+    await this.waitForAuthReady();
+
     const snapshot = await get(ref(this.db, 'courses'));
     if (!snapshot.exists()) return [];
+
     const obj = snapshot.val() as Record<string, RawCourse>;
-    return Object.entries(obj).map(([id, data]) =>
-      this.normalizeCourse(id, data),
-    );
+    return this.normalizeCourseList(obj);
   }
 
   async getCourseById(id: string): Promise<Course | null> {
+    await this.waitForAuthReady();
+
     const snap = await get(ref(this.db, `courses/${id}`));
-    return snap.exists() ? this.normalizeCourse(id, snap.val() as RawCourse) : null;
+    if (!snap.exists()) return null;
+
+    const course = this.normalizeCourse(id, snap.val() as RawCourse);
+    return this.canDisplayCourse(course) ? course : null;
   }
 
   watchCourses(): Observable<Course[]> {
     return new Observable<Course[]>((subscriber) => {
       const r = ref(this.db, 'courses');
-      const unsubscribe = onValue(
+      let latestCourses: Record<string, RawCourse> | null = null;
+      let hasCoursesSnapshot = false;
+
+      const emitCourses = () => {
+        if (!hasCoursesSnapshot || !latestCourses) {
+          subscriber.next([]);
+          return;
+        }
+
+        subscriber.next(this.normalizeCourseList(latestCourses));
+      };
+
+      const unsubscribeCourses = onValue(
         r,
         (snap) => {
+          hasCoursesSnapshot = true;
+
           if (!snap.exists()) {
+            latestCourses = null;
             subscriber.next([]);
             return;
           }
-          const obj = snap.val() as Record<string, RawCourse>;
-          const list = Object.entries(obj).map(([id, data]) =>
-            this.normalizeCourse(id, data),
-          );
-          subscriber.next(list);
+
+          latestCourses = snap.val() as Record<string, RawCourse>;
+          emitCourses();
         },
         (error) => subscriber.error(error),
       );
 
+      const unsubscribeAuth = this.auth.onAuthStateChanged(() => {
+        emitCourses();
+      });
+
       return () => {
-        unsubscribe();
+        unsubscribeAuth();
+        unsubscribeCourses();
         off(r);
       };
+    });
+  }
+
+  private normalizeCourseList(obj: Record<string, RawCourse>): Course[] {
+    return Object.entries(obj)
+      .map(([id, data]) => this.normalizeCourse(id, data))
+      .filter((course) => this.canDisplayCourse(course));
+  }
+
+  private canDisplayCourse(course: Course): boolean {
+    return course.published === true || this.isAdminPreviewUser();
+  }
+
+  private isAdminPreviewUser(): boolean {
+    return (
+      this.auth.currentUser?.email?.trim().toLowerCase() ===
+      this.adminPreviewEmail
+    );
+  }
+
+  private waitForAuthReady(): Promise<void> {
+    return new Promise((resolve) => {
+      let unsubscribe: (() => void) | undefined;
+
+      unsubscribe = this.auth.onAuthStateChanged(
+        () => {
+          unsubscribe?.();
+          resolve();
+        },
+        () => {
+          unsubscribe?.();
+          resolve();
+        },
+      );
     });
   }
 
