@@ -152,7 +152,8 @@
           <a
             *ngIf="introVideoSafeUrl"
             class="btn btn-outline-primary"
-            href="#course-video"
+            [routerLink]="[]"
+            fragment="course-video"
           >
             {{ isEnglish ? 'Watch intro video' : 'شاهد الفيديو التعريفي' }}
           </a>

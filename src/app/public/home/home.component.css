@@ -314,6 +314,18 @@ body.dark-theme .course-card {
   font-weight: 600;
 }
 
+.course-title-highlight {
+  display: inline;
+  margin-inline-start: 0.25rem;
+  color: var(--primary-color);
+  font-weight: 800;
+  line-height: inherit;
+}
+
+body.dark-theme .course-title-highlight {
+  color: var(--primary-soft);
+}
+
 .course-desc {
   font-size: 0.86rem;
   color: var(--text-muted);

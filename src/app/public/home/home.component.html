@@ -95,7 +95,12 @@
         </div>
 
         <div class="course-body">
-          <h3 class="course-title">{{ c.title }}</h3>
+          <h3 class="course-title">
+            {{ c.title }}
+            <span class="course-title-highlight" *ngIf="c.heroTitleHighlight">
+              {{ c.heroTitleHighlight }}
+            </span>
+          </h3>
           <p class="course-desc">{{ c.description }}</p>
 
           <div class="course-meta">
