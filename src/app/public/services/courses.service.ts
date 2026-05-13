@@ -92,11 +92,11 @@ type RawCourse = {
     heading?: LocalizedText;
     text?: LocalizedText;
     ctaText?: LocalizedText;
-  };
+  } | null;
   bottomCta?: {
     text?: LocalizedText;
     buttonText?: LocalizedText;
-  };
+  } | null;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -198,7 +198,7 @@ export class CoursesService {
       }))
       .filter((item) => !!item.label || !!item.value);
 
-    const offer: CourseOffer | undefined = raw.offer
+    const normalizedOffer: CourseOffer | undefined = raw.offer
       ? {
           percent: Number(raw.offer.percent || 0) || undefined,
           heading: this.pickText(raw.offer.heading, lang, ''),
@@ -207,12 +207,26 @@ export class CoursesService {
         }
       : undefined;
 
-    const bottomCta: CourseBottomCta | undefined = raw.bottomCta
+    const offer: CourseOffer | undefined = normalizedOffer &&
+      (normalizedOffer.percent ||
+        normalizedOffer.heading?.trim() ||
+        normalizedOffer.text?.trim() ||
+        normalizedOffer.ctaText?.trim())
+        ? normalizedOffer
+        : undefined;
+
+    const normalizedBottomCta: CourseBottomCta | undefined = raw.bottomCta
       ? {
           text: this.pickText(raw.bottomCta.text, lang, ''),
           buttonText: this.pickText(raw.bottomCta.buttonText, lang, ''),
         }
       : undefined;
+
+    const bottomCta: CourseBottomCta | undefined = normalizedBottomCta &&
+      (normalizedBottomCta.text?.trim() ||
+        normalizedBottomCta.buttonText?.trim())
+        ? normalizedBottomCta
+        : undefined;
 
     const featuredPlan = this.pickFeaturedPlan(pricingPlans);
     const displayPriceText = this.pickDisplayPriceText(featuredPlan, raw.price);

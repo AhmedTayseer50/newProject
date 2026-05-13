@@ -731,17 +731,44 @@ export class CourseEditorComponent implements OnInit {
   private buildCoursePayload(): AdminCourse {
     const formValue = this.courseForm.controls;
 
-    const offer: AdminCourseOffer = {
-      percent: Number(formValue.offerPercent.value || 0),
-      heading: this.textValue(formValue.offerHeading),
-      text: this.textValue(formValue.offerText),
-      ctaText: this.textValue(formValue.offerCtaText),
-    };
+    const offerPercent = Number(formValue.offerPercent.value || 0);
+    const offerHeading = this.textValue(formValue.offerHeading);
+    const offerText = this.textValue(formValue.offerText);
+    const offerCtaText = this.textValue(formValue.offerCtaText);
 
-    const bottomCta: AdminCourseBottomCta = {
-      text: this.textValue(formValue.bottomCtaText),
-      buttonText: this.textValue(formValue.bottomCtaButtonText),
-    };
+    const hasOfferContent =
+      offerPercent > 0 ||
+      offerHeading.ar ||
+      offerHeading.en ||
+      offerText.ar ||
+      offerText.en ||
+      offerCtaText.ar ||
+      offerCtaText.en;
+
+    const offer: AdminCourseOffer | null = hasOfferContent
+      ? {
+          percent: offerPercent,
+          heading: offerHeading,
+          text: offerText,
+          ctaText: offerCtaText,
+        }
+      : null;
+
+    const bottomCtaText = this.textValue(formValue.bottomCtaText);
+    const bottomCtaButtonText = this.textValue(formValue.bottomCtaButtonText);
+
+    const hasBottomCtaContent =
+      bottomCtaText.ar ||
+      bottomCtaText.en ||
+      bottomCtaButtonText.ar ||
+      bottomCtaButtonText.en;
+
+    const bottomCta: AdminCourseBottomCta | null = hasBottomCtaContent
+      ? {
+          text: bottomCtaText,
+          buttonText: bottomCtaButtonText,
+        }
+      : null;
 
     return {
       title: this.textValue(formValue.title),

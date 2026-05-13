@@ -81,10 +81,40 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   }
 
   get enrollButtonText(): string {
-    if (this.course?.bottomCta?.buttonText?.trim()) {
-      return this.course.bottomCta.buttonText;
-    }
-    return this.isEnglish ? 'Enroll now' : 'اشترك الآن';
+    return this.purchaseCtaLabel;
+  }
+
+  get purchaseCtaLabel(): string {
+    const bottomButton = this.course?.bottomCta?.buttonText?.trim();
+    if (bottomButton) return bottomButton;
+
+    return this.isEnglish ? 'Buy Now' : 'اشترِ الآن';
+  }
+
+  get loginPurchaseLabel(): string {
+    return this.isEnglish ? 'Login to purchase' : 'سجل دخول للشراء';
+  }
+
+  get offerCtaLabel(): string {
+    const offerButton = this.course?.offer?.ctaText?.trim();
+    if (offerButton) return offerButton;
+
+    return this.isEnglish ? 'Claim the offer' : 'استفد من العرض الآن';
+  }
+
+  get finalCtaLabel(): string {
+    return this.course?.bottomCta?.buttonText?.trim() || this.purchaseCtaLabel;
+  }
+
+  get hasActiveOffer(): boolean {
+    if (!this.course?.offer) return false;
+
+    return !!(
+      Number(this.course.offer.percent || 0) ||
+      this.course.offer.heading?.trim() ||
+      this.course.offer.text?.trim() ||
+      this.course.offer.ctaText?.trim()
+    );
   }
 
   get sectionTitleLearn(): string {
@@ -207,6 +237,8 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
     const scrollPosition = window.innerHeight + window.scrollY;
     const threshold = document.body.offsetHeight - 80;
+
+    if (!this.hasActiveOffer) return;
 
     if (!this.offerShown && scrollPosition >= threshold) {
       this.offerShown = true;

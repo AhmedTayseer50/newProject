@@ -99,8 +99,8 @@ export interface AdminCourse {
   communityPerks?: LocalizedStringList;
   testimonials?: AdminCourseTestimonial[];
   pricingPlans?: AdminCoursePricingPlan[];
-  offer?: AdminCourseOffer;
-  bottomCta?: AdminCourseBottomCta;
+  offer?: AdminCourseOffer | null;
+  bottomCta?: AdminCourseBottomCta | null;
 }
 
 export interface AdminLesson {
