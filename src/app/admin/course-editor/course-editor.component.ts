@@ -127,6 +127,7 @@ export class CourseEditorComponent implements OnInit {
       FormGroup<{
         name: LangTextGroup;
         badge: LangTextGroup;
+        priceBeforeOfferText: LangTextGroup;
         priceText: LangTextGroup;
         note: LangTextGroup;
         highlighted: FormControl<boolean>;
@@ -249,6 +250,7 @@ export class CourseEditorComponent implements OnInit {
         FormGroup<{
           name: LangTextGroup;
           badge: LangTextGroup;
+          priceBeforeOfferText: LangTextGroup;
           priceText: LangTextGroup;
           note: LangTextGroup;
           highlighted: FormControl<boolean>;
@@ -368,6 +370,7 @@ export class CourseEditorComponent implements OnInit {
     FormGroup<{
       name: LangTextGroup;
       badge: LangTextGroup;
+      priceBeforeOfferText: LangTextGroup;
       priceText: LangTextGroup;
       note: LangTextGroup;
       highlighted: FormControl<boolean>;
@@ -379,6 +382,7 @@ export class CourseEditorComponent implements OnInit {
       FormGroup<{
         name: LangTextGroup;
         badge: LangTextGroup;
+        priceBeforeOfferText: LangTextGroup;
         priceText: LangTextGroup;
         note: LangTextGroup;
         highlighted: FormControl<boolean>;
@@ -526,6 +530,7 @@ export class CourseEditorComponent implements OnInit {
       this.fb.group({
         name: this.createLangTextValue(value?.name),
         badge: this.createLangTextValue(value?.badge),
+        priceBeforeOfferText: this.createLangTextValue(value?.priceBeforeOfferText),
         priceText: this.createLangTextValue(value?.priceText),
         note: this.createLangTextValue(value?.note),
         highlighted: this.fb.nonNullable.control(!!value?.highlighted),
@@ -877,6 +882,7 @@ export class CourseEditorComponent implements OnInit {
         .map((group) => ({
           name: this.textValue(group.controls.name),
           badge: this.textValue(group.controls.badge),
+          priceBeforeOfferText: this.textValue(group.controls.priceBeforeOfferText),
           priceText: this.textValue(group.controls.priceText),
           note: this.textValue(group.controls.note),
           highlighted: !!group.controls.highlighted.value,
@@ -889,6 +895,8 @@ export class CourseEditorComponent implements OnInit {
           (item) =>
             item.name.ar ||
             item.name.en ||
+            item.priceBeforeOfferText.ar ||
+            item.priceBeforeOfferText.en ||
             item.priceText.ar ||
             item.priceText.en ||
             item.features.ar.length ||

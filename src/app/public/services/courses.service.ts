@@ -26,6 +26,7 @@ type RawCoursePricingPlan = {
   id?: string | number;
   name?: LocalizedText;
   badge?: LocalizedText;
+  priceBeforeOfferText?: LocalizedText;
   priceText?: LocalizedText;
   note?: LocalizedText;
   highlighted?: boolean;
@@ -215,13 +216,18 @@ export class CoursesService {
         id: this.buildPricingPlanId(index, this.pickText(plan?.name, lang, ''), plan?.id),
         name: this.pickText(plan?.name, lang, ''),
         badge: this.pickText(plan?.badge, lang, ''),
+        priceBeforeOfferText: this.pickText(plan?.priceBeforeOfferText, lang, ''),
         priceText: this.pickText(plan?.priceText, lang, ''),
         note: this.pickText(plan?.note, lang, ''),
         highlighted: !!plan?.highlighted,
         features: this.pickList(plan?.features, lang),
       }))
       .filter(
-        (plan) => !!plan.name || !!plan.priceText || plan.features.length > 0,
+        (plan) =>
+          !!plan.name ||
+          !!plan.priceBeforeOfferText ||
+          !!plan.priceText ||
+          plan.features.length > 0,
       );
 
     const testimonials: CourseTestimonial[] = (

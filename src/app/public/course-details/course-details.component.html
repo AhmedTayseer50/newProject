@@ -584,7 +584,15 @@
 
         <div class="pricing-name">{{ plan.name }}</div>
         <div class="pricing-badge" *ngIf="plan.badge">{{ plan.badge }}</div>
-        <div class="pricing-price">{{ plan.priceText }}</div>
+        <div class="pricing-price-wrap">
+          <div class="pricing-offer-label" *ngIf="plan.priceBeforeOfferText && course?.offer?.percent">
+            {{ isEnglish ? 'Save' : 'خصم' }} {{ course?.offer?.percent }}%
+          </div>
+          <div class="pricing-old-price" *ngIf="plan.priceBeforeOfferText">
+            {{ plan.priceBeforeOfferText }}
+          </div>
+          <div class="pricing-price">{{ plan.priceText }}</div>
+        </div>
         <div class="pricing-note" *ngIf="plan.note">{{ plan.note }}</div>
 
         <ul class="pricing-features" *ngIf="plan.features.length">

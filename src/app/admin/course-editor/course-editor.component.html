@@ -714,20 +714,38 @@
               <input
                 class="form-control"
                 [formControl]="item.controls.badge.controls[activeLang]"
+                [placeholder]="activeLang === 'ar' ? 'مثال: عرض لفترة محدودة' : 'Example: Limited offer'"
               />
             </div>
             <div class="col-md-3">
-              <label class="form-label">السعر المعروض</label>
+              <label class="form-label">السعر قبل العرض</label>
+              <input
+                class="form-control"
+                [formControl]="item.controls.priceBeforeOfferText.controls[activeLang]"
+                [placeholder]="activeLang === 'ar' ? 'مثال: 1200 جنيه' : 'Example: EGP 1200'"
+              />
+              <div class="form-text">
+                اتركه فارغًا لو لا يوجد خصم. يظهر كمبلغ مشطوب فقط.
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">السعر النهائي / بعد الخصم</label>
               <input
                 class="form-control"
                 [formControl]="item.controls.priceText.controls[activeLang]"
+                [placeholder]="activeLang === 'ar' ? 'مثال: 799 جنيه' : 'Example: EGP 799'"
               />
+              <div class="form-text">
+                هذا هو السعر الذي سيتم استخدامه في السلة والدفع.
+              </div>
             </div>
-            <div class="col-md-3">
+
+            <div class="col-md-12">
               <label class="form-label">ملاحظة إضافية</label>
               <input
                 class="form-control"
                 [formControl]="item.controls.note.controls[activeLang]"
+                [placeholder]="activeLang === 'ar' ? 'مثال: العرض متاح لفترة محدودة' : 'Example: Offer available for a limited time'"
               />
             </div>
 

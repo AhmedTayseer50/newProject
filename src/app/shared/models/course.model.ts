@@ -26,6 +26,7 @@ export interface CoursePricingPlan {
   id?: string;
   name: string;
   badge?: string;
+  priceBeforeOfferText?: string;
   priceText: string;
   note?: string;
   highlighted?: boolean;

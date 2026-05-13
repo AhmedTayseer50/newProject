@@ -602,6 +602,63 @@ body.dark-theme .final-push-box {
   margin-bottom: 0.8rem;
 }
 
+
+.pricing-price-wrap {
+  margin: 0.85rem 0 0.45rem;
+}
+
+
+.pricing-offer-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.65rem;
+  margin-bottom: 0.45rem;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #16803d;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.pricing-card.highlight .pricing-offer-label {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.pricing-old-price {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.pricing-card.highlight 
+.pricing-offer-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.65rem;
+  margin-bottom: 0.45rem;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #16803d;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.pricing-card.highlight .pricing-offer-label {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.pricing-old-price {
+  color: rgba(255, 255, 255, 0.78);
+}
+
 .pricing-price {
   font-size: 1.8rem;
   font-weight: 900;

@@ -47,6 +47,7 @@ export interface AdminCourseTestimonial {
 export interface AdminCoursePricingPlan {
   name: LocalizedText;
   badge: LocalizedText;
+  priceBeforeOfferText: LocalizedText;
   priceText: LocalizedText;
   note: LocalizedText;
   highlighted?: boolean;
