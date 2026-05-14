@@ -507,32 +507,7 @@
           </div>
         </div>
 
-        <div class="mt-3">
-          <label class="form-label">المتطلبات السابقة</label>
-          <div class="row g-2">
-            <div class="col-md-4">
-              <input
-                class="form-control"
-                [formControl]="
-                  courseForm.controls.prerequisitesTitle.controls[activeLang]
-                "
-                [placeholder]="activeLang === 'ar' ? 'عنوان يظهر في الكارت' : 'Card title'"
-              />
-            </div>
-            <div class="col-md-8">
-              <textarea
-                rows="2"
-                class="form-control"
-                [formControl]="
-                  courseForm.controls.prerequisitesDescription.controls[
-                    activeLang
-                  ]
-                "
-                [placeholder]="activeLang === 'ar' ? 'وصف المتطلبات السابقة' : 'Prerequisites description'"
-              ></textarea>
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       <!-- 8) IS THIS COURSE FOR YOU -->
@@ -567,6 +542,33 @@
               >
                 حذف
               </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">المتطلبات السابقة</label>
+          <div class="row g-2">
+            <div class="col-md-4">
+              <input
+                class="form-control"
+                [formControl]="
+                  courseForm.controls.prerequisitesTitle.controls[activeLang]
+                "
+                [placeholder]="activeLang === 'ar' ? 'عنوان يظهر في الكارت' : 'Card title'"
+              />
+            </div>
+            <div class="col-md-8">
+              <textarea
+                rows="2"
+                class="form-control"
+                [formControl]="
+                  courseForm.controls.prerequisitesDescription.controls[
+                    activeLang
+                  ]
+                "
+                [placeholder]="activeLang === 'ar' ? 'وصف المتطلبات السابقة' : 'Prerequisites description'"
+              ></textarea>
             </div>
           </div>
         </div>

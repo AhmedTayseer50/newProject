@@ -508,6 +508,38 @@ body.dark-theme .final-push-box {
   font-weight: 900;
 }
 
+
+.lecture-names-card {
+  margin-bottom: 1.1rem;
+}
+
+.lecture-names-card__badge {
+  display: inline-flex;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #16803d;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.lecture-names-card__title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 0.9rem;
+}
+
+.lecture-names-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.lecture-names-list li strong {
+  color: var(--primary-color);
+}
+
 .video-layout {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
@@ -655,7 +687,7 @@ body.dark-theme .final-push-box {
   color: #fff;
 }
 
-.pricing-card.highlight .pricing-old-price {
+.pricing-old-price {
   color: rgba(255, 255, 255, 0.78);
 }
 

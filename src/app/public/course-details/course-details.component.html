@@ -388,7 +388,7 @@
 <section
   class="section study-highlights"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course && (course.programDuration || course.expectedStudyTimeTitle || course.expectedStudyTimeDescription || course.prerequisitesTitle || course.prerequisitesDescription || course.targetAudience)"
+  *ngIf="!loading && !error && course && (course.programDuration || course.expectedStudyTimeTitle || course.expectedStudyTimeDescription)"
 >
   <div class="container">
     <div class="section-header">
@@ -420,15 +420,6 @@
         </div>
         <p class="overview-text">
           {{ course.expectedStudyTimeDescription || (isEnglish ? 'Details will be added soon.' : 'سيتم إضافة التفاصيل قريبًا.') }}
-        </p>
-      </article>
-
-      <article class="overview-card" *ngIf="course.prerequisitesTitle || course.prerequisitesDescription || course.targetAudience">
-        <div class="overview-label">
-          {{ course.prerequisitesTitle || (isEnglish ? 'Experience needed' : 'الخبرة المطلوبة') }}
-        </div>
-        <p class="overview-text">
-          {{ course.prerequisitesDescription || course.targetAudience || (isEnglish ? 'Details will be added soon.' : 'سيتم إضافة التفاصيل قريبًا.') }}
         </p>
       </article>
     </div>
@@ -600,7 +591,7 @@
         </ul>
 
         <ng-container *ngIf="auth.currentUser; else loginToBuyPricing">
-          <div class="d-flex gap-2 mt-3">
+          <div class="d-flex gap-2">
             <button
               class="btn btn-primary flex-fill"
               type="button"
