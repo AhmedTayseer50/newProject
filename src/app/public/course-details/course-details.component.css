@@ -655,7 +655,7 @@ body.dark-theme .final-push-box {
   color: #fff;
 }
 
-.pricing-old-price {
+.pricing-card.highlight .pricing-old-price {
   color: rgba(255, 255, 255, 0.78);
 }
 

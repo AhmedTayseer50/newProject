@@ -585,8 +585,8 @@
         <div class="pricing-name">{{ plan.name }}</div>
         <div class="pricing-badge" *ngIf="plan.badge">{{ plan.badge }}</div>
         <div class="pricing-price-wrap">
-          <div class="pricing-offer-label" *ngIf="plan.priceBeforeOfferText && course?.offer?.percent">
-            {{ isEnglish ? 'Save' : 'خصم' }} {{ course?.offer?.percent }}%
+          <div class="pricing-offer-label" *ngIf="plan.priceBeforeOfferText && course.offer?.percent">
+            {{ isEnglish ? 'Save' : 'خصم' }} {{ course.offer?.percent }}%
           </div>
           <div class="pricing-old-price" *ngIf="plan.priceBeforeOfferText">
             {{ plan.priceBeforeOfferText }}
@@ -600,7 +600,7 @@
         </ul>
 
         <ng-container *ngIf="auth.currentUser; else loginToBuyPricing">
-          <div class="d-flex gap-2">
+          <div class="d-flex gap-2 mt-3">
             <button
               class="btn btn-primary flex-fill"
               type="button"
