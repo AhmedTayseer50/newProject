@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Database } from '@angular/fire/database';
+import { Auth } from '@angular/fire/auth';
 import { ref, get } from 'firebase/database';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -25,6 +26,7 @@ export class LessonMaterialViewComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private db: Database,
+    private auth: Auth,
     private sanitizer: DomSanitizer,
   ) {}
 
@@ -65,6 +67,15 @@ export class LessonMaterialViewComponent implements OnInit {
     }
 
     try {
+      const canAccessMaterial = await this.canAccessStudyMaterial();
+      if (!canAccessMaterial) {
+        throw new Error(
+          this.isEnglish
+            ? 'Study material PDF is not included in your selected plan.'
+            : 'المادة العلمية PDF غير متاحة ضمن خطتك الحالية.'
+        );
+      }
+
       const snap = await get(ref(this.db, `lessons/${this.courseId}/${this.lessonId}`));
 
       if (!snap.exists()) {
@@ -94,6 +105,24 @@ export class LessonMaterialViewComponent implements OnInit {
     } finally {
       this.loading = false;
     }
+  }
+
+  private async canAccessStudyMaterial(): Promise<boolean> {
+    const user = this.auth.currentUser;
+    if (!user?.uid || !this.courseId) return false;
+
+    const adminSnap = await get(ref(this.db, `users/${user.uid}/isAdmin`));
+    if (adminSnap.exists() && adminSnap.val() === true) {
+      return true;
+    }
+
+    const enrollmentSnap = await get(ref(this.db, `enrollments/${user.uid}/${this.courseId}`));
+    if (!enrollmentSnap.exists()) return false;
+
+    const enrollment = enrollmentSnap.val();
+    if (enrollment === true) return true;
+
+    return enrollment?.hideStudyMaterial !== true;
   }
 
   backToLesson(): void {

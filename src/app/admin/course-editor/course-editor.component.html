@@ -751,7 +751,7 @@
               />
             </div>
 
-            <div class="col-md-9">
+            <div class="col-md-6">
               <label class="form-label">
                 مميزات الخطة
                 <span class="text-muted small">(كل سطر = ميزة)</span>
@@ -765,6 +765,22 @@
                     : item.controls.featuresEn
                 "
               ></textarea>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <div class="form-check border rounded-3 p-3 w-100 bg-light">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [formControl]="item.controls.hideStudyMaterial"
+                  [id]="'hideStudyMaterial' + i"
+                />
+                <label class="form-check-label fw-semibold" [for]="'hideStudyMaterial' + i">
+                  لا تشمل المادة العلمية PDF
+                </label>
+                <div class="form-text">
+                  عند تفعيلها، المشتري لهذه الخطة لن يظهر له زر المادة العلمية داخل الدروس.
+                </div>
+              </div>
             </div>
             <div class="col-md-1 d-flex align-items-end">
               <div class="form-check">

@@ -30,6 +30,7 @@ type RawCoursePricingPlan = {
   priceText?: LocalizedText;
   note?: LocalizedText;
   highlighted?: boolean;
+  hideStudyMaterial?: boolean;
   features?: LocalizedStringList;
 };
 
@@ -220,6 +221,7 @@ export class CoursesService {
         priceText: this.pickText(plan?.priceText, lang, ''),
         note: this.pickText(plan?.note, lang, ''),
         highlighted: !!plan?.highlighted,
+        hideStudyMaterial: !!plan?.hideStudyMaterial,
         features: this.pickList(plan?.features, lang),
       }))
       .filter(

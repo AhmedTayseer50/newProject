@@ -30,13 +30,21 @@
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
         <h2 class="lesson-title mb-0">{{ title }}</h2>
 
-        <a
-          *ngIf="pdfDriveFileId"
-          class="btn btn-outline-primary"
-          [routerLink]="['/lesson-material', courseId, lessonId]"
-        >
-          {{ materialButtonText }}
-        </a>
+        <ng-container *ngIf="pdfDriveFileId">
+          <a
+            *ngIf="!studyMaterialHidden; else studyMaterialUnavailable"
+            class="btn btn-outline-primary"
+            [routerLink]="['/lesson-material', courseId, lessonId]"
+          >
+            {{ materialButtonText }}
+          </a>
+
+          <ng-template #studyMaterialUnavailable>
+            <span class="badge text-bg-light border text-muted px-3 py-2">
+              {{ materialUnavailableText }}
+            </span>
+          </ng-template>
+        </ng-container>
       </div>
 
       <div class="video-card" *ngIf="safeUrl">

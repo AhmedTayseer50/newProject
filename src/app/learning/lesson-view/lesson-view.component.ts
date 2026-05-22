@@ -39,6 +39,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
   videoRef?: string;
   pdfDriveFileId?: string;
   pdfTitle?: string;
+  studyMaterialHidden = false;
 
   playerUrl?: string;
   safeUrl?: SafeResourceUrl;
@@ -132,6 +133,12 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     return this.pdfTitle || (this.isEnglish ? 'View study material' : 'عرض المادة العلمية');
   }
 
+  get materialUnavailableText(): string {
+    return this.isEnglish
+      ? 'Study material PDF is not included in your selected plan.'
+      : 'المادة العلمية PDF غير متاحة ضمن خطتك الحالية.';
+  }
+
   get videoTitleText(): string {
     return this.isEnglish ? 'Lesson video' : 'فيديو الدرس';
   }
@@ -193,6 +200,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
       this.playerUrl = undefined;
       this.safeUrl = undefined;
+      this.studyMaterialHidden = false;
 
       this.isPlaying = false;
       this.stopRandomPresenceScheduler();
@@ -267,6 +275,7 @@ export class LessonViewComponent implements OnInit, OnDestroy {
     this.videoRef = data.videoRef;
     this.pdfDriveFileId = data.pdfDriveFileId || '';
     this.pdfTitle = data.pdfTitle || '';
+    this.studyMaterialHidden = await this.shouldHideStudyMaterial();
 
     if (!this.videoProvider || !this.videoRef) {
       this.playerUrl = undefined;
@@ -302,6 +311,29 @@ export class LessonViewComponent implements OnInit, OnDestroy {
 
     this.playerUrl = url;
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  private async shouldHideStudyMaterial(): Promise<boolean> {
+    const user = this.auth.currentUser;
+    if (!user?.uid || !this.courseId) return false;
+
+    try {
+      const adminSnap = await get(ref(this.db, `users/${user.uid}/isAdmin`));
+      if (adminSnap.exists() && adminSnap.val() === true) {
+        return false;
+      }
+
+      const enrollmentSnap = await get(ref(this.db, `enrollments/${user.uid}/${this.courseId}`));
+      if (!enrollmentSnap.exists()) return false;
+
+      const enrollment = enrollmentSnap.val();
+      if (enrollment === true) return false;
+
+      return !!enrollment?.hideStudyMaterial;
+    } catch {
+      // في حالة حدوث خطأ قراءة، نحافظ على السلوك القديم ولا نخفي المادة بالخطأ.
+      return false;
+    }
   }
 
   private startRandomPresenceScheduler() {

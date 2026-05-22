@@ -11,6 +11,9 @@ import {
 export interface EnrollmentInfo {
   grantedAt: number;
   grantedBy?: string | null;
+  hideStudyMaterial?: boolean;
+  planId?: string | null;
+  planName?: string | null;
 }
 
 export interface TelegramAccessInfo {

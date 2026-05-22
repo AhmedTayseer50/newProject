@@ -29,6 +29,7 @@ export interface DiplomaPricingPlan {
   priceText: string;
   note?: string;
   highlighted?: boolean;
+  hideStudyMaterial?: boolean;
   features: string[];
 }
 

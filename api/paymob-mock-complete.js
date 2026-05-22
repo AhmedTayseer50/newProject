@@ -6,15 +6,55 @@ function resolveOrderLanguage(orderData) {
   return String(orderData?.language || 'ar').trim().toLowerCase() === 'en' ? 'en' : 'ar';
 }
 
+
+function resolveEnrollmentAccess(orderData, courseId) {
+  const items = Array.isArray(orderData?.items) ? orderData.items : [];
+  const relatedItems = items.filter((item) => {
+    if (item?.itemType === 'course' && String(item?.id || '') === courseId) {
+      return true;
+    }
+
+    const grantedCourseIds = Array.isArray(item?.grantedCourseIds)
+      ? item.grantedCourseIds.map((id) => String(id || ''))
+      : [];
+
+    return grantedCourseIds.includes(courseId);
+  });
+
+  // لو مفيش معلومات عن الخطة، نخلي السلوك القديم: المادة العلمية متاحة.
+  if (!relatedItems.length) {
+    return { hideStudyMaterial: false };
+  }
+
+  // لو الطالب حصل على نفس الكورس من أكتر من عنصر، خطة واحدة تسمح بالمادة تكفي للسماح.
+  const hideStudyMaterial = relatedItems.every((item) => item?.hideStudyMaterial === true);
+  const sourceItem = relatedItems[0] || {};
+
+  return {
+    hideStudyMaterial,
+    planId: sourceItem.planId || null,
+    planName: sourceItem.planName || null,
+    itemType: sourceItem.itemType || null,
+    orderItemId: sourceItem.id || null,
+  };
+}
+
 async function grantCoursesAndTelegram(admin, orderData) {
   const uid = orderData.userId;
   const courseIdsObj = orderData.courseIds || {};
   const courseIds = Object.keys(courseIdsObj);
 
   for (const courseId of courseIds) {
+    const access = resolveEnrollmentAccess(orderData, courseId);
+
     await admin.database().ref(`enrollments/${uid}/${courseId}`).set({
       grantedAt: Date.now(),
       grantedBy: 'paymob-mock',
+      hideStudyMaterial: !!access.hideStudyMaterial,
+      planId: access.planId,
+      planName: access.planName,
+      itemType: access.itemType,
+      orderItemId: access.orderItemId,
     });
 
     await admin.database().ref(`telegramAccess/${uid}/${courseId}`).set({

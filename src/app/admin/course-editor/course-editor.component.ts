@@ -131,6 +131,7 @@ export class CourseEditorComponent implements OnInit {
         priceText: LangTextGroup;
         note: LangTextGroup;
         highlighted: FormControl<boolean>;
+        hideStudyMaterial: FormControl<boolean>;
         featuresAr: FormControl<string>;
         featuresEn: FormControl<string>;
       }>
@@ -254,6 +255,7 @@ export class CourseEditorComponent implements OnInit {
           priceText: LangTextGroup;
           note: LangTextGroup;
           highlighted: FormControl<boolean>;
+          hideStudyMaterial: FormControl<boolean>;
           featuresAr: FormControl<string>;
           featuresEn: FormControl<string>;
         }>
@@ -374,6 +376,7 @@ export class CourseEditorComponent implements OnInit {
       priceText: LangTextGroup;
       note: LangTextGroup;
       highlighted: FormControl<boolean>;
+      hideStudyMaterial: FormControl<boolean>;
       featuresAr: FormControl<string>;
       featuresEn: FormControl<string>;
     }>
@@ -386,6 +389,7 @@ export class CourseEditorComponent implements OnInit {
         priceText: LangTextGroup;
         note: LangTextGroup;
         highlighted: FormControl<boolean>;
+        hideStudyMaterial: FormControl<boolean>;
         featuresAr: FormControl<string>;
         featuresEn: FormControl<string>;
       }>
@@ -530,10 +534,15 @@ export class CourseEditorComponent implements OnInit {
       this.fb.group({
         name: this.createLangTextValue(value?.name),
         badge: this.createLangTextValue(value?.badge),
-        priceBeforeOfferText: this.createLangTextValue(value?.priceBeforeOfferText),
+        priceBeforeOfferText: this.createLangTextValue(
+          value?.priceBeforeOfferText,
+        ),
         priceText: this.createLangTextValue(value?.priceText),
         note: this.createLangTextValue(value?.note),
         highlighted: this.fb.nonNullable.control(!!value?.highlighted),
+        hideStudyMaterial: this.fb.nonNullable.control(
+          !!value?.hideStudyMaterial,
+        ),
         featuresAr: this.fb.nonNullable.control(
           (value?.features?.ar || []).join('\n'),
         ),
@@ -726,7 +735,8 @@ export class CourseEditorComponent implements OnInit {
     if (!this.hasListItems(course.outcomes)) issues.push('مخرجات التعلم');
     if (!hasAudienceContent) issues.push('الفئة المستهدفة أو متطلبات البداية');
     if (!hasCurriculumContent) issues.push('المنهج أو أسماء الدروس');
-    if (!(course.testimonials || []).length) issues.push('آراء وتجارب المتعلمين');
+    if (!(course.testimonials || []).length)
+      issues.push('آراء وتجارب المتعلمين');
     if (!(course.faqs || []).length) issues.push('الأسئلة الشائعة');
     if (!hasPricingContent) issues.push('خطة سعر أو سعر أساسي');
 
@@ -882,10 +892,13 @@ export class CourseEditorComponent implements OnInit {
         .map((group) => ({
           name: this.textValue(group.controls.name),
           badge: this.textValue(group.controls.badge),
-          priceBeforeOfferText: this.textValue(group.controls.priceBeforeOfferText),
+          priceBeforeOfferText: this.textValue(
+            group.controls.priceBeforeOfferText,
+          ),
           priceText: this.textValue(group.controls.priceText),
           note: this.textValue(group.controls.note),
           highlighted: !!group.controls.highlighted.value,
+          hideStudyMaterial: !!group.controls.hideStudyMaterial.value,
           features: {
             ar: this.multilineToList(group.controls.featuresAr.value),
             en: this.multilineToList(group.controls.featuresEn.value),

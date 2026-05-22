@@ -252,6 +252,7 @@ function resolvePlanFromEntity(entity, requestedPlanId) {
       features: getLocalizedArray(plan.features),
       badge: getLocalizedText(plan.badge),
       note: getLocalizedText(plan.note),
+      hideStudyMaterial: plan?.hideStudyMaterial === true,
     };
   }
 
@@ -378,6 +379,7 @@ module.exports = async function handler(req, res) {
           badge: resolvedPlan.badge,
           note: resolvedPlan.note,
           features: resolvedPlan.features,
+          hideStudyMaterial: !!resolvedPlan.hideStudyMaterial,
         });
 
         continue;
@@ -429,6 +431,7 @@ module.exports = async function handler(req, res) {
         badge: resolvedPlan.badge,
         note: resolvedPlan.note,
         features: resolvedPlan.features,
+        hideStudyMaterial: !!resolvedPlan.hideStudyMaterial,
         grantedCourseIds: diplomaCourseIds,
       });
     }

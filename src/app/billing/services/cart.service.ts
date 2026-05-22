@@ -21,6 +21,7 @@ export interface CartItem {
   planBadge?: string;
   planNote?: string;
   planFeatures: string[];
+  hideStudyMaterial?: boolean;
   includedCourseIds?: string[];
 }
 
@@ -74,6 +75,7 @@ export class CartService {
       planBadge: plan.badge || '',
       planNote: plan.note || '',
       planFeatures: Array.isArray(plan.features) ? [...plan.features] : [],
+      hideStudyMaterial: !!plan.hideStudyMaterial,
       includedCourseIds: [course.id],
     };
 
@@ -101,6 +103,7 @@ export class CartService {
       planBadge: plan.badge || '',
       planNote: plan.note || '',
       planFeatures: Array.isArray(plan.features) ? [...plan.features] : [],
+      hideStudyMaterial: !!plan.hideStudyMaterial,
       includedCourseIds,
     };
 

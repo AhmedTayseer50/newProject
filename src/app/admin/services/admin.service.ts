@@ -51,6 +51,8 @@ export interface AdminCoursePricingPlan {
   priceText: LocalizedText;
   note: LocalizedText;
   highlighted?: boolean;
+  /** لو true: المشتري لهذه الخطة لا تظهر له المادة العلمية PDF */
+  hideStudyMaterial?: boolean;
   features: LocalizedStringList;
 }
 

@@ -30,6 +30,8 @@ export interface CoursePricingPlan {
   priceText: string;
   note?: string;
   highlighted?: boolean;
+  /** لو true: الخطة لا تشمل عرض/تحميل المادة العلمية PDF بعد الشراء */
+  hideStudyMaterial?: boolean;
   features: string[];
 }
 

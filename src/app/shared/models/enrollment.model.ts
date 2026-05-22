@@ -3,6 +3,10 @@ export interface EnrollmentInfo {
   grantedAt: number;
   /** UID الشخص اللي منح الصلاحية (مثلاً الأدمن) */
   grantedBy?: string;
+  /** لو true: لا تظهر المادة العلمية PDF للمستخدم داخل هذا الكورس */
+  hideStudyMaterial?: boolean;
+  planId?: string | null;
+  planName?: string | null;
 }
 
 // تمثيل الصلاحيات للمستخدم الواحد: courseId -> true أو كائن معلومات
