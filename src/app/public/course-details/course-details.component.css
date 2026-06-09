@@ -1190,3 +1190,100 @@ body.dark-theme .overview-label {
   }
 }
 
+
+/* Pricing section polish: keep plans visually balanced even with different feature counts */
+#course-pricing .pricing-grid {
+  align-items: stretch;
+}
+
+#course-pricing .pricing-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 580px;
+  padding: 1.45rem 1.25rem 1.2rem;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+#course-pricing .pricing-card.highlight {
+  transform: none;
+}
+
+#course-pricing .pricing-name {
+  min-height: 2.7rem;
+  display: flex;
+  align-items: flex-start;
+  font-size: 1.12rem;
+  line-height: 1.55;
+}
+
+#course-pricing .pricing-badge {
+  min-height: 1.9rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+#course-pricing .pricing-price-wrap {
+  min-height: 5.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0.65rem 0 0.75rem;
+}
+
+#course-pricing .pricing-old-price {
+  color: var(--text-muted);
+}
+
+#course-pricing .pricing-card.highlight .pricing-old-price {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+#course-pricing .pricing-note {
+  min-height: 3.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.85;
+}
+
+#course-pricing .pricing-features {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 1.1rem;
+}
+
+#course-pricing .pricing-features li {
+  margin-bottom: 0;
+  line-height: 1.75;
+}
+
+#course-pricing .pricing-card > .d-flex {
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(168, 140, 255, 0.12);
+}
+
+body.dark-theme #course-pricing .pricing-card > .d-flex {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 991.98px) {
+  #course-pricing .pricing-card {
+    min-height: auto;
+  }
+
+  #course-pricing .pricing-name,
+  #course-pricing .pricing-badge,
+  #course-pricing .pricing-price-wrap,
+  #course-pricing .pricing-note {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #course-pricing .pricing-card > .d-flex {
+    flex-direction: column;
+  }
+}
