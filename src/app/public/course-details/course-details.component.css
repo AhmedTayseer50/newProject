@@ -1287,3 +1287,88 @@ body.dark-theme #course-pricing .pricing-card > .d-flex {
     flex-direction: column;
   }
 }
+
+/* Access notice - moved near pricing for better UX */
+#course-pricing .course-access-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 920px;
+  margin: -0.25rem auto 1.35rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(168, 140, 255, 0.14), transparent 30%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 255, 0.96));
+  border: 1px solid rgba(168, 140, 255, 0.22);
+  box-shadow: 0 14px 32px rgba(93, 63, 211, 0.08);
+}
+
+#course-pricing .course-access-notice__icon {
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary-color), #8c63ff);
+  box-shadow: 0 12px 24px rgba(140, 99, 255, 0.22);
+}
+
+#course-pricing .course-access-notice__content {
+  flex: 1;
+  min-width: 0;
+}
+
+#course-pricing .course-access-notice__title {
+  margin-bottom: 0.3rem;
+  color: var(--primary-color);
+  font-weight: 900;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+#course-pricing .course-access-notice__text,
+#course-pricing .course-access-notice__hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  line-height: 1.85;
+}
+
+#course-pricing .course-access-notice__hint {
+  margin-top: 0.35rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+body.dark-theme #course-pricing .course-access-notice {
+  background:
+    radial-gradient(circle at top right, rgba(168, 140, 255, 0.12), transparent 30%),
+    linear-gradient(135deg, rgba(24, 24, 24, 0.96), rgba(34, 25, 48, 0.94));
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow: none;
+}
+
+body.dark-theme #course-pricing .course-access-notice__title,
+body.dark-theme #course-pricing .course-access-notice__hint {
+  color: var(--primary-soft);
+}
+
+@media (max-width: 575.98px) {
+  #course-pricing .course-access-notice {
+    gap: 0.85rem;
+    padding: 1rem;
+    border-radius: 18px;
+    margin-bottom: 1.1rem;
+  }
+
+  #course-pricing .course-access-notice__icon {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    border-radius: 14px;
+  }
+}
