@@ -1372,3 +1372,113 @@ body.dark-theme #course-pricing .course-access-notice__hint {
     border-radius: 14px;
   }
 }
+
+/* === UX balance for dynamic course-details cards ===
+   Keeps backend-driven sections visually balanced for 1, 2, 3, 4, or 5 cards.
+   Also preserves the smaller hero poster height requested earlier. */
+.course-hero-poster {
+  height: clamp(300px, 32vw, 430px);
+  min-height: 0;
+  max-height: 430px;
+}
+
+.course-hero-poster img {
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+}
+
+.cards-grid,
+.transformation-grid,
+.testimonials-grid,
+.curriculum-grid,
+.audience-fit-grid,
+.overview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.cards-grid > *,
+.transformation-grid > *,
+.testimonials-grid > * {
+  flex: 1 1 300px;
+  max-width: 380px;
+}
+
+.curriculum-grid > *,
+.audience-fit-grid > *,
+.overview-grid > * {
+  flex: 1 1 360px;
+  max-width: 560px;
+}
+
+.pricing-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.pricing-grid > .pricing-card {
+  flex: 1 1 310px;
+  max-width: 370px;
+}
+
+.cards-grid:has(> :nth-child(4):last-child) > *,
+.transformation-grid:has(> :nth-child(4):last-child) > *,
+.testimonials-grid:has(> :nth-child(4):last-child) > *,
+.pricing-grid:has(> :nth-child(4):last-child) > .pricing-card {
+  flex-basis: calc(50% - 0.5rem);
+  max-width: 420px;
+}
+
+@media (max-width: 991.98px) {
+  .course-hero-poster,
+  .course-hero-poster img {
+    height: 280px;
+    min-height: 0;
+  }
+
+  .cards-grid > *,
+  .transformation-grid > *,
+  .testimonials-grid > *,
+  .curriculum-grid > *,
+  .audience-fit-grid > *,
+  .overview-grid > *,
+  .pricing-grid > .pricing-card {
+    flex-basis: 100%;
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .course-hero-poster,
+  .course-hero-poster img {
+    height: 220px;
+    min-height: 0;
+  }
+
+  .cards-grid,
+  .transformation-grid,
+  .testimonials-grid,
+  .curriculum-grid,
+  .audience-fit-grid,
+  .overview-grid,
+  .pricing-grid {
+    gap: 0.9rem;
+  }
+
+  .cards-grid > *,
+  .transformation-grid > *,
+  .testimonials-grid > *,
+  .curriculum-grid > *,
+  .audience-fit-grid > *,
+  .overview-grid > *,
+  .pricing-grid > .pricing-card {
+    max-width: 100%;
+  }
+}
