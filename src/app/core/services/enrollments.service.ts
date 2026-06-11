@@ -37,11 +37,46 @@ export class EnrollmentsService {
     return Object.keys(obj || {});
   }
 
-  async grant(uid: string, courseId: string, adminUid?: string) {
-    const value: EnrollmentInfo = {
+  async grant(
+    uid: string,
+    courseId: string,
+    adminUid?: string,
+    options?: {
+      hideStudyMaterial?: boolean;
+      planId?: string | null;
+      planName?: string | null;
+      orderId?: string | null;
+      paymentProvider?: string | null;
+    },
+  ) {
+    const value: EnrollmentInfo & {
+      orderId?: string | null;
+      paymentProvider?: string | null;
+    } = {
       grantedAt: Date.now(),
       grantedBy: adminUid ?? null,
     };
+
+    if (options?.hideStudyMaterial !== undefined) {
+      value.hideStudyMaterial = !!options.hideStudyMaterial;
+    }
+
+    if (options?.planId !== undefined) {
+      value.planId = options.planId ?? null;
+    }
+
+    if (options?.planName !== undefined) {
+      value.planName = options.planName ?? null;
+    }
+
+    if (options?.orderId !== undefined) {
+      value.orderId = options.orderId ?? null;
+    }
+
+    if (options?.paymentProvider !== undefined) {
+      value.paymentProvider = options.paymentProvider ?? null;
+    }
+
     await set(ref(this.db, `enrollments/${uid}/${courseId}`), value);
   }
 

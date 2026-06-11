@@ -106,6 +106,40 @@ export interface AdminCourse {
   bottomCta?: AdminCourseBottomCta | null;
 }
 
+export interface AdminPaymentOrderItem {
+  id: string;
+  itemType?: 'course' | 'diploma';
+  title?: string | LocalizedText;
+  price?: number;
+  priceText?: string;
+  planId?: string;
+  planName?: string;
+  badge?: string;
+  note?: string;
+  hideStudyMaterial?: boolean;
+  grantedCourseIds?: string[];
+}
+
+export interface AdminPaymentOrder {
+  merchantOrderId: string;
+  userId: string;
+  userEmail: string;
+  userName?: string;
+  userPhone?: string;
+  amount: number;
+  amountCents?: number;
+  currency?: string;
+  courseIds?: Record<string, boolean>;
+  grantedCourseIds?: Record<string, boolean>;
+  purchasedKeys?: string[];
+  items?: AdminPaymentOrderItem[];
+  status?: string;
+  paymentProvider?: string;
+  createdAt?: number;
+  processedAt?: number;
+  processedBy?: string | null;
+}
+
 export interface AdminLesson {
   title: string;
   lessonIndex: number;
@@ -137,10 +171,7 @@ export class AdminService {
     return snap.exists() ? (snap.val() as AdminCoursePrivate) : {};
   }
 
-  async saveCoursePrivate(
-    id: string,
-    data: AdminCoursePrivate,
-  ): Promise<void> {
+  async saveCoursePrivate(id: string, data: AdminCoursePrivate): Promise<void> {
     await update(ref(this.db, `coursePrivate/${id}`), {
       telegramInviteUrl: (data.telegramInviteUrl || '').trim(),
     });
@@ -224,6 +255,40 @@ export class AdminService {
 
   async deleteLesson(courseId: string, lessonId: string): Promise<void> {
     await remove(ref(this.db, `lessons/${courseId}/${lessonId}`));
+  }
+
+  async listPaymentOrders(): Promise<AdminPaymentOrder[]> {
+    const snap = await get(ref(this.db, 'paymentOrders'));
+    if (!snap.exists()) return [];
+
+    const obj = snap.val() as Record<
+      string,
+      Omit<AdminPaymentOrder, 'merchantOrderId'>
+    >;
+    return Object.entries(obj)
+      .map(([merchantOrderId, data]) => ({ merchantOrderId, ...data }))
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }
+
+  async markPaymentOrderCourseGranted(
+    orderId: string,
+    courseId: string,
+    allGranted: boolean,
+    adminUid?: string | null,
+  ): Promise<void> {
+    const now = Date.now();
+    const payload: Record<string, any> = {
+      [`grantedCourseIds/${courseId}`]: true,
+      status: allGranted ? 'processed' : 'partially_granted',
+      updatedAt: now,
+    };
+
+    if (allGranted) {
+      payload['processedAt'] = now;
+      payload['processedBy'] = adminUid ?? null;
+    }
+
+    await update(ref(this.db, `paymentOrders/${orderId}`), payload);
   }
 
   buildLocalizedText(value?: Partial<LocalizedText>): LocalizedText {

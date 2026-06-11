@@ -4,3 +4,78 @@
 .badge .btn-close:hover {
   opacity: 1;
 }
+
+.access-orders-card {
+  overflow: hidden;
+}
+
+.payment-orders-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.payment-order-card {
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 18px;
+  padding: 1rem;
+  background: linear-gradient(180deg, #fff, #fffafc);
+  box-shadow: 0 12px 28px rgba(31, 41, 55, 0.06);
+}
+
+.payment-order-head,
+.order-course-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.order-email {
+  font-weight: 800;
+  color: #111827;
+}
+
+.order-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.order-provider-badge {
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  color: #6d28d9;
+}
+
+.order-courses-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.order-course-row {
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 14px;
+  padding: 0.85rem;
+  background: #fff;
+}
+
+.order-course-info {
+  display: grid;
+  gap: 0.25rem;
+}
+
+@media (max-width: 767.98px) {
+  .payment-order-head,
+  .order-course-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .order-course-row .btn,
+  .order-course-row .badge {
+    width: 100%;
+    text-align: center;
+  }
+}

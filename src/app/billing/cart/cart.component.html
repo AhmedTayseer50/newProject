@@ -84,9 +84,13 @@
                   <li *ngFor="let feature of item.planFeatures">{{ feature }}</li>
                 </ul>
 
-                <div class="small text-muted mb-2" *ngIf="item.itemType === 'diploma' && item.includedCourseIds?.length">
-                  {{ isEnglish ? 'Includes' : 'تشمل' }} {{ item.includedCourseIds?.length }} {{ isEnglish ? 'course(s)' : 'كورس/كورسات' }}
-                </div>
+                <ng-container *ngIf="item.itemType === 'diploma' && item.includedCourseIds as includedCourseIds">
+                  <div class="small text-muted mb-2" *ngIf="includedCourseIds.length">
+                    {{ isEnglish ? 'Includes' : 'تشمل' }}
+                    {{ includedCourseIds.length }}
+                    {{ isEnglish ? 'course(s)' : 'كورس/كورسات' }}
+                  </div>
+                </ng-container>
 
                 <div class="d-flex flex-wrap align-items-center gap-2">
                   <span class="badge text-bg-light cart-badge">
@@ -124,8 +128,21 @@
               <strong class="total-price">{{ totalPrice | number:'1.0-0' }} EGP</strong>
             </div>
 
-            <button class="btn btn-primary w-100 mb-2" type="button" (click)="goToCheckout()">
-              {{ isEnglish ? 'Continue to checkout' : 'الانتقال إلى الدفع' }}
+            <div *ngIf="checkoutError" class="alert alert-danger small py-2 mb-2">
+              {{ checkoutError }}
+            </div>
+
+            <button
+              class="btn btn-primary w-100 mb-2"
+              type="button"
+              [disabled]="submittingWhatsappOrder"
+              (click)="goToCheckout()"
+            >
+              {{
+                submittingWhatsappOrder
+                  ? (isEnglish ? 'Preparing WhatsApp order...' : 'جارٍ تجهيز طلب الواتساب...')
+                  : (isEnglish ? 'Continue via WhatsApp' : 'إتمام الدفع عبر واتساب')
+              }}
             </button>
 
             <button class="btn btn-outline-secondary w-100" type="button" (click)="continueShopping()">

@@ -23,6 +23,11 @@ export interface StartPaymobCheckoutResponse {
   merchantOrderId: string;
 }
 
+export interface StartWhatsappOrderResponse {
+  whatsappUrl: string;
+  merchantOrderId: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -48,6 +53,30 @@ export class PaymentsService {
     return await firstValueFrom(
       this.http.post<StartPaymobCheckoutResponse>(
         '/api/paymob-create-session',
+        payload,
+        { headers }
+      )
+    );
+  }
+
+  async startWhatsappOrder(
+    payload: Pick<StartPaymobCheckoutPayload, 'selectedItems' | 'language'>
+  ): Promise<StartWhatsappOrderResponse> {
+    const user = this.auth.currentUser;
+
+    if (!user) {
+      throw new Error('يجب تسجيل الدخول أولاً');
+    }
+
+    const token = await user.getIdToken();
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    return await firstValueFrom(
+      this.http.post<StartWhatsappOrderResponse>(
+        '/api/whatsapp-create-order',
         payload,
         { headers }
       )

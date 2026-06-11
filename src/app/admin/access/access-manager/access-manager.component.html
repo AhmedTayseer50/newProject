@@ -1,3 +1,84 @@
+<div class="card shadow-sm border-0 mb-4 access-orders-card">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h5 class="mb-1">طلبات الدفع عبر واتساب</h5>
+      <p class="text-muted mb-0 small">
+        الطلبات التي تم إنشاؤها من السلة، ويمكن البحث عنها بالإيميل ومنح صلاحية كل كورس مباشرة.
+      </p>
+    </div>
+
+    <button class="btn btn-sm btn-outline-primary" type="button" (click)="refreshOrders()">
+      تحديث الطلبات
+    </button>
+  </div>
+
+  <div class="card-body">
+    <div class="row g-3 align-items-end mb-3">
+      <div class="col-lg-5">
+        <label class="form-label small text-muted">البحث بإيميل العميل</label>
+        <input
+          class="form-control"
+          type="search"
+          placeholder="مثال: customer@email.com"
+          [(ngModel)]="ordersQ"
+        />
+      </div>
+    </div>
+
+    <ng-container *ngIf="filteredPaymentOrders.length; else noWhatsappOrders">
+      <div class="payment-orders-list">
+        <div class="payment-order-card" *ngFor="let order of filteredPaymentOrders">
+          <div class="payment-order-head">
+            <div>
+              <div class="order-email">{{ order.userEmail || 'بدون إيميل' }}</div>
+              <div class="order-meta">
+                <span>{{ orderStatusLabel(order) }}</span>
+                <span>•</span>
+                <span>{{ order.amount | number:'1.0-0' }} {{ order.currency || 'EGP' }}</span>
+                <span *ngIf="order.createdAt">• {{ order.createdAt | date:'short' }}</span>
+              </div>
+            </div>
+
+            <span class="badge text-bg-light order-provider-badge">
+              WhatsApp
+            </span>
+          </div>
+
+          <div class="order-courses-list mt-3">
+            <div class="order-course-row" *ngFor="let courseId of orderCourseIds(order)">
+              <div class="order-course-info">
+                <strong>{{ courseTitle(courseId) }}</strong>
+                <span class="small text-muted">
+                  الخطة: {{ orderCoursePlanLabel(order, courseId) }}
+                </span>
+              </div>
+
+              <button
+                class="btn btn-sm btn-success"
+                type="button"
+                *ngIf="!isOrderCourseGranted(order, courseId); else grantedOrderCourse"
+                (click)="grantOrderCourse(order, courseId)"
+              >
+                منح الصلاحية
+              </button>
+
+              <ng-template #grantedOrderCourse>
+                <span class="badge text-bg-success">تم منح الصلاحية</span>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #noWhatsappOrders>
+      <div class="text-center text-muted py-4">
+        لا توجد طلبات واتساب مطابقة حاليًا.
+      </div>
+    </ng-template>
+  </div>
+</div>
+
 <div class="card shadow-sm border-0">
   <div
     class="card-header bg-white d-flex justify-content-between align-items-center"
@@ -20,6 +101,18 @@
     </div>
 
     <ng-container *ngIf="!loading">
+      <div class="row g-3 mb-3">
+        <div class="col-lg-5">
+          <label class="form-label small text-muted">البحث بإيميل المستخدم</label>
+          <input
+            class="form-control"
+            type="search"
+            placeholder="ابحث داخل المستخدمين"
+            [(ngModel)]="q"
+          />
+        </div>
+      </div>
+
       <div *ngIf="users.length; else emptyState" class="table-responsive">
         <table class="table align-middle">
           <thead>

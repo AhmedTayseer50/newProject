@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 
-import { AdminService } from 'src/app/admin/services/admin.service';
+import {
+  AdminPaymentOrder,
+  AdminPaymentOrderItem,
+  AdminService,
+} from 'src/app/admin/services/admin.service';
 import { UsersAdminService } from 'src/app/admin/services/users-admin.service';
 import {
   EnrollmentsService,
@@ -19,6 +23,12 @@ type AccessCourse = {
   title?: string;
 };
 
+type OrderCourseGrantData = {
+  hideStudyMaterial?: boolean;
+  planId?: string | null;
+  planName?: string | null;
+};
+
 @Component({
   selector: 'app-access-manager',
   templateUrl: './access-manager.component.html',
@@ -30,6 +40,7 @@ export class AccessManagerComponent implements OnInit {
 
   users: AccessUser[] = [];
   courses: AccessCourse[] = [];
+  paymentOrders: AdminPaymentOrder[] = [];
 
   userEnrollments: Record<string, string[]> = {};
   selectedCourse: Record<string, string> = {};
@@ -38,6 +49,7 @@ export class AccessManagerComponent implements OnInit {
   grantTelegramWithCourse: Record<string, boolean> = {};
 
   q = '';
+  ordersQ = '';
 
   constructor(
     private usersSvc: UsersAdminService,
@@ -55,6 +67,21 @@ export class AccessManagerComponent implements OnInit {
     );
   }
 
+  get filteredPaymentOrders(): AdminPaymentOrder[] {
+    const keyword = this.ordersQ.trim().toLowerCase();
+    const orders = this.paymentOrders.filter(
+      (order) => order.paymentProvider === 'whatsapp' || order.status === 'whatsapp_pending' || order.status === 'partially_granted',
+    );
+
+    if (!keyword) {
+      return orders;
+    }
+
+    return orders.filter((order) =>
+      (order.userEmail || '').toLowerCase().includes(keyword),
+    );
+  }
+
   async ngOnInit(): Promise<void> {
     this.loading = true;
     this.error = undefined;
@@ -62,7 +89,11 @@ export class AccessManagerComponent implements OnInit {
     try {
       const currentAdminUid = this.auth.currentUser?.uid;
 
-      await Promise.all([this.loadUsers(currentAdminUid), this.loadCourses()]);
+      await Promise.all([
+        this.loadUsers(currentAdminUid),
+        this.loadCourses(),
+        this.loadPaymentOrders(),
+      ]);
       await this.loadUserAccessData();
     } catch (e: any) {
       this.error = e?.message ?? 'تعذر التحميل';
@@ -98,6 +129,10 @@ export class AccessManagerComponent implements OnInit {
     }));
   }
 
+  private async loadPaymentOrders(): Promise<void> {
+    this.paymentOrders = await this.adminSvc.listPaymentOrders();
+  }
+
   private async loadUserAccessData(): Promise<void> {
     const results = await Promise.all(
       this.users.map(async (user) => {
@@ -122,6 +157,134 @@ export class AccessManagerComponent implements OnInit {
     return (
       this.courses.find((course) => course.id === courseId)?.title || courseId
     );
+  }
+
+  orderCourseIds(order: AdminPaymentOrder): string[] {
+    return Object.keys(order.courseIds || {}).filter(Boolean);
+  }
+
+  orderStatusLabel(order: AdminPaymentOrder): string {
+    switch (order.status) {
+      case 'processed':
+        return 'تمت المعالجة';
+      case 'partially_granted':
+        return 'تم منح جزء من الطلب';
+      case 'whatsapp_pending':
+        return 'طلب واتساب جديد';
+      case 'pending':
+        return 'قيد الانتظار';
+      default:
+        return order.status || 'غير محدد';
+    }
+  }
+
+  isOrderCourseGranted(order: AdminPaymentOrder, courseId: string): boolean {
+    return !!order.grantedCourseIds?.[courseId];
+  }
+
+  private textValue(value: any): string {
+    if (typeof value === 'string' || typeof value === 'number') {
+      return String(value);
+    }
+
+    if (value && typeof value === 'object') {
+      return value.ar || value.en || value.title || value.name || '';
+    }
+
+    return '';
+  }
+
+  private getOrderItemForCourse(
+    order: AdminPaymentOrder,
+    courseId: string,
+  ): AdminPaymentOrderItem | undefined {
+    return (order.items || []).find((item) => {
+      if (item.itemType === 'course' && item.id === courseId) {
+        return true;
+      }
+
+      return Array.isArray(item.grantedCourseIds) && item.grantedCourseIds.includes(courseId);
+    });
+  }
+
+  orderCourseGrantData(
+    order: AdminPaymentOrder,
+    courseId: string,
+  ): OrderCourseGrantData {
+    const item = this.getOrderItemForCourse(order, courseId);
+
+    return {
+      hideStudyMaterial: item?.hideStudyMaterial === true,
+      planId: item?.planId || null,
+      planName: this.textValue(item?.planName) || null,
+    };
+  }
+
+  orderCoursePlanLabel(order: AdminPaymentOrder, courseId: string): string {
+    const data = this.orderCourseGrantData(order, courseId);
+    return data.planName || data.planId || '—';
+  }
+
+  async grantOrderCourse(order: AdminPaymentOrder, courseId: string): Promise<void> {
+    if (!order.userId || !courseId) {
+      this.error = 'بيانات الطلب غير مكتملة';
+      return;
+    }
+
+    this.error = undefined;
+
+    try {
+      const currentUser = this.auth.currentUser ?? undefined;
+      const grantData = this.orderCourseGrantData(order, courseId);
+
+      await this.enrollSvc.grant(order.userId, courseId, currentUser?.uid, {
+        hideStudyMaterial: grantData.hideStudyMaterial,
+        planId: grantData.planId,
+        planName: grantData.planName,
+        orderId: order.merchantOrderId,
+        paymentProvider: order.paymentProvider || 'whatsapp',
+      });
+      await this.enrollSvc.touchCustomer(order.userId, order.userEmail ?? null);
+
+      const currentEnrollments = this.userEnrollments[order.userId] || [];
+      if (!currentEnrollments.includes(courseId)) {
+        this.userEnrollments[order.userId] = [...currentEnrollments, courseId];
+      }
+
+      const existingGranted = {
+        ...(order.grantedCourseIds || {}),
+        [courseId]: true,
+      };
+      const allGranted = this.orderCourseIds(order).every(
+        (id) => existingGranted[id] === true,
+      );
+
+      await this.adminSvc.markPaymentOrderCourseGranted(
+        order.merchantOrderId,
+        courseId,
+        allGranted,
+        currentUser?.uid,
+      );
+
+      order.grantedCourseIds = existingGranted;
+      order.status = allGranted ? 'processed' : 'partially_granted';
+      if (allGranted) {
+        order.processedAt = Date.now();
+        order.processedBy = currentUser?.uid ?? null;
+      }
+    } catch (e: any) {
+      this.error = e?.message ?? 'تعذر منح صلاحية الكورس من الطلب';
+    }
+  }
+
+  async refreshOrders(): Promise<void> {
+    this.error = undefined;
+
+    try {
+      await this.loadPaymentOrders();
+    } catch (e: any) {
+      this.error = e?.message ?? 'تعذر تحديث الطلبات';
+    }
   }
 
   async grant(user: AccessUser): Promise<void> {
