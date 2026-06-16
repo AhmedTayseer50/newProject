@@ -52,6 +52,42 @@ type LangListGroup = FormGroup<{
   en: FormControl<string>;
 }>;
 
+type ParsedLocalizedLandingPage = {
+  title?: string;
+  description?: string;
+  heroEyebrow?: string;
+  heroTagline?: string;
+  heroTitleHighlight?: string;
+  categoryId?: string;
+  thumbnail?: string;
+  price?: number;
+  meta: { label: string; value: string }[];
+  goalTitle?: string;
+  goalDescription?: string;
+  outcomes: string[];
+  curriculum: { title: string; points: string[] }[];
+  programDuration?: string;
+  targetAudience?: string;
+  expectedStudyTimeTitle?: string;
+  expectedStudyTimeDescription?: string;
+  audienceItems: string[];
+  prerequisitesTitle?: string;
+  prerequisitesDescription?: string;
+  sectionCards: { title: string; description: string }[];
+  communityPerks: string[];
+  bottomCtaText?: string;
+  bottomCtaButtonText?: string;
+  offerPercent?: number;
+  offerHeading?: string;
+  offerText?: string;
+  offerCtaText?: string;
+};
+
+type ParsedLandingPage = {
+  ar: ParsedLocalizedLandingPage;
+  en: ParsedLocalizedLandingPage;
+};
+
 @Component({
   selector: 'app-course-editor',
   templateUrl: './course-editor.component.html',
@@ -69,6 +105,9 @@ export class CourseEditorComponent implements OnInit {
   loading = true;
   error?: string;
   activeLang: AdminLang = 'ar';
+  bulkLandingPageControl = this.fb.nonNullable.control('');
+  bulkImportMessage?: string;
+  bulkImportError?: string;
 
   courses: CourseRow[] = [];
   lessons: LessonRow[] = [];
@@ -919,6 +958,486 @@ export class CourseEditorComponent implements OnInit {
       offer,
       bottomCta,
     };
+  }
+
+
+  fillCourseFieldsFromBulkText(): void {
+    this.bulkImportError = undefined;
+    this.bulkImportMessage = undefined;
+
+    const rawText = this.bulkLandingPageControl.value.trim();
+    if (!rawText) {
+      this.bulkImportError = 'ضع بيانات صفحة البيع داخل المربع أولًا.';
+      return;
+    }
+
+    const parsed = this.parseLandingPageText(rawText);
+    const hasAnyData = !!(
+      parsed.ar.title ||
+      parsed.en.title ||
+      parsed.ar.description ||
+      parsed.en.description ||
+      parsed.ar.curriculum.length ||
+      parsed.en.curriculum.length ||
+      parsed.ar.sectionCards.length ||
+      parsed.en.sectionCards.length
+    );
+
+    if (!hasAnyData) {
+      this.bulkImportError =
+        'لم أتمكن من قراءة البيانات. تأكد أن النص بنفس ترتيب الفورم وفيه عناوين الخانات مثل: عنوان الكورس، الوصف المختصر، عناصر التعلم.';
+      return;
+    }
+
+    this.applyParsedLandingPage(parsed);
+
+    const arCount = this.countParsedItems(parsed.ar);
+    const enCount = this.countParsedItems(parsed.en);
+    this.bulkImportMessage = `تم ملء الخانات بنجاح. تم قراءة ${arCount} عنصر عربي و ${enCount} عنصر إنجليزي.`;
+  }
+
+  private emptyParsedLandingPage(): ParsedLocalizedLandingPage {
+    return {
+      meta: [],
+      outcomes: [],
+      curriculum: [],
+      audienceItems: [],
+      sectionCards: [],
+      communityPerks: [],
+    };
+  }
+
+  private countParsedItems(data: ParsedLocalizedLandingPage): number {
+    return [
+      data.title,
+      data.description,
+      data.heroEyebrow,
+      data.heroTagline,
+      data.heroTitleHighlight,
+      data.categoryId,
+      data.goalTitle,
+      data.goalDescription,
+      data.programDuration,
+      data.targetAudience,
+      data.expectedStudyTimeTitle,
+      data.expectedStudyTimeDescription,
+      data.prerequisitesTitle,
+      data.prerequisitesDescription,
+      data.bottomCtaText,
+      data.bottomCtaButtonText,
+      data.offerHeading,
+      data.offerText,
+      data.offerCtaText,
+      ...data.meta.flatMap((item) => [item.label, item.value]),
+      ...data.outcomes,
+      ...data.curriculum.flatMap((item) => [item.title, ...item.points]),
+      ...data.audienceItems,
+      ...data.sectionCards.flatMap((item) => [item.title, item.description]),
+      ...data.communityPerks,
+    ].filter((item) => `${item || ''}`.trim()).length;
+  }
+
+  private parseLandingPageText(rawText: string): ParsedLandingPage {
+    const normalizedText = this.normalizeBulkText(rawText);
+    const englishMarker = /(?:بيانات\s+Landing\s+Page\s*[—-]\s*النسخة\s+الإنجليزية|النسخة\s+الإنجليزية|English\s+Version)/i;
+    const markerMatch = englishMarker.exec(normalizedText);
+
+    const arText = markerMatch
+      ? normalizedText.slice(0, markerMatch.index).trim()
+      : normalizedText;
+    const enText = markerMatch
+      ? normalizedText.slice(markerMatch.index + markerMatch[0].length).trim()
+      : '';
+
+    return {
+      ar: this.parseLocalizedLandingPageBlock(arText),
+      en: this.parseLocalizedLandingPageBlock(enText),
+    };
+  }
+
+  private parseLocalizedLandingPageBlock(text: string): ParsedLocalizedLandingPage {
+    const data = this.emptyParsedLandingPage();
+    if (!text.trim()) return data;
+
+    const heroBlock = this.sectionBetween(text, '1.', '2.');
+    data.title = this.cleanBulkValue(this.valueAfter(heroBlock, 'عنوان الكورس:', 'الوصف المختصر:'));
+    data.description = this.cleanBulkValue(this.valueAfter(heroBlock, 'الوصف المختصر:', 'Eyebrow'));
+    data.heroEyebrow = this.cleanBulkValue(this.valueAfter(heroBlock, 'Eyebrow / عنوان صغير أعلى الهيرو:', 'Tagline / سطر تعريفي قصير:'));
+    data.heroTagline = this.cleanBulkValue(this.valueAfter(heroBlock, 'Tagline / سطر تعريفي قصير:', 'Highlighted title / الجزء المميز من العنوان:'));
+    data.heroTitleHighlight = this.cleanBulkValue(this.valueAfter(heroBlock, 'Highlighted title / الجزء المميز من العنوان:', 'التصنيف:'));
+    data.categoryId = this.cleanBulkValue(this.valueAfter(heroBlock, 'التصنيف:', 'رابط الصورة المصغرة:'));
+    data.thumbnail = this.cleanUrlValue(this.cleanBulkValue(this.valueAfter(heroBlock, 'رابط الصورة المصغرة:', 'السعر الأساسي')));
+    data.price = this.parseNumberValue(this.valueAfter(heroBlock, 'السعر الأساسي', ''));
+
+    const metaBlock = this.sectionBetween(text, '2.', '3.');
+    data.meta = this.parseMetaItems(metaBlock);
+
+    const goalBlock = this.sectionBetween(text, '3.', '4.');
+    data.goalTitle = this.cleanBulkValue(this.valueAfter(goalBlock, 'عنوان الهدف:', 'وصف الهدف:'));
+    data.goalDescription = this.cleanBulkValue(this.valueAfter(goalBlock, 'وصف الهدف:', ''));
+
+    const outcomesBlock = this.sectionBetween(text, '4.', '6.');
+    data.outcomes = this.parseNumberedItems(this.valueAfter(outcomesBlock, 'عناصر التعلم:', ''));
+
+    const curriculumBlock = this.sectionBetween(text, '6.', '7.');
+    data.curriculum = this.parseCurriculumItems(curriculumBlock);
+
+    const studyBlock = this.sectionBetween(text, '7.', '8.');
+    data.programDuration = this.cleanBulkValue(this.valueAfter(studyBlock, 'مدة البرنامج:', 'لمن هذا البرنامج؟'));
+    data.targetAudience = this.cleanBulkValue(this.valueAfter(studyBlock, 'لمن هذا البرنامج؟ / وصف مختصر للجمهور:', 'المدة المتوقعة للدراسة:'));
+    data.expectedStudyTimeTitle = this.cleanBulkValue(this.valueAfter(studyBlock, 'المدة المتوقعة للدراسة:', 'وصف المدة أو نمط الدراسة:'));
+    data.expectedStudyTimeDescription = this.cleanBulkValue(this.valueAfter(studyBlock, 'وصف المدة أو نمط الدراسة:', ''));
+
+    const audienceBlock = this.sectionBetween(text, '8.', '9.');
+    const prereqStart = this.indexOfAny(audienceBlock, ['المتطلبات السابقة']);
+    const audienceOnlyBlock = prereqStart >= 0 ? audienceBlock.slice(0, prereqStart) : audienceBlock;
+    data.audienceItems = this.parseNumberedItems(
+      this.valueAfter(audienceOnlyBlock, 'مراحل التحسين المناسبة لك', ''),
+    );
+    data.prerequisitesTitle =
+      this.cleanBulkValue(
+        this.valueAfter(
+          audienceBlock,
+          'المتطلبات السابقة / عنوان يظهر في الكارت:',
+          'وصف المتطلبات السابقة:',
+        ),
+      ) ||
+      this.cleanBulkValue(
+        this.valueAfter(
+          audienceBlock,
+          'المتطلبات السابقة ( عنوان يظهر في الكارت) :',
+          'وصف المتطلبات السابقة:',
+        ),
+      ) ||
+      this.cleanBulkValue(
+        this.valueAfter(audienceBlock, 'المتطلبات السابقة', 'وصف المتطلبات السابقة:'),
+      );
+    data.prerequisitesDescription = this.cleanBulkValue(this.valueAfter(audienceBlock, 'وصف المتطلبات السابقة:', ''));
+
+    const transformationBlock = this.sectionBetween(text, '9.', '12.');
+    data.sectionCards = this.parseTitleDescriptionBlocks(transformationBlock, 'التحول المتوقع');
+
+    const communityBlock = this.sectionBetween(text, '12.', '14.');
+    data.communityPerks = this.parseCommunityItems(communityBlock);
+
+    const bottomCtaBlock = this.sectionBetween(text, '14.', '15.');
+    data.bottomCtaText = this.cleanBulkValue(this.valueAfter(bottomCtaBlock, 'النص:', 'نص الزر:'));
+    data.bottomCtaButtonText = this.cleanBulkValue(this.valueAfter(bottomCtaBlock, 'نص الزر:', ''));
+
+    const offerBlock = this.sectionAfter(text, '15.');
+    data.offerPercent = this.parseNumberValue(this.valueAfter(offerBlock, 'النسبة %:', 'عنوان العرض:'));
+    data.offerHeading = this.cleanBulkValue(this.valueAfter(offerBlock, 'عنوان العرض:', 'نص العرض:'));
+    data.offerText = this.cleanBulkValue(this.valueAfter(offerBlock, 'نص العرض:', 'نص الزر:'));
+    data.offerCtaText = this.cleanBulkValue(this.valueAfter(offerBlock, 'نص الزر:', ''));
+
+    return data;
+  }
+
+  private applyParsedLandingPage(parsed: ParsedLandingPage): void {
+    const controls = this.courseForm.controls;
+
+    this.patchLangGroup(controls.title, parsed.ar.title, parsed.en.title);
+    this.patchLangGroup(controls.description, parsed.ar.description, parsed.en.description);
+    this.patchLangGroup(controls.heroEyebrow, parsed.ar.heroEyebrow, parsed.en.heroEyebrow);
+    this.patchLangGroup(controls.heroTagline, parsed.ar.heroTagline, parsed.en.heroTagline);
+    this.patchLangGroup(controls.heroTitleHighlight, parsed.ar.heroTitleHighlight, parsed.en.heroTitleHighlight);
+    this.patchLangGroup(controls.categoryId, parsed.ar.categoryId, parsed.en.categoryId);
+    this.patchLangGroup(controls.goalTitle, parsed.ar.goalTitle, parsed.en.goalTitle);
+    this.patchLangGroup(controls.goalDescription, parsed.ar.goalDescription, parsed.en.goalDescription);
+    this.patchLangGroup(controls.programDuration, parsed.ar.programDuration, parsed.en.programDuration);
+    this.patchLangGroup(controls.targetAudience, parsed.ar.targetAudience, parsed.en.targetAudience);
+    this.patchLangGroup(controls.expectedStudyTimeTitle, parsed.ar.expectedStudyTimeTitle, parsed.en.expectedStudyTimeTitle);
+    this.patchLangGroup(controls.expectedStudyTimeDescription, parsed.ar.expectedStudyTimeDescription, parsed.en.expectedStudyTimeDescription);
+    this.patchLangGroup(controls.prerequisitesTitle, parsed.ar.prerequisitesTitle, parsed.en.prerequisitesTitle);
+    this.patchLangGroup(controls.prerequisitesDescription, parsed.ar.prerequisitesDescription, parsed.en.prerequisitesDescription);
+    this.patchLangGroup(controls.bottomCtaText, parsed.ar.bottomCtaText, parsed.en.bottomCtaText);
+    this.patchLangGroup(controls.bottomCtaButtonText, parsed.ar.bottomCtaButtonText, parsed.en.bottomCtaButtonText);
+    this.patchLangGroup(controls.offerHeading, parsed.ar.offerHeading, parsed.en.offerHeading);
+    this.patchLangGroup(controls.offerText, parsed.ar.offerText, parsed.en.offerText);
+    this.patchLangGroup(controls.offerCtaText, parsed.ar.offerCtaText, parsed.en.offerCtaText);
+
+    if (parsed.ar.thumbnail || parsed.en.thumbnail) {
+      controls.thumbnail.setValue(parsed.ar.thumbnail || parsed.en.thumbnail || '');
+    }
+
+    if (Number(parsed.ar.price || parsed.en.price || 0) > 0) {
+      controls.price.setValue(Number(parsed.ar.price || parsed.en.price || 0));
+    }
+
+    if (Number(parsed.ar.offerPercent || parsed.en.offerPercent || 0) > 0) {
+      controls.offerPercent.setValue(
+        Number(parsed.ar.offerPercent || parsed.en.offerPercent || 0),
+      );
+    }
+
+    this.replaceMetaItems(parsed.ar.meta, parsed.en.meta);
+    this.replaceLocalizedTextArray(this.outcomes, parsed.ar.outcomes, parsed.en.outcomes, (item) => this.addOutcome(item));
+    this.replaceCurriculumItems(parsed.ar.curriculum, parsed.en.curriculum);
+    this.replaceLocalizedTextArray(this.audienceItems, parsed.ar.audienceItems, parsed.en.audienceItems, (item) => this.addAudienceItem(item));
+    this.replaceSectionCards(parsed.ar.sectionCards, parsed.en.sectionCards);
+    this.replaceLocalizedTextArray(this.communityPerks, parsed.ar.communityPerks, parsed.en.communityPerks, (item) => this.addCommunityPerk(item));
+  }
+
+  private patchLangGroup(group: LangTextGroup, ar?: string, en?: string): void {
+    if (ar !== undefined || en !== undefined) {
+      group.patchValue({
+        ar: ar ?? group.controls.ar.value,
+        en: en ?? group.controls.en.value,
+      });
+    }
+  }
+
+  private replaceLocalizedTextArray(
+    arr: FormArray<LangTextGroup>,
+    arItems: string[],
+    enItems: string[],
+    addItem: (value: Partial<LocalizedText>) => void,
+  ): void {
+    const max = Math.max(arItems.length, enItems.length);
+    if (!max) return;
+
+    this.clearFormArray(arr);
+    for (let index = 0; index < max; index += 1) {
+      addItem({ ar: arItems[index] || '', en: enItems[index] || '' });
+    }
+  }
+
+  private replaceMetaItems(
+    arItems: { label: string; value: string }[],
+    enItems: { label: string; value: string }[],
+  ): void {
+    const max = Math.max(arItems.length, enItems.length);
+    if (!max) return;
+
+    this.clearFormArray(this.meta);
+    for (let index = 0; index < max; index += 1) {
+      this.addMetaItem({
+        label: {
+          ar: arItems[index]?.label || '',
+          en: enItems[index]?.label || '',
+        },
+        value: {
+          ar: arItems[index]?.value || '',
+          en: enItems[index]?.value || '',
+        },
+      });
+    }
+  }
+
+  private replaceCurriculumItems(
+    arItems: { title: string; points: string[] }[],
+    enItems: { title: string; points: string[] }[],
+  ): void {
+    const max = Math.max(arItems.length, enItems.length);
+    if (!max) return;
+
+    this.clearFormArray(this.curriculum);
+    for (let index = 0; index < max; index += 1) {
+      this.addCurriculumItem({
+        title: {
+          ar: arItems[index]?.title || '',
+          en: enItems[index]?.title || '',
+        },
+        points: {
+          ar: arItems[index]?.points || [],
+          en: enItems[index]?.points || [],
+        },
+      });
+    }
+  }
+
+  private replaceSectionCards(
+    arItems: { title: string; description: string }[],
+    enItems: { title: string; description: string }[],
+  ): void {
+    const max = Math.max(arItems.length, enItems.length);
+    if (!max) return;
+
+    this.clearFormArray(this.sectionCards);
+    for (let index = 0; index < max; index += 1) {
+      this.addSectionCard({
+        title: {
+          ar: arItems[index]?.title || '',
+          en: enItems[index]?.title || '',
+        },
+        description: {
+          ar: arItems[index]?.description || '',
+          en: enItems[index]?.description || '',
+        },
+      });
+    }
+  }
+
+  private normalizeBulkText(value: string): string {
+    return (value || '')
+      .replace(/\r/g, '')
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/\u00a0/g, ' ')
+      .replace(/\t/g, '  ')
+      .replace(/^[_\sـ-]{5,}$/gm, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  private sectionBetween(text: string, startMarker: string, endMarker: string): string {
+    const startIndex = text.indexOf(startMarker);
+    if (startIndex < 0) return '';
+
+    const endIndex = text.indexOf(endMarker, startIndex + startMarker.length);
+    return (endIndex >= 0 ? text.slice(startIndex, endIndex) : text.slice(startIndex)).trim();
+  }
+
+  private sectionAfter(text: string, startMarker: string): string {
+    const startIndex = text.indexOf(startMarker);
+    return startIndex >= 0 ? text.slice(startIndex).trim() : '';
+  }
+
+  private valueAfter(text: string, startMarker: string, endMarker: string): string {
+    if (!text || !startMarker) return '';
+
+    const startIndex = text.indexOf(startMarker);
+    if (startIndex < 0) return '';
+
+    const from = startIndex + startMarker.length;
+    const endIndex = endMarker ? text.indexOf(endMarker, from) : -1;
+    return (endIndex >= 0 ? text.slice(from, endIndex) : text.slice(from)).trim();
+  }
+
+  private indexOfAny(text: string, markers: string[]): number {
+    const indexes = markers
+      .map((marker) => text.indexOf(marker))
+      .filter((index) => index >= 0);
+
+    return indexes.length ? Math.min(...indexes) : -1;
+  }
+
+  private cleanBulkValue(value?: string): string {
+    return (value || '')
+      .split('\n')
+      .map((line) =>
+        line
+          .replace(/^[-–—•]+\s*/, '')
+          .replace(/^\d+[.)-]\s*/, '')
+          .trim(),
+      )
+      .filter(
+        (line) =>
+          !!line &&
+          !/^[_\sـ-]{5,}$/.test(line) &&
+          !/^\/?\s*[\u0600-\u06FFa-zA-Z0-9\s؟?()/%-]+:$/.test(line),
+      )
+      .join('\n')
+      .trim();
+  }
+
+  private cleanUrlValue(value: string): string {
+    const cleaned = this.cleanBulkValue(value);
+    if (!cleaned) return '';
+
+    const lower = cleaned.toLowerCase();
+    const isPlaceholder =
+      cleaned.includes('لوحة الإدارة') ||
+      cleaned.includes('Firebase Storage') ||
+      lower.includes('admin panel') ||
+      lower.includes('to be added');
+
+    return isPlaceholder ? '' : cleaned;
+  }
+
+  private parseNumberValue(value?: string): number {
+    const normalized = `${value || ''}`.replace(/[٠-٩]/g, (digit) =>
+      `${'٠١٢٣٤٥٦٧٨٩'.indexOf(digit)}`,
+    );
+    const match = normalized.match(/\d+(?:\.\d+)?/);
+    return match ? Number(match[0]) : 0;
+  }
+
+  private parseNumberedItems(block: string): string[] {
+    const lines = (block || '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    return lines
+      .filter((line) => /^\d+[.)-]\s+/.test(line))
+      .map((line) => this.cleanBulkValue(line))
+      .filter(Boolean);
+  }
+
+  private parseMetaItems(block: string): { label: string; value: string }[] {
+    const lines = (block || '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const items: { label: string; value: string }[] = [];
+
+    for (let index = 0; index < lines.length; index += 1) {
+      if (!/^Label\s*\//i.test(lines[index])) continue;
+
+      const label = this.cleanBulkValue(
+        lines[index].replace(/^Label\s*\/\s*اسم البيان\s*:?/i, ''),
+      ) || this.cleanBulkValue(lines[index + 1] || '');
+
+      let value = '';
+      const valueLineIndex = lines.findIndex(
+        (line, lineIndex) => lineIndex > index && /^Value\s*\//i.test(line),
+      );
+
+      if (valueLineIndex >= 0) {
+        value = this.cleanBulkValue(
+          lines[valueLineIndex].replace(/^Value\s*\/\s*القيمة\s*:?/i, ''),
+        ) || this.cleanBulkValue(lines[valueLineIndex + 1] || '');
+        index = valueLineIndex;
+      }
+
+      if (label || value) items.push({ label, value });
+    }
+
+    return items;
+  }
+
+  private parseCurriculumItems(block: string): { title: string; points: string[] }[] {
+    return (block || '')
+      .split(/\n\s*عنصر من محتوى البرنامج\s*\n/g)
+      .map((part) => part.trim())
+      .filter((part) => part.includes('عنوان المحور:'))
+      .map((part) => ({
+        title: this.cleanBulkValue(this.valueAfter(part, 'عنوان المحور:', 'نقاط المحور:')),
+        points: this.cleanBulkValue(this.valueAfter(part, 'نقاط المحور:', ''))
+          .split('\n')
+          .map((line) => this.cleanBulkValue(line))
+          .filter(Boolean),
+      }))
+      .filter((item) => item.title || item.points.length);
+  }
+
+  private parseTitleDescriptionBlocks(
+    block: string,
+    splitMarker: string,
+  ): { title: string; description: string }[] {
+    return (block || '')
+      .split(new RegExp(`\\n\\s*${splitMarker}\\s*\\n`, 'g'))
+      .map((part) => part.trim())
+      .filter((part) => part.includes('العنوان:'))
+      .map((part) => ({
+        title: this.cleanBulkValue(this.valueAfter(part, 'العنوان:', 'الوصف:')),
+        description: this.cleanBulkValue(this.valueAfter(part, 'الوصف:', '')),
+      }))
+      .filter((item) => item.title || item.description);
+  }
+
+  private parseCommunityItems(block: string): string[] {
+    const items: string[] = [];
+    const regex = /بعد الاشتراك:?\s*([\s\S]*?)(?=\n\s*بعد الاشتراك:?|$)/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(block || ''))) {
+      const value = this.cleanBulkValue(match[1] || '');
+      if (value) items.push(value);
+    }
+
+    return items;
   }
 
   async saveCourse(): Promise<void> {

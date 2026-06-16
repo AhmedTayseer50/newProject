@@ -55,3 +55,14 @@
     flex: 1 1 auto;
   }
 }
+.bulk-import-section {
+  border-color: rgba(13, 110, 253, 0.22);
+  background: linear-gradient(180deg, rgba(13, 110, 253, 0.035), #ffffff);
+}
+
+.bulk-import-textarea {
+  min-height: 260px;
+  line-height: 1.8;
+  font-size: 0.92rem;
+  resize: vertical;
+}

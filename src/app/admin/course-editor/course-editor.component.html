@@ -122,6 +122,41 @@
         <strong>{{ activeLang === "ar" ? "العربية" : "الإنجليزية" }}</strong>
       </div>
 
+      <!-- BULK LANDING PAGE IMPORT -->
+      <div class="editor-section bulk-import-section">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+          <div>
+            <h6 class="editor-section__title mb-1">ملء الخانات تلقائيًا من نموذج صفحة البيع</h6>
+            <p class="text-muted small mb-0">
+              انسخ بيانات الـ Landing Page بنفس ترتيب الفورم داخل المربع، ثم اضغط على زر ملء الخانات.
+              سيتم إنشاء العناصر المتكررة تلقائيًا مثل Meta pills، عناصر التعلم، محتوى البرنامج، التحولات، وما بعد الاشتراك.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="fillCourseFieldsFromBulkText()"
+          >
+            ملء الخانات
+          </button>
+        </div>
+
+        <textarea
+          rows="10"
+          class="form-control bulk-import-textarea"
+          [formControl]="bulkLandingPageControl"
+          placeholder="الصق هنا بيانات صفحة البيع العربية والإنجليزية بنفس شكل الفورم..."
+        ></textarea>
+
+        <div *ngIf="bulkImportMessage" class="alert alert-success small py-2 mt-3 mb-0">
+          {{ bulkImportMessage }}
+        </div>
+        <div *ngIf="bulkImportError" class="alert alert-danger small py-2 mt-3 mb-0">
+          {{ bulkImportError }}
+        </div>
+      </div>
+
       <!-- 1) HERO / MAIN COURSE PRESENTATION -->
       <div class="editor-section">
         <h6 class="editor-section__title">1. Hero / بداية صفحة الكورس</h6>
