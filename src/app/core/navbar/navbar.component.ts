@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, isDevMode } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { of, Subscription, switchMap, catchError, from } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -123,15 +123,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
 
     const newUrl = `/${nextLang}${restPath}${search}${hash}`;
+    const currentPort = window.location.port;
 
-    if (isDevMode()) {
-      const port = nextLang === 'en' ? '4201' : '4200';
-      const host = window.location.hostname;
-      const protocol = window.location.protocol;
-      window.location.assign(`${protocol}//${host}:${port}${newUrl}`);
-    } else {
-      window.location.assign(newUrl);
+    if (currentPort === '4200' || currentPort === '4201') {
+      const nextPort = nextLang === 'en' ? '4201' : '4200';
+      window.location.assign(
+        `${window.location.protocol}//${window.location.hostname}:${nextPort}${newUrl}`
+      );
+      return;
     }
+
+    window.location.assign(newUrl);
   }
 
   toggleUserMenu(): void {

@@ -52,7 +52,9 @@
         الاستشارات
       </a>
 
-      <a routerLink="/about" routerLinkActive="active" i18n>عن الدكتورة</a>
+      <a routerLink="/about" routerLinkActive="active">
+        {{ currentLang === 'en' ? 'About the Coach' : 'عن المدربة' }}
+      </a>
 
       <a routerLink="/contact" routerLinkActive="active" i18n>
         التواصل وطرق الدفع
@@ -210,7 +212,9 @@
         <a routerLink="/courses" routerLinkActive="active" i18n>الكورسات</a>
         <a routerLink="/diplomas" routerLinkActive="active" i18n>الدبلومات</a>
         <a routerLink="/consultations" routerLinkActive="active" i18n>الاستشارات</a>
-        <a routerLink="/about" routerLinkActive="active" i18n>عن الدكتورة</a>
+        <a routerLink="/about" routerLinkActive="active">
+        {{ currentLang === 'en' ? 'About the Coach' : 'عن المدربة' }}
+      </a>
         <a routerLink="/contact" routerLinkActive="active" i18n>التواصل وطرق الدفع</a>
       </nav>
 

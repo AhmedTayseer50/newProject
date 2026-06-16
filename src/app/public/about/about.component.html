@@ -1,4 +1,4 @@
-<div class="container py-4" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
+<div class="container py-4" [attr.dir]="content.dir">
   <main class="profile-shell">
     <div class="profile-inner">
       <aside class="profile-left">
@@ -6,165 +6,89 @@
           <div class="avatar-ring">
             <img
               src="https://i.pinimg.com/736x/30/32/67/3032670f69d92b11c8cf661b3e104cb3.jpg"
-              i18n-alt
-              alt="المدربة إنعام عبد اللاه"
+              [alt]="content.imageAlt"
               loading="lazy"
             />
           </div>
 
           <div>
-            <div class="profile-name" i18n>المدربة إنعام عبد اللاه</div>
-            <div class="profile-title-main" i18n>
-              مستشار الصحة النفسية والتنمية الذاتية
-            </div>
-            <div class="profile-title-sub" i18n>
-              مستشار تدريب وتنمية بشرية وأسري وتربوي
-            </div>
+            <div class="profile-name">{{ content.name }}</div>
+            <div class="profile-title-main">{{ content.titleMain }}</div>
+            <div class="profile-title-sub">{{ content.titleSub }}</div>
           </div>
 
-          <div class="role-list" aria-label="مجالات عمل المدربة">
-            <div class="role-item" i18n>مستشار الصحة النفسية والتنمية الذاتية</div>
-            <div class="role-item" i18n>مستشار تدريب وتنمية بشرية</div>
-            <div class="role-item" i18n>مستشار أسري وتربوي</div>
-            <div class="role-item" i18n>مدرب الوعي الذاتي وفهم المشاعر</div>
+          <div class="role-list" [attr.aria-label]="content.rolesLabel">
+            <div class="role-item" *ngFor="let role of content.roles; trackBy: trackByIndex">
+              {{ role }}
+            </div>
           </div>
 
           <div class="tag-row">
-            <span class="tag-chip" i18n>دكتوراه مهنية</span>
-            <span class="tag-chip" i18n>صحة نفسية</span>
-            <span class="tag-chip" i18n>تنمية بشرية</span>
-            <span class="tag-chip" i18n>إرشاد أسري</span>
+            <span class="tag-chip" *ngFor="let tag of content.tags; trackBy: trackByIndex">
+              {{ tag }}
+            </span>
           </div>
         </div>
 
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-number">+10</div>
-            <div class="stat-label" i18n>سنوات خبرة</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-number">+25</div>
-            <div class="stat-label" i18n>برنامج ودورة</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-number">+1000</div>
-            <div class="stat-label" i18n>مستفيد/ة</div>
+          <div class="stat-card" *ngFor="let stat of content.stats; trackBy: trackByIndex">
+            <div class="stat-number">{{ stat.number }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
           </div>
         </div>
 
         <div class="left-footer text-center">
           <a routerLink="/book-session" class="btn-primary btn-cta">
             <span aria-hidden="true">📅</span>
-            <span i18n>احجز استشارة فردية</span>
+            <span>{{ content.ctaPrimary }}</span>
           </a>
 
-          <div class="small-note" i18n>
-            الجلسات تتم أونلاين مع خصوصية وسرية تامة
-          </div>
+          <div class="small-note">{{ content.smallNote }}</div>
         </div>
       </aside>
 
       <section class="profile-right">
         <header class="page-header">
-          <div class="page-eyebrow" i18n>من نحن</div>
-          <h1 class="page-title" i18n>من المدربة إنعام عبد اللاه</h1>
-          <p class="page-subtitle" i18n>
-            رحلة علمية وعملية تهدف لفهم جذور الألم النفسي وبناء وعي صحي ينعكس على
-            علاقاتك وحياتك.
-          </p>
+          <div class="page-eyebrow">{{ content.eyebrow }}</div>
+          <h1 class="page-title">{{ content.pageTitle }}</h1>
+          <p class="page-subtitle">{{ content.pageSubtitle }}</p>
         </header>
 
         <section class="content-section intro-section">
           <h2 class="pill-heading">
             <span class="pill-dot" aria-hidden="true"></span>
-            <span i18n>نبذة تعريفية</span>
+            <span>{{ content.introLabel }}</span>
           </h2>
 
-          <h3 class="section-title-main" i18n>
-            رؤية عميقة للإنسان تتجاوز حدود العرض النفسي
-          </h3>
+          <h3 class="section-title-main">{{ content.introTitle }}</h3>
 
-          <p class="lead-text" i18n>
-            تجمع المدربة إنعام عبد اللاه بين التكوين الأكاديمي المتخصص والخبرة
-            العملية مع الأفراد والأسر في مجالات الصحة النفسية والتنمية الذاتية.
-          </p>
-
-          <p class="lead-text" i18n>
-            تهتم بالوصول إلى جذور الألم النفسي بدل الاكتفاء بملاحقة الأعراض
-            الظاهرة؛ لتساعد الإنسان على بناء وعي حقيقي بذاته وترميم علاقته
-            بنفسه وبمن حوله على أسس صحية وناضجة.
+          <p class="lead-text" *ngFor="let paragraph of content.introParagraphs; trackBy: trackByIndex">
+            {{ paragraph }}
           </p>
 
           <blockquote class="quote-box">
             <div class="quote-mark" aria-hidden="true">“</div>
-            <p class="quote-text" i18n>
-              أؤمن أن كل إنسان يحمل داخله بذرة صحة نفسية وفطرة سليمة، ودوري أن
-              أرافقه في رحلة اكتشاف هذه البذرة ورعايتها حتى تتحول إلى نمط حياة
-              أكثر وعيًا واتزانًا.
-            </p>
+            <p class="quote-text">{{ content.quote }}</p>
           </blockquote>
         </section>
 
         <section class="content-section">
           <h2 class="pill-heading">
             <span class="pill-dot" aria-hidden="true"></span>
-            <span i18n>المؤهلات الأكاديمية والمهنية</span>
+            <span>{{ content.qualificationsLabel }}</span>
           </h2>
 
           <div class="timeline">
-            <article class="timeline-item">
+            <article class="timeline-item" *ngFor="let item of content.timeline; trackBy: trackByIndex">
               <div class="timeline-dot" aria-hidden="true"></div>
-              <div class="timeline-title" i18n>
-                دكتوراه مهنية في ما وراء الإنسانية والتنمية الذاتية
-              </div>
-              <div class="timeline-text" i18n>
-                تركّز على فهم الإنسان في أبعاده النفسية والفكرية والوجودية مع
-                تطبيقات عملية في العلاج والتغيير.
-              </div>
-            </article>
-
-            <article class="timeline-item">
-              <div class="timeline-dot" aria-hidden="true"></div>
-              <div class="timeline-title" i18n>ماجستير في الصحة النفسية</div>
-              <div class="timeline-text" i18n>
-                مع تعمّق في مدارس العلاج الحديثة وأساليب دعم الأفراد في التعامل
-                مع القلق والاكتئاب واضطرابات العلاقات.
-              </div>
-            </article>
-
-            <article class="timeline-item">
-              <div class="timeline-dot" aria-hidden="true"></div>
-              <div class="timeline-title" i18n>
-                ماجستير تطويري وتحفيزي في تنمية الإنسان
-              </div>
-              <div class="timeline-text" i18n>
-                يركّز على تمكين الإنسان من اكتشاف نقاط قوّته وإعادة صياغة صورته
-                عن ذاته وبناء أهداف متّسقة مع قيمه.
-              </div>
-            </article>
-
-            <article class="timeline-item">
-              <div class="timeline-dot" aria-hidden="true"></div>
-              <div class="timeline-title" i18n>
-                دورات متقدمة في الإرشاد والعلاج النفسي
-              </div>
-              <div class="timeline-text" i18n>
-                تدريب في أساليب الإرشاد والاستماع الفعّال وإدارة الجلسات
-                الفردية والجماعية باحترافية.
-              </div>
+              <div class="timeline-title">{{ item.title }}</div>
+              <div class="timeline-text">{{ item.text }}</div>
             </article>
           </div>
 
           <div class="checklist-grid mt-3">
-            <div class="check-item" i18n>تدريب في اكتشاف الذات وفهم المشاعر</div>
-            <div class="check-item" i18n>تدريب في اكتشاف القدرات والمهارات الشخصية</div>
-            <div class="check-item" i18n>
-              تدريب في معرفة وإدراك العالم المادي والعالم الشعوري
-            </div>
-            <div class="check-item" i18n>
-              تدريب في بناء العلاقات الاجتماعية والمهنية والأسرية
+            <div class="check-item" *ngFor="let item of content.trainingItems; trackBy: trackByIndex">
+              {{ item }}
             </div>
           </div>
         </section>
@@ -172,73 +96,34 @@
         <section class="content-section">
           <h2 class="pill-heading">
             <span class="pill-dot" aria-hidden="true"></span>
-            <span i18n>مجالات التخصص</span>
+            <span>{{ content.specialtiesLabel }}</span>
           </h2>
 
           <div class="badges-grid">
-            <span class="badge-soft" i18n>التعافي من صدمات الطفولة</span>
-            <span class="badge-soft" i18n>العلاقات الأسرية والزوجية</span>
-            <span class="badge-soft" i18n>إدارة القلق والاحتراق النفسي</span>
-            <span class="badge-soft" i18n>بناء صورة ذاتية صحية</span>
-            <span class="badge-soft" i18n>إرشاد الأمهات والتربية الواعية</span>
-            <span class="badge-soft" i18n>برامج المرأة والنجاح المتوازن</span>
-            <span class="badge-soft" i18n>تنمية الوعي بالذات والرسائل الداخلية</span>
-            <span class="badge-soft" i18n>إعداد وتقديم برامج تدريبية في التنمية البشرية</span>
-            <span class="badge-soft" i18n>إعداد وتقديم برامج تدريبية في القيادة والإدارة</span>
-            <span class="badge-soft" i18n>إعداد وتقديم برامج في الوعي الذاتي</span>
-            <span class="badge-soft" i18n>إعداد وتقديم برامج تدريبية في الوعي التربوي</span>
-            <span class="badge-soft" i18n>إعداد وتقديم برامج تدريبية في الإرشاد الأسري</span>
-            <span class="badge-soft" i18n>إعداد وتقديم برامج تدريبية في الإرشاد النفسي</span>
+            <span class="badge-soft" *ngFor="let specialty of content.specialties; trackBy: trackByIndex">
+              {{ specialty }}
+            </span>
           </div>
         </section>
 
         <section class="content-section">
           <h2 class="pill-heading">
             <span class="pill-dot" aria-hidden="true"></span>
-            <span i18n>لمن هذه الجلسات والبرامج؟</span>
+            <span>{{ content.audienceLabel }}</span>
           </h2>
 
           <div class="two-col-grid">
-            <article class="mini-card">
-              <div class="mini-title" i18n>لمن يحمل جرحًا لم يُعالج بعد</div>
-              <ul class="mini-list">
-                <li i18n>أشخاص يشعرون بألم داخلي متكرر.</li>
-                <li i18n>من مرّوا بصدمات طفولة أو صدمات عاطفية.</li>
-                <li i18n>من يعانون من اضطرابات نفسية أو الدخول في علاقات سامة.</li>
-                <li i18n>
-                  من تتكرر معهم أشخاص وأنماط وعلاقات مؤذية ولا يجدون تفسيرًا
-                  واضحًا لما يحدث معهم.
-                </li>
-              </ul>
-            </article>
+            <article class="mini-card" *ngFor="let card of content.audienceCards; trackBy: trackByIndex">
+              <div class="mini-title">{{ card.title }}</div>
+              <p *ngIf="card.text">{{ card.text }}</p>
 
-            <article class="mini-card">
-              <div class="mini-title" i18n>للأمهات والمربين</div>
-              <p i18n>
-                من يرغبون في تربية واعية وإيقاف انتقال صدمات الطفولة بين الأجيال
-                وبناء علاقة آمنة مع الأبناء.
-              </p>
-            </article>
-
-            <article class="mini-card">
-              <div class="mini-title" i18n>للنساء الباحثات عن الاتزان</div>
-              <p i18n>
-                نساء يبحثن عن تحقيق النجاح دون أن يفقدن ذواتهن بين الأدوار
-                الأسرية والاجتماعية والمهنية.
-              </p>
-            </article>
-
-            <article class="mini-card">
-              <div class="mini-title" i18n>لمن يريد بداية مختلفة</div>
-              <ul class="mini-list">
-                <li i18n>كل شخص قرّر أن يتوقف عن التكرار.</li>
-                <li i18n>من يبدأ رحلة جديدة مع ذاته مبنية على الوعي والمسؤولية والرحمة.</li>
-                <li i18n>من يبحث عن تحقيق أهدافه الشخصية والمهنية.</li>
-                <li i18n>من لا يعرف كيف يبدأ ومتى يبدأ وأين يبدأ.</li>
-                <li i18n>من يشعر بالضياع وعدم وضوح الرؤية.</li>
-                <li i18n>من يضيع وقته على الميديا بدون إنجاز أو نتيجة.</li>
-                <li i18n>من يسعى لمعرفة الرسالة الكونية التي خُلق لها.</li>
-              </ul>
+              <ng-container *ngIf="card.points as points">
+                <ul class="mini-list" *ngIf="points.length">
+                  <li *ngFor="let point of points; trackBy: trackByIndex">
+                    {{ point }}
+                  </li>
+                </ul>
+              </ng-container>
             </article>
           </div>
         </section>
@@ -246,41 +131,30 @@
         <section class="content-section reminder-section">
           <h2 class="pill-heading">
             <span class="pill-dot" aria-hidden="true"></span>
-            <span i18n>تذكّر</span>
+            <span>{{ content.reminderLabel }}</span>
           </h2>
 
           <div class="reminder-grid">
-            <div class="reminder-card" i18n>المعرفة كنز وتطبيق المعرفة مفتاح الكنز</div>
-            <div class="reminder-card" i18n>الاستثمار في الذات هو أفضل استثمار</div>
-            <div class="reminder-card" i18n>اصرف على دماغك عشان دماغك تصرف عليك</div>
-            <div class="reminder-card" i18n>عندما يجهز الطالب يظهر المعلم</div>
+            <div class="reminder-card" *ngFor="let reminder of content.reminders; trackBy: trackByIndex">
+              {{ reminder }}
+            </div>
           </div>
         </section>
 
         <section class="content-section end-cta">
           <div class="end-cta-card">
-            <div class="end-cta-title" i18n>جاهز/ة تبدأ رحلة أهدأ؟</div>
-            <div class="end-cta-text" i18n>
-              احجز جلستك الآن وخد أول خطوة واضحة نحو فهم أعمق لذاتك وبناء خطة
-              تناسبك.
-            </div>
-            <a
-              routerLink="/book-session"
-              class="btn-primary btn-cta-wide lowerbutton"
-              i18n
-            >
-              احجز موعدًا الآن
+            <div class="end-cta-title">{{ content.endCtaTitle }}</div>
+            <div class="end-cta-text">{{ content.endCtaText }}</div>
+            <a routerLink="/book-session" class="btn-primary btn-cta-wide lowerbutton">
+              {{ content.endCtaButton }}
             </a>
           </div>
 
           <div class="signature-card">
-            <div class="signature-greeting" i18n>تحياتي وامتناني ليكم جميعًا</div>
-            <div class="signature-name" i18n>مدربة / إنعام عبد اللاه</div>
-            <div class="signature-title" i18n>
-              مستشار الصحة النفسية والتنمية الذاتية
-            </div>
-            <div class="signature-title" i18n>
-              مستشار التدريب والتنمية البشرية
+            <div class="signature-greeting">{{ content.signatureGreeting }}</div>
+            <div class="signature-name">{{ content.signatureName }}</div>
+            <div class="signature-title" *ngFor="let title of content.signatureTitles; trackBy: trackByIndex">
+              {{ title }}
             </div>
           </div>
         </section>

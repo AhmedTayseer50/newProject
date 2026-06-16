@@ -58,7 +58,7 @@ const routes: Routes = [
   {
     path: 'about',
     component: AboutComponent,
-    data: { title: $localize`:@@title_about:عن الدكتورة` },
+    data: { title: $localize`:@@title_about:عن المدربة` },
   },
   {
     path: 'courses',
