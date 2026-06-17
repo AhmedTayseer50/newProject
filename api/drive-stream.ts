@@ -1,6 +1,6 @@
 // api/drive-stream.ts
 // Vercel Serverless Function (Node)
-// Streams Google Drive video with Range support, using a short-lived session cookie "ps"
+// Streams Google Drive video with proper Range support, using a short-lived session cookie "ps".
 
 const jwt = require('jsonwebtoken');
 const { google } = require('googleapis');
@@ -16,6 +16,23 @@ function parseCookies(cookieHeader?: string) {
   });
 
   return out;
+}
+
+function parseRangeHeader(rangeHeader: string | undefined, fileSize: number) {
+  if (!rangeHeader || !fileSize) return null;
+
+  const match = String(rangeHeader).match(/bytes=(\d*)-(\d*)/);
+  if (!match) return null;
+
+  let start = match[1] ? Number(match[1]) : 0;
+  let end = match[2] ? Number(match[2]) : fileSize - 1;
+
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+  if (start < 0) start = 0;
+  if (end >= fileSize) end = fileSize - 1;
+  if (start > end || start >= fileSize) return null;
+
+  return { start, end };
 }
 
 async function handler(req: any, res: any) {
@@ -57,50 +74,43 @@ async function handler(req: any, res: any) {
 
     const drive = google.drive({ version: 'v3', auth });
 
-    const range = req.headers?.range;
+    const metaRes = await drive.files.get({
+      fileId,
+      fields: 'name,size,mimeType',
+      supportsAllDrives: true,
+    });
 
-    const driveRes = await drive.files.get(
-      { fileId, alt: 'media' },
-      {
-        responseType: 'stream',
-        headers: range ? { Range: range } : undefined,
-      }
-    );
-
-    // خُد نفس status من جوجل (ده مهم جدًا)
-    const status = driveRes?.status || (range ? 206 : 200);
-    res.statusCode = status;
-
-    const h = driveRes?.headers || {};
-    const contentType = h['content-type'] || 'video/mp4';
-    const contentLength = h['content-length'];
-    const contentRange = h['content-range'];
-    const contentDisposition = h['content-disposition'];
+    const fileSize = Number(metaRes?.data?.size || 0);
+    const contentType = metaRes?.data?.mimeType || 'video/mp4';
+    const range = parseRangeHeader(req.headers?.range, fileSize);
 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Robots-Tag', 'noindex');
+    res.setHeader('Content-Disposition', 'inline');
 
-    // مرّر Content-Disposition لو موجود (بيساعد اسم الملف)
-    if (contentDisposition) {
-      res.setHeader('Content-Disposition', contentDisposition);
+    let driveRangeHeader: string | undefined;
+
+    if (range && fileSize) {
+      const chunkSize = range.end - range.start + 1;
+      res.statusCode = 206;
+      res.setHeader('Content-Range', `bytes ${range.start}-${range.end}/${fileSize}`);
+      res.setHeader('Content-Length', String(chunkSize));
+      driveRangeHeader = `bytes=${range.start}-${range.end}`;
     } else {
-      res.setHeader('Content-Disposition', 'inline');
+      res.statusCode = 200;
+      if (fileSize) res.setHeader('Content-Length', String(fileSize));
     }
 
-    // لو 206 لازم Content-Range. لو مفيش → هننزّلها لـ 200 عشان المتصفح ما ينهارش
-    if (status === 206) {
-      if (!contentRange) {
-        res.statusCode = 200;
-      } else {
-        res.setHeader('Content-Range', contentRange);
-      }
-    }
+    const driveRes = await drive.files.get(
+      { fileId, alt: 'media', supportsAllDrives: true },
+      {
+        responseType: 'stream',
+        headers: driveRangeHeader ? { Range: driveRangeHeader } : undefined,
+      },
+    );
 
-    if (contentLength) res.setHeader('Content-Length', contentLength);
-
-    // stream errors
     driveRes.data.on('error', (e: any) => {
       console.error('[drive-stream] upstream stream error:', e);
       try {
@@ -109,11 +119,10 @@ async function handler(req: any, res: any) {
       } catch (_) {}
     });
 
-    // pipe stream
     driveRes.data.pipe(res);
-  } catch (err) {
+  } catch (err: any) {
     console.error('[drive-stream] ERROR:', err);
-    return res.status(500).send('Drive stream failed');
+    return res.status(500).send(err?.message || 'Drive stream failed');
   }
 }
 

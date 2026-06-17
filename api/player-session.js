@@ -3,8 +3,9 @@
 const jwt = require('jsonwebtoken');
 const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
 
-function setCookie(res, name, value) {
-  const cookie = `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300`;
+function setCookie(res, name, value, maxAgeSec) {
+  const safeMaxAge = Math.max(60, Number(maxAgeSec || 7200));
+  const cookie = `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${safeMaxAge}`;
   res.setHeader('Set-Cookie', cookie);
 }
 
@@ -69,7 +70,7 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const expiresInSec = Number(process.env.PLAYER_SESSION_TTL_SEC || 300);
+    const expiresInSec = Number(process.env.PLAYER_SESSION_TTL_SEC || 7200);
     const now = Math.floor(Date.now() / 1000);
 
     const token = jwt.sign(
@@ -85,7 +86,7 @@ module.exports = async function handler(req, res) {
       secret
     );
 
-    setCookie(res, 'ps', token);
+    setCookie(res, 'ps', token, expiresInSec);
 
     res.status(200).json({
       playerUrl: '/api/player',
