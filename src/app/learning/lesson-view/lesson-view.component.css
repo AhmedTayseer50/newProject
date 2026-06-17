@@ -283,6 +283,10 @@ body.dark-theme .lesson-item {
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
+  .video-card {
+    width: 100%;
+  }
+
   .topbar-inner {
     flex-direction: column;
     align-items: stretch;
@@ -291,10 +295,6 @@ body.dark-theme .lesson-item {
   .topbar-meta {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .video-card {
-    width: 100%;
   }
 
   .lesson-item {

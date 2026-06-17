@@ -1,9 +1,11 @@
 // api/drive-stream.ts
 // Vercel Serverless Function (Node)
-// Streams Google Drive video with proper Range support, using a short-lived session cookie "ps".
+// Streams Google Drive video with protected Range support.
 
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { google } = require('googleapis');
+const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
 
 function parseCookies(cookieHeader?: string) {
   const out: Record<string, string> = {};
@@ -18,27 +20,130 @@ function parseCookies(cookieHeader?: string) {
   return out;
 }
 
-function parseRangeHeader(rangeHeader: string | undefined, fileSize: number) {
-  if (!rangeHeader || !fileSize) return null;
+function sha256(value: any) {
+  return crypto.createHash('sha256').update(String(value || '')).digest('hex');
+}
 
-  const match = String(rangeHeader).match(/bytes=(\d*)-(\d*)/);
+function normalizeProvider(value: any) {
+  const v = String(value || '').trim().toLowerCase();
+  if (v === 'gdrive' || v === 'drive' || v === 'google_drive' || v === 'google-drive' || v === 'google drive') return 'gdrive';
+  return v;
+}
+
+function isLikelyBrowserVideoRequest(req: any) {
+  const secFetchDest = String(req.headers?.['sec-fetch-dest'] || '').toLowerCase();
+  const secFetchSite = String(req.headers?.['sec-fetch-site'] || '').toLowerCase();
+  const secFetchMode = String(req.headers?.['sec-fetch-mode'] || '').toLowerCase();
+
+  // Chrome/Edge video element usually sends: Sec-Fetch-Dest: video, Sec-Fetch-Site: same-origin
+  // Some browsers/proxies omit these headers, so we only block clearly suspicious values.
+  if (secFetchDest && secFetchDest !== 'video' && secFetchDest !== 'empty') return false;
+  if (secFetchSite && secFetchSite !== 'same-origin' && secFetchSite !== 'same-site') return false;
+  if (secFetchMode && secFetchMode !== 'no-cors' && secFetchMode !== 'cors') return false;
+
+  return true;
+}
+
+function parseRange(rangeHeader: string | undefined, fileSize: number) {
+  if (!rangeHeader) return null;
+
+  const match = /^bytes=(\d*)-(\d*)$/i.exec(String(rangeHeader).trim());
   if (!match) return null;
 
-  let start = match[1] ? Number(match[1]) : 0;
-  let end = match[2] ? Number(match[2]) : fileSize - 1;
+  let start: number;
+  let end: number;
 
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
-  if (start < 0) start = 0;
-  if (end >= fileSize) end = fileSize - 1;
-  if (start > end || start >= fileSize) return null;
+  if (match[1] === '' && match[2] === '') return null;
 
-  return { start, end };
+  if (match[1] === '') {
+    const suffixLength = Number(match[2]);
+    if (!Number.isFinite(suffixLength) || suffixLength <= 0) return null;
+    start = Math.max(fileSize - suffixLength, 0);
+    end = fileSize - 1;
+  } else {
+    start = Number(match[1]);
+    end = match[2] === '' ? fileSize - 1 : Number(match[2]);
+  }
+
+  if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end < start || start >= fileSize) {
+    return { invalid: true } as any;
+  }
+
+  end = Math.min(end, fileSize - 1);
+  return { start, end, invalid: false };
+}
+
+function clientIp(req: any) {
+  return String(
+    req.headers?.['x-forwarded-for'] ||
+      req.headers?.['x-real-ip'] ||
+      req.socket?.remoteAddress ||
+      ''
+  )
+    .split(',')[0]
+    .trim();
+}
+
+async function validateActiveSession(req: any, payload: any) {
+  const admin = getFirebaseAdmin();
+  const uid = String(payload?.uid || '');
+  const courseId = String(payload?.courseId || '');
+  const lessonId = String(payload?.lessonId || '');
+  const sid = String(payload?.sid || '');
+
+  if (!uid || !courseId || !lessonId || !sid) {
+    return { ok: false, reason: 'Missing session identity' };
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const activeRef = admin.database().ref(`activePlayerSessions/${uid}/${courseId}/${lessonId}`);
+  const activeSnap = await activeRef.get();
+
+  if (!activeSnap.exists()) {
+    return { ok: false, reason: 'Session is not active' };
+  }
+
+  const active = activeSnap.val() || {};
+  if (String(active.sid || '') !== sid) {
+    return { ok: false, reason: 'Session was replaced by another active player' };
+  }
+
+  if (Number(active.expiresAt || 0) < now) {
+    await activeRef.remove().catch(() => undefined);
+    return { ok: false, reason: 'Session expired' };
+  }
+
+  const userAgent = String(req.headers?.['user-agent'] || '');
+  if (payload?.userAgentHash && payload.userAgentHash !== sha256(userAgent)) {
+    return { ok: false, reason: 'Session user-agent mismatch' };
+  }
+
+  const enrollSnap = await admin.database().ref(`enrollments/${uid}/${courseId}`).get();
+  if (!enrollSnap.exists()) {
+    return { ok: false, reason: 'Enrollment no longer exists' };
+  }
+
+  // Lightweight heartbeat for admin diagnostics without changing the active sid.
+  activeRef.update({
+    lastSeenAt: now,
+    lastIpHash: sha256(clientIp(req)),
+  }).catch(() => undefined);
+
+  return { ok: true };
 }
 
 async function handler(req: any, res: any) {
   try {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      return res.status(405).send('Method Not Allowed');
+    }
+
     const secret = process.env['PLAYER_SESSION_SECRET'];
     if (!secret) return res.status(500).send('Missing env PLAYER_SESSION_SECRET');
+
+    if (!isLikelyBrowserVideoRequest(req)) {
+      return res.status(403).send('Blocked non-player video request');
+    }
 
     const cookies = parseCookies(req.headers?.cookie);
     const token = cookies['ps'];
@@ -51,11 +156,16 @@ async function handler(req: any, res: any) {
       return res.status(401).send('Invalid/Expired session');
     }
 
-    if (payload?.videoProvider !== 'gdrive') {
+    if (normalizeProvider(payload?.videoProvider) !== 'gdrive') {
       return res.status(400).send('Not a Google Drive session');
     }
 
-    const fileId = String(payload?.videoRef || '');
+    const active = await validateActiveSession(req, payload);
+    if (!active.ok) {
+      return res.status(403).send(active.reason || 'Inactive player session');
+    }
+
+    const fileId = String(payload?.videoRef || '').trim();
     if (!fileId) return res.status(400).send('Missing fileId in session');
 
     const clientEmail = process.env['GOOGLE_DRIVE_SA_EMAIL'];
@@ -80,35 +190,54 @@ async function handler(req: any, res: any) {
       supportsAllDrives: true,
     });
 
-    const fileSize = Number(metaRes?.data?.size || 0);
-    const contentType = metaRes?.data?.mimeType || 'video/mp4';
-    const range = parseRangeHeader(req.headers?.range, fileSize);
+    const meta = metaRes.data || {};
+    const fileSize = Number(meta.size || 0);
+    const contentType = String(meta.mimeType || 'video/mp4');
+
+    if (!fileSize || !Number.isFinite(fileSize)) {
+      return res.status(500).send('Missing Google Drive file size');
+    }
+
+    const rangeInfo: any = parseRange(req.headers?.range, fileSize);
 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Accept-Ranges', 'bytes');
-    res.setHeader('Cache-Control', 'no-store');
-    res.setHeader('X-Robots-Tag', 'noindex');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Content-Disposition', 'inline');
 
-    let driveRangeHeader: string | undefined;
+    if (rangeInfo?.invalid) {
+      res.setHeader('Content-Range', `bytes */${fileSize}`);
+      return res.status(416).end();
+    }
 
-    if (range && fileSize) {
-      const chunkSize = range.end - range.start + 1;
-      res.statusCode = 206;
-      res.setHeader('Content-Range', `bytes ${range.start}-${range.end}/${fileSize}`);
-      res.setHeader('Content-Length', String(chunkSize));
-      driveRangeHeader = `bytes=${range.start}-${range.end}`;
-    } else {
-      res.statusCode = 200;
-      if (fileSize) res.setHeader('Content-Length', String(fileSize));
+    let start = 0;
+    let end = fileSize - 1;
+    let statusCode = 200;
+
+    if (rangeInfo) {
+      start = rangeInfo.start;
+      end = rangeInfo.end;
+      statusCode = 206;
+      res.setHeader('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+    }
+
+    const chunkSize = end - start + 1;
+    res.statusCode = statusCode;
+    res.setHeader('Content-Length', String(chunkSize));
+
+    if (req.method === 'HEAD') {
+      return res.end();
     }
 
     const driveRes = await drive.files.get(
       { fileId, alt: 'media', supportsAllDrives: true },
       {
         responseType: 'stream',
-        headers: driveRangeHeader ? { Range: driveRangeHeader } : undefined,
-      },
+        headers: { Range: `bytes=${start}-${end}` },
+      }
     );
 
     driveRes.data.on('error', (e: any) => {
@@ -120,9 +249,9 @@ async function handler(req: any, res: any) {
     });
 
     driveRes.data.pipe(res);
-  } catch (err: any) {
+  } catch (err) {
     console.error('[drive-stream] ERROR:', err);
-    return res.status(500).send(err?.message || 'Drive stream failed');
+    return res.status(500).send('Drive stream failed');
   }
 }
 
