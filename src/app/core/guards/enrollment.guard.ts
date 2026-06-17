@@ -1,7 +1,32 @@
 import { Injectable, inject } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
-import { Auth } from '@angular/fire/auth';
+import { Auth, User, onAuthStateChanged } from '@angular/fire/auth';
 import { Database, ref, get } from '@angular/fire/database';
+
+function waitForAuthUser(auth: Auth): Promise<User | null> {
+  if (auth.currentUser) return Promise.resolve(auth.currentUser);
+
+  return new Promise<User | null>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      unsubscribe();
+      resolve(auth.currentUser);
+    }, 5000);
+
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        clearTimeout(timeoutId);
+        unsubscribe();
+        resolve(user);
+      },
+      (error) => {
+        clearTimeout(timeoutId);
+        unsubscribe();
+        reject(error);
+      },
+    );
+  });
+}
 
 @Injectable({ providedIn: 'root' })
 export class EnrollmentGuard implements CanActivate {
@@ -10,23 +35,28 @@ export class EnrollmentGuard implements CanActivate {
   private router = inject(Router);
 
   async canActivate(route: ActivatedRouteSnapshot): Promise<boolean | UrlTree> {
-    const me = this.auth.currentUser;
     const courseId = route.paramMap.get('courseId');
+    const lessonId = route.paramMap.get('lessonId');
 
     if (!courseId) return this.router.parseUrl('/courses');
 
-    // لو مش مسجّل دخول -> إلى /login ثم يرجع بعد تسجيل الدخول
-    if (!me) return this.router.createUrlTree(['/login'], { queryParams: { r: `/lesson/${courseId}/${route.paramMap.get('lessonId')}` } });
+    // مهم بعد Refresh: Firebase Auth بيحتاج لحظة يسترجع المستخدم من التخزين المحلي.
+    // لذلك لا نستخدم currentUser مباشرة قبل انتظار onAuthStateChanged.
+    const me = await waitForAuthUser(this.auth);
+    const redirectUrl = lessonId ? `/lesson/${courseId}/${lessonId}` : `/courses/${courseId}`;
 
-    // أدمن؟ اسمح له مباشرة
+    if (!me) {
+      return this.router.createUrlTree(['/login'], {
+        queryParams: { redirect: redirectUrl },
+      });
+    }
+
     const adminSnap = await get(ref(this.db, `users/${me.uid}/isAdmin`));
     if (adminSnap.exists() && adminSnap.val() === true) return true;
 
-    // هل له صلاحية enrollment؟
     const enrSnap = await get(ref(this.db, `enrollments/${me.uid}/${courseId}`));
     if (enrSnap.exists()) return true;
 
-    // لا يملك صلاحية -> أعده إلى صفحة تفاصيل الكورس
     return this.router.parseUrl(`/courses/${courseId}`);
   }
 }
