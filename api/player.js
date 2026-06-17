@@ -14,6 +14,7 @@ function parseCookies(cookieHeader) {
 
   return out;
 }
+// const jwt = require('jsonwebtoken');
 
 function normalizeProvider(value) {
   const v = String(value || '').trim().toLowerCase();

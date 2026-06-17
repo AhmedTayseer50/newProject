@@ -78,6 +78,8 @@ module.exports = async function handler(req, res) {
     res.status(500).send('Missing env PLAYER_SESSION_SECRET');
     return;
   }
+  
+  // const expiresInSec = Number(process.env.PLAYER_SESSION_TTL_SEC || 1200);
 
   try {
     const admin = getFirebaseAdmin();
