@@ -23,71 +23,6 @@
   <div class="alert alert-danger">{{ error }}</div>
 </div>
 
-<!-- this part for the auth part -->
-<div
-  class="container mb-4"
-  *ngIf="!loading && !error && course"
-  [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
->
-  <div
-    *ngIf="canViewLessons && firstLessonId"
-    class="alert alert-primary d-flex justify-content-between align-items-center flex-wrap gap-2"
-  >
-    <span>{{ defaultAccessGranted }}</span>
-    <button
-      class="btn btn-outline-primary btn-sm"
-      type="button"
-      (click)="goToLessons()"
-    >
-      {{ watchLessonsLabel }}
-    </button>
-  </div>
-
-  <div
-    *ngIf="canViewLessons && (!telegramUsed || telegramMessage)"
-    class="alert alert-light border d-flex align-items-center justify-content-between flex-wrap gap-2"
-  >
-    <div>
-      <div class="fw-semibold mb-1">
-        {{
-          isEnglish ? "Telegram community access" : "الدخول إلى جروب التليجرام"
-        }}
-      </div>
-
-      <div class="small text-muted" *ngIf="telegramEligible && !telegramUsed">
-        {{
-          isEnglish
-            ? "Your Telegram access is ready. This button can only be used once."
-            : "تم تجهيز صلاحية دخولك إلى جروب التليجرام. هذا الزر يعمل مرة واحدة فقط."
-        }}
-      </div>
-
-      <div class="small text-muted" *ngIf="telegramMessage">
-        {{ telegramMessage }}
-      </div>
-    </div>
-
-    <button
-      *ngIf="telegramEligible && !telegramUsed"
-      class="btn btn-success btn-sm"
-      type="button"
-      [disabled]="telegramBusy"
-      (click)="joinTelegramGroup()"
-    >
-      {{
-        telegramBusy
-          ? isEnglish
-            ? "Opening..."
-            : "جارٍ الفتح..."
-          : isEnglish
-            ? "Join Telegram group"
-            : "الانضمام إلى جروب التليجرام"
-      }}
-    </button>
-  </div>
-
-</div>
-
 <!-- HERO -->
 <section
   class="course-hero"
@@ -194,6 +129,81 @@
           />
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESS STATUS / COMMUNITY ACTIONS -->
+<section
+  class="course-access-section"
+  [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
+  *ngIf="!loading && !error && course && canViewLessons"
+>
+  <div class="container">
+    <div class="course-access-panel">
+      <article class="course-access-card" *ngIf="firstLessonId">
+        <div class="course-access-card__icon" aria-hidden="true">✓</div>
+
+        <div class="course-access-card__content">
+          <h2 class="course-access-card__title">
+            {{ isEnglish ? "Your course access is active" : "تم تفعيل صلاحية مشاهدة الكورس" }}
+          </h2>
+          <p class="course-access-card__text">
+            {{ defaultAccessGranted }}
+          </p>
+        </div>
+
+        <button
+          class="btn btn-primary course-access-card__btn"
+          type="button"
+          (click)="goToLessons()"
+        >
+          {{ watchLessonsLabel }}
+        </button>
+      </article>
+
+      <article
+        class="course-access-card course-access-card--telegram"
+        *ngIf="!telegramUsed || telegramMessage"
+      >
+        <div class="course-access-card__icon" aria-hidden="true">💬</div>
+
+        <div class="course-access-card__content">
+          <h2 class="course-access-card__title">
+            {{ isEnglish ? "Telegram community access" : "الدخول إلى جروب التليجرام" }}
+          </h2>
+
+          <p class="course-access-card__text" *ngIf="telegramEligible && !telegramUsed">
+            {{
+              isEnglish
+                ? "Your Telegram access is ready. This button can only be used once."
+                : "تم تجهيز صلاحية دخولك إلى جروب التليجرام. هذا الزر يعمل مرة واحدة فقط."
+            }}
+          </p>
+
+          <p class="course-access-card__text" *ngIf="telegramMessage">
+            {{ telegramMessage }}
+          </p>
+        </div>
+
+        <button
+          *ngIf="telegramEligible && !telegramUsed"
+          class="btn btn-outline-primary course-access-card__btn"
+          type="button"
+          [disabled]="telegramBusy"
+          (click)="joinTelegramGroup()"
+        >
+          {{
+            telegramBusy
+              ? isEnglish
+                ? "Opening..."
+                : "جارٍ الفتح..."
+              : isEnglish
+                ? "Join Telegram group"
+                : "الانضمام إلى الجروب"
+          }}
+        </button>
+      </article>
     </div>
   </div>
 </section>
