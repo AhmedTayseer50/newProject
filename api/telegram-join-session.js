@@ -1,4 +1,6 @@
 // api/telegram-join-session.js
+// Single endpoint for Telegram availability check + join redirect session.
+// This avoids adding an extra Serverless Function on Vercel Hobby plan.
 
 const jwt = require('jsonwebtoken');
 const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
@@ -8,6 +10,50 @@ function setCookie(res, name, value, maxAge = 120) {
     value
   )}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
   res.setHeader('Set-Cookie', cookie);
+}
+
+async function readTelegramState(admin, uid, courseId) {
+  const enrollmentSnap = await admin
+    .database()
+    .ref(`enrollments/${uid}/${courseId}`)
+    .get();
+
+  if (!enrollmentSnap.exists()) {
+    return {
+      hasEnrollment: false,
+      telegramInviteUrl: '',
+      used: false,
+    };
+  }
+
+  const privateSnap = await admin
+    .database()
+    .ref(`coursePrivate/${courseId}/telegramInviteUrl`)
+    .get();
+
+  const telegramInviteUrl = String(privateSnap.val() || '').trim();
+
+  if (!telegramInviteUrl) {
+    return {
+      hasEnrollment: true,
+      telegramInviteUrl: '',
+      used: false,
+    };
+  }
+
+  const accessSnap = await admin
+    .database()
+    .ref(`telegramAccess/${uid}/${courseId}`)
+    .get();
+
+  const access = accessSnap.exists() ? accessSnap.val() || {} : {};
+  const used = !!access.usedAt || access.status === 'used';
+
+  return {
+    hasEnrollment: true,
+    telegramInviteUrl,
+    used,
+  };
 }
 
 module.exports = async function handler(req, res) {
@@ -27,6 +73,7 @@ module.exports = async function handler(req, res) {
   const idToken = match[1];
   const body = req.body || {};
   const courseId = String(body.courseId || '').trim();
+  const action = String(body.action || 'join').trim().toLowerCase();
 
   if (!courseId) {
     res.status(400).send('Missing courseId');
@@ -44,24 +91,27 @@ module.exports = async function handler(req, res) {
     const decoded = await admin.auth().verifyIdToken(idToken);
     const uid = decoded.uid;
 
-    const enrollmentSnap = await admin
-      .database()
-      .ref(`enrollments/${uid}/${courseId}`)
-      .get();
+    const state = await readTelegramState(admin, uid, courseId);
 
-    if (!enrollmentSnap.exists()) {
+    if (!state.hasEnrollment) {
+      if (action === 'status') {
+        res.status(403).json({ available: false, used: false });
+        return;
+      }
+
       res.status(403).send('You do not have access to this course');
       return;
     }
 
-    const privateSnap = await admin
-      .database()
-      .ref(`coursePrivate/${courseId}/telegramInviteUrl`)
-      .get();
+    if (action === 'status') {
+      res.status(200).json({
+        available: !!state.telegramInviteUrl,
+        used: !!state.used,
+      });
+      return;
+    }
 
-    const telegramInviteUrl = String(privateSnap.val() || '').trim();
-
-    if (!telegramInviteUrl) {
+    if (!state.telegramInviteUrl) {
       res.status(404).send('Telegram invite link is not configured');
       return;
     }
@@ -78,7 +128,7 @@ module.exports = async function handler(req, res) {
       {
         uid,
         courseId,
-        telegramInviteUrl,
+        telegramInviteUrl: state.telegramInviteUrl,
         iat: now,
         exp: now + 120,
       },

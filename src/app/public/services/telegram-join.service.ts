@@ -24,8 +24,8 @@ export class TelegramJoinService {
     });
 
     return this.http.post<TelegramJoinStatusResponse>(
-      '/api/telegram-join-status',
-      { courseId },
+      '/api/telegram-join-session',
+      { courseId, action: 'status' },
       { headers },
     );
   }
@@ -40,7 +40,7 @@ export class TelegramJoinService {
 
     return this.http.post<TelegramJoinSessionResponse>(
       '/api/telegram-join-session',
-      { courseId },
+      { courseId, action: 'join' },
       { headers },
     );
   }
