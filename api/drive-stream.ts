@@ -2,7 +2,7 @@
 // Vercel Serverless Function (Node)
 // Streams Google Drive video with protected Range support + anti-download throttling.
 
-const crypto = require('crypto');
+const nodeCrypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { google } = require('googleapis');
 const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
@@ -27,7 +27,7 @@ function parseCookies(cookieHeader?: string) {
 }
 
 function sha256(value: any) {
-  return crypto.createHash('sha256').update(String(value || '')).digest('hex');
+  return nodeCrypto.createHash('sha256').update(String(value || '')).digest('hex');
 }
 
 function normalizeProvider(value: any) {
