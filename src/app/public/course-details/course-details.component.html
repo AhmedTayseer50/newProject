@@ -507,7 +507,7 @@
 
     <div class="audience-fit-grid">
       <ng-container *ngIf="course.audienceItems as audienceItems">
-        <article class="fit-card" *ngIf="audienceItems.length">
+        <article class="fit-card fit-card--list" *ngIf="audienceItems.length">
           <div class="fit-card__badge">
             {{ isEnglish ? "Who it is for" : "لمن صُمم" }}
           </div>
@@ -519,7 +519,7 @@
       </ng-container>
 
       <article
-        class="fit-card"
+        class="fit-card fit-card--note"
         *ngIf="
           course.prerequisitesTitle ||
           course.prerequisitesDescription ||
@@ -680,7 +680,9 @@
         </div>
 
         <div class="pricing-name">{{ plan.name }}</div>
-        <div class="pricing-badge" *ngIf="plan.badge">{{ plan.badge }}</div>
+        <div class="pricing-badge" [class.pricing-badge--empty]="!plan.badge">
+          {{ plan.badge || " " }}
+        </div>
         <div class="pricing-price-wrap">
           <ng-container *ngIf="course.offer?.percent as offerPercent">
             <div class="pricing-offer-label" *ngIf="plan.priceBeforeOfferText">
@@ -699,7 +701,7 @@
         </ul>
 
         <ng-container *ngIf="auth.currentUser; else loginToBuyPricing">
-          <div class="d-flex gap-2">
+          <div class="pricing-actions d-flex gap-2">
             <button
               class="btn btn-primary flex-fill"
               type="button"
@@ -753,7 +755,7 @@
           <ng-container
             *ngIf="auth.currentUser; else loginToBuyFallbackPricing"
           >
-            <div class="d-flex gap-2">
+            <div class="pricing-actions d-flex gap-2">
               <button
                 class="btn btn-primary flex-fill"
                 type="button"

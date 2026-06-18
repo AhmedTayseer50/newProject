@@ -1482,3 +1482,261 @@ body.dark-theme #course-pricing .course-access-notice__hint {
     max-width: 100%;
   }
 }
+
+
+/* === Course details UX alignment fixes ===
+   1) Make "Is this course for you?" cards compact instead of leaving large empty space.
+   2) Keep pricing cards aligned even when one plan has no badge or fewer features. */
+.section--light .audience-fit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  align-items: start;
+  max-width: 940px;
+  margin-inline: auto;
+  gap: 1rem;
+}
+
+.section--light .fit-card {
+  height: auto;
+  min-height: 0;
+  padding: 1.25rem;
+}
+
+.section--light .fit-card--list {
+  align-self: start;
+}
+
+.section--light .fit-card--note {
+  align-self: start;
+  position: sticky;
+  top: 92px;
+}
+
+.section--light .fit-card--list .check-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.1rem;
+  row-gap: 0.2rem;
+}
+
+.section--light .fit-card--list .check-list li {
+  margin-bottom: 0.65rem;
+}
+
+.section--light .fit-card__badge {
+  margin-bottom: 0.95rem;
+}
+
+#course-pricing .pricing-grid {
+  max-width: 1080px;
+  margin-inline: auto;
+  align-items: stretch;
+}
+
+#course-pricing .pricing-card {
+  min-height: 0;
+  height: auto;
+  padding: 1.45rem 1.25rem 1.2rem;
+}
+
+#course-pricing .pricing-name {
+  min-height: 3.15rem;
+  align-items: center;
+}
+
+#course-pricing .pricing-badge {
+  min-height: 1.9rem;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+}
+
+#course-pricing .pricing-badge--empty {
+  visibility: hidden;
+}
+
+#course-pricing .pricing-price-wrap {
+  min-height: 5.7rem;
+}
+
+#course-pricing .pricing-note {
+  min-height: 4.35rem;
+}
+
+#course-pricing .pricing-features {
+  flex: 1 1 auto;
+  margin-bottom: 1.15rem;
+}
+
+#course-pricing .pricing-actions {
+  margin-top: auto;
+}
+
+#course-pricing .pricing-actions .btn {
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+@media (max-width: 991.98px) {
+  .section--light .audience-fit-grid {
+    grid-template-columns: 1fr;
+    max-width: 720px;
+  }
+
+  .section--light .fit-card--note {
+    position: static;
+  }
+
+  .section--light .fit-card--list .check-list {
+    grid-template-columns: 1fr;
+  }
+
+  #course-pricing .pricing-name,
+  #course-pricing .pricing-price-wrap,
+  #course-pricing .pricing-note {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #course-pricing .pricing-actions {
+    flex-direction: column;
+  }
+}
+
+/* === Final UX adjustment: stack "Is this course for you?" cards vertically === */
+.section--light .audience-fit-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  max-width: 760px;
+  margin-inline: auto;
+  gap: 0.95rem;
+}
+
+.section--light .audience-fit-grid > .fit-card {
+  width: 100%;
+  max-width: 100%;
+}
+
+.section--light .fit-card--list,
+.section--light .fit-card--note {
+  position: static;
+  align-self: stretch;
+}
+
+.section--light .fit-card--list {
+  padding: 1.35rem 1.35rem 1.2rem;
+}
+
+.section--light .fit-card--note {
+  padding: 1.15rem 1.25rem;
+  background:
+    radial-gradient(circle at top left, rgba(168, 140, 255, 0.1), transparent 34%),
+    var(--bg-color-soft);
+}
+
+.section--light .fit-card--list .check-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.15rem;
+}
+
+.section--light .fit-card--list .check-list li {
+  margin-bottom: 0.55rem;
+  line-height: 1.85;
+}
+
+.section--light .fit-card--note .overview-text {
+  max-width: 680px;
+}
+
+@media (max-width: 575.98px) {
+  .section--light .audience-fit-grid {
+    max-width: 100%;
+    gap: 0.85rem;
+  }
+
+  .section--light .fit-card--list,
+  .section--light .fit-card--note {
+    padding: 1rem;
+  }
+}
+
+/* === Fix stacked audience cards height: override old flex-basis from dynamic grid rules === */
+.section--light .audience-fit-grid > .fit-card,
+.section--light .audience-fit-grid > * {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.section--light .fit-card--list .check-list {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.section--light .fit-card--list .check-list li {
+  break-inside: avoid;
+}
+
+/* === Transformation section UX balance: avoid 4 cards in first row and 1 alone === */
+.transformation-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: stretch;
+  justify-content: center;
+  max-width: 1120px;
+  margin-inline: auto;
+  gap: 1rem;
+}
+
+.transformation-grid > .transformation-card {
+  grid-column: span 2;
+  width: 100%;
+  max-width: none !important;
+  height: 100%;
+  min-height: 230px;
+}
+
+/* When the section has 5 cards, center the last 2 cards in the second row. */
+.transformation-grid > .transformation-card:nth-last-child(2):nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+.transformation-grid > .transformation-card:nth-last-child(1):nth-child(5) {
+  grid-column: 4 / span 2;
+}
+
+.transformation-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.transformation-card .feature-card__text {
+  margin-bottom: 0;
+}
+
+@media (max-width: 991.98px) {
+  .transformation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 760px;
+  }
+
+  .transformation-grid > .transformation-card,
+  .transformation-grid > .transformation-card:nth-last-child(2):nth-child(4),
+  .transformation-grid > .transformation-card:nth-last-child(1):nth-child(5) {
+    grid-column: auto;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .transformation-grid {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+}
+
