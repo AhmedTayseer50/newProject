@@ -164,7 +164,7 @@
 
       <article
         class="course-access-card course-access-card--telegram"
-        *ngIf="!telegramUsed || telegramMessage"
+        *ngIf="telegramAvailable"
       >
         <div class="course-access-card__icon" aria-hidden="true">💬</div>
 
@@ -176,8 +176,8 @@
           <p class="course-access-card__text" *ngIf="telegramEligible && !telegramUsed">
             {{
               isEnglish
-                ? "Your Telegram access is ready. This button can only be used once."
-                : "تم تجهيز صلاحية دخولك إلى جروب التليجرام. هذا الزر يعمل مرة واحدة فقط."
+                ? "The Telegram group link is available for this course."
+                : "رابط جروب التليجرام متاح لهذا الكورس."
             }}
           </p>
 

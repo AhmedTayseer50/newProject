@@ -39,7 +39,7 @@ function resolveEnrollmentAccess(orderData, courseId) {
   };
 }
 
-async function grantCoursesAndTelegram(admin, orderData) {
+async function grantCourses(admin, orderData) {
   const uid = orderData.userId;
   const courseIdsObj = orderData.courseIds || {};
   const courseIds = Object.keys(courseIdsObj);
@@ -55,14 +55,6 @@ async function grantCoursesAndTelegram(admin, orderData) {
       planName: access.planName,
       itemType: access.itemType,
       orderItemId: access.orderItemId,
-    });
-
-    await admin.database().ref(`telegramAccess/${uid}/${courseId}`).set({
-      enabled: true,
-      status: 'ready',
-      grantedAt: Date.now(),
-      grantedBy: 'paymob-mock',
-      usedAt: null,
     });
   }
 
@@ -101,7 +93,7 @@ module.exports = async function handler(req, res) {
 
     if (status === 'paid') {
       if (orderData.status !== 'paid') {
-        await grantCoursesAndTelegram(admin, orderData);
+        await grantCourses(admin, orderData);
       }
 
       await orderRef.update({

@@ -66,35 +66,11 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const accessRef = admin.database().ref(`telegramAccess/${uid}/${courseId}`);
-
-    const txResult = await accessRef.transaction((current) => {
-      if (!current) return current;
-      if (current.enabled !== true) return current;
-      if (current.usedAt) return current;
-
-      return {
-        ...current,
-        status: 'used',
-        usedAt: Date.now(),
-      };
+    await admin.database().ref(`telegramAccess/${uid}/${courseId}`).update({
+      status: 'used',
+      usedAt: Date.now(),
+      lastJoinedAt: Date.now(),
     });
-
-    if (!txResult.committed) {
-      res
-        .status(403)
-        .send('Telegram access is not available or has already been used');
-      return;
-    }
-
-    const newValue = txResult.snapshot.val();
-
-    if (!newValue || !newValue.usedAt) {
-      res
-        .status(403)
-        .send('Telegram access is not available or has already been used');
-      return;
-    }
 
     const now = Math.floor(Date.now() / 1000);
 

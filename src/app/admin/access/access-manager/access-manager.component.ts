@@ -7,10 +7,7 @@ import {
   AdminService,
 } from 'src/app/admin/services/admin.service';
 import { UsersAdminService } from 'src/app/admin/services/users-admin.service';
-import {
-  EnrollmentsService,
-  TelegramAccessInfo,
-} from 'src/app/core/services/enrollments.service';
+import { EnrollmentsService } from 'src/app/core/services/enrollments.service';
 
 type AccessUser = {
   uid: string;
@@ -45,8 +42,6 @@ export class AccessManagerComponent implements OnInit {
   userEnrollments: Record<string, string[]> = {};
   selectedCourse: Record<string, string> = {};
 
-  telegramAccess: Record<string, Record<string, TelegramAccessInfo>> = {};
-  grantTelegramWithCourse: Record<string, boolean> = {};
 
   q = '';
   ordersQ = '';
@@ -137,19 +132,15 @@ export class AccessManagerComponent implements OnInit {
     const results = await Promise.all(
       this.users.map(async (user) => {
         const enrollments = await this.enrollSvc.listUserEnrollments(user.uid);
-        const telegram = await this.enrollSvc.listUserTelegramAccess(user.uid);
-
         return {
           uid: user.uid,
           enrollments,
-          telegram,
         };
       }),
     );
 
     for (const item of results) {
       this.userEnrollments[item.uid] = item.enrollments;
-      this.telegramAccess[item.uid] = item.telegram || {};
     }
   }
 
@@ -308,28 +299,7 @@ export class AccessManagerComponent implements OnInit {
         this.userEnrollments[user.uid] = [...currentEnrollments, courseId];
       }
 
-      if (this.grantTelegramWithCourse[user.uid]) {
-        await this.enrollSvc.grantTelegramAccess(
-          user.uid,
-          courseId,
-          currentUser?.uid,
-        );
-
-        if (!this.telegramAccess[user.uid]) {
-          this.telegramAccess[user.uid] = {};
-        }
-
-        this.telegramAccess[user.uid][courseId] = {
-          enabled: true,
-          status: 'ready',
-          grantedAt: Date.now(),
-          grantedBy: currentUser?.uid ?? null,
-          usedAt: null,
-        };
-      }
-
       this.selectedCourse[user.uid] = '';
-      this.grantTelegramWithCourse[user.uid] = false;
     } catch (e: any) {
       this.error = e?.message ?? 'تعذر منح الصلاحية';
     }
@@ -345,77 +315,9 @@ export class AccessManagerComponent implements OnInit {
       this.userEnrollments[user.uid] = (
         this.userEnrollments[user.uid] || []
       ).filter((id) => id !== courseId);
-
-      if (this.telegramAccess[user.uid]?.[courseId]) {
-        delete this.telegramAccess[user.uid][courseId];
-      }
     } catch (e: any) {
       this.error = e?.message ?? 'تعذر إلغاء الصلاحية';
     }
   }
 
-  async enableTelegram(user: AccessUser, courseId: string): Promise<void> {
-    this.error = undefined;
-
-    const hasEnrollment = (this.userEnrollments[user.uid] || []).includes(
-      courseId,
-    );
-    if (!hasEnrollment) {
-      this.error =
-        'لا يمكن تفعيل زر التليجرام لمستخدم غير حاصل على صلاحية الكورس';
-      return;
-    }
-
-    try {
-      const currentUser = this.auth.currentUser ?? undefined;
-
-      await this.enrollSvc.grantTelegramAccess(
-        user.uid,
-        courseId,
-        currentUser?.uid,
-      );
-
-      if (!this.telegramAccess[user.uid]) {
-        this.telegramAccess[user.uid] = {};
-      }
-
-      this.telegramAccess[user.uid][courseId] = {
-        enabled: true,
-        status: 'ready',
-        grantedAt: Date.now(),
-        grantedBy: currentUser?.uid ?? null,
-        usedAt: null,
-      };
-    } catch (e: any) {
-      this.error = e?.message ?? 'تعذر تفعيل زر التليجرام';
-    }
-  }
-
-  async disableTelegram(user: AccessUser, courseId: string): Promise<void> {
-    this.error = undefined;
-
-    try {
-      await this.enrollSvc.revokeTelegramAccess(user.uid, courseId);
-
-      if (this.telegramAccess[user.uid]?.[courseId]) {
-        delete this.telegramAccess[user.uid][courseId];
-      }
-    } catch (e: any) {
-      this.error = e?.message ?? 'تعذر إلغاء زر التليجرام';
-    }
-  }
-
-  telegramState(uid: string, courseId: string): 'none' | 'ready' | 'used' {
-    const item = this.telegramAccess[uid]?.[courseId];
-
-    if (!item || item.enabled !== true) {
-      return 'none';
-    }
-
-    if (item.status === 'used' || !!item.usedAt) {
-      return 'used';
-    }
-
-    return 'ready';
-  }
 }

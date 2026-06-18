@@ -86,7 +86,7 @@
     <div>
       <h5 class="mb-1">إدارة صلاحيات الكورسات</h5>
       <p class="text-muted mb-0 small">
-        منح أو سحب صلاحيات الكورسات، مع التحكم في زر التليجرام لكل عميل.
+        منح أو سحب صلاحيات الكورسات للطلاب.
       </p>
     </div>
   </div>
@@ -142,17 +142,6 @@
                     </option>
                   </select>
 
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      [id]="'tg-' + u.uid"
-                      [(ngModel)]="grantTelegramWithCourse[u.uid]"
-                    />
-                    <label class="form-check-label" [for]="'tg-' + u.uid">
-                      تفعيل زر التليجرام مع الصلاحية
-                    </label>
-                  </div>
 
                   <button class="btn btn-sm btn-primary" (click)="grant(u)">
                     إتاحة
@@ -173,36 +162,6 @@
                         <span class="badge text-bg-secondary">
                           {{ courseTitle(cid) }}
                         </span>
-
-                        <span
-                          class="small text-success"
-                          *ngIf="telegramState(u.uid, cid) === 'ready'"
-                        >
-                          زر التليجرام مفعّل
-                        </span>
-
-                        <span
-                          class="small text-muted"
-                          *ngIf="telegramState(u.uid, cid) === 'used'"
-                        >
-                          تم استخدام رابط التليجرام
-                        </span>
-
-                        <button
-                          class="btn btn-sm btn-outline-success"
-                          *ngIf="telegramState(u.uid, cid) === 'none'"
-                          (click)="enableTelegram(u, cid)"
-                        >
-                          تفعيل زر التليجرام
-                        </button>
-
-                        <button
-                          class="btn btn-sm btn-outline-warning"
-                          *ngIf="telegramState(u.uid, cid) !== 'none'"
-                          (click)="disableTelegram(u, cid)"
-                        >
-                          إلغاء زر التليجرام
-                        </button>
 
                         <button
                           class="btn btn-sm btn-outline-danger ms-auto"

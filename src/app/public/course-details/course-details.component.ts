@@ -45,6 +45,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   public firstLessonId: string | null = null;
   public introVideoSafeUrl: SafeResourceUrl | null = null;
 
+  public telegramAvailable = false;
   public telegramEligible = false;
   public telegramUsed = false;
   public telegramBusy = false;
@@ -263,6 +264,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         this.showOfferPopup = false;
         this.offerShown = false;
 
+        this.telegramAvailable = false;
         this.telegramEligible = false;
         this.telegramUsed = false;
         this.telegramBusy = false;
@@ -302,6 +304,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
           this.canViewLessons = false;
           this.showOfferPopup = false;
           this.offerShown = false;
+          this.telegramAvailable = false;
           this.telegramEligible = false;
           this.telegramUsed = false;
           this.telegramBusy = false;
@@ -321,6 +324,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
             await this.loadTelegramAccessState(user.uid);
           } else {
             this.offerShown = false;
+            this.telegramAvailable = false;
             this.telegramEligible = false;
             this.telegramUsed = false;
             this.telegramBusy = false;
@@ -328,6 +332,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
           }
         } catch {
           this.canViewLessons = false;
+          this.telegramAvailable = false;
           this.telegramEligible = false;
           this.telegramUsed = false;
           this.telegramBusy = false;
@@ -441,6 +446,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         this.telegramJoin.createSession(this.courseId, idToken)
       );
 
+      this.telegramAvailable = true;
       this.telegramEligible = false;
       this.telegramUsed = true;
       this.telegramMessage = this.isEnglish
@@ -460,38 +466,43 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async loadTelegramAccessState(uid: string): Promise<void> {
+  private async loadTelegramAccessState(_uid: string): Promise<void> {
+    const user = this.auth.currentUser;
+
+    if (!user || !this.courseId) {
+      this.telegramAvailable = false;
+      this.telegramEligible = false;
+      this.telegramUsed = false;
+      this.telegramBusy = false;
+      this.telegramMessage = '';
+      return;
+    }
+
     try {
-      const snap = await get(
-        ref(this.db, `telegramAccess/${uid}/${this.courseId}`)
+      const idToken = await user.getIdToken();
+      const status = await firstValueFrom(
+        this.telegramJoin.getStatus(this.courseId, idToken)
       );
 
-      if (!snap.exists()) {
-        this.telegramEligible = false;
-        this.telegramUsed = false;
-        this.telegramBusy = false;
+      this.telegramAvailable = !!status.available;
+      this.telegramUsed = !!status.used;
+      this.telegramEligible = this.telegramAvailable && !this.telegramUsed;
+      this.telegramBusy = false;
+
+      if (!this.telegramAvailable) {
         this.telegramMessage = '';
         return;
       }
 
-      const data = snap.val() as {
-        enabled?: boolean;
-        status?: 'ready' | 'used';
-        usedAt?: number | null;
-      };
-
-      this.telegramUsed = !!data?.usedAt || data?.status === 'used';
-      this.telegramEligible = !!data?.enabled && !this.telegramUsed;
-      this.telegramBusy = false;
-
       if (this.telegramUsed) {
         this.telegramMessage = this.isEnglish
-          ? 'Your Telegram registration link has already been used. If you could not access the group, please contact support and we will help you.'
-          : 'تم استخدام رابط التسجيل الخاص بجروب التليجرام بالفعل. إذا لم تتمكن من دخول الجروب، يرجى التواصل مع الدعم وسنساعدك في حل المشكلة.';
+          ? 'The Telegram group link has already been opened for this course. If you could not access the group, please contact support and we will help you.'
+          : 'تم فتح رابط جروب التليجرام لهذا الكورس من قبل. إذا لم تتمكن من دخول الجروب، يرجى التواصل مع الدعم وسنساعدك في حل المشكلة.';
       } else {
         this.telegramMessage = '';
       }
     } catch {
+      this.telegramAvailable = false;
       this.telegramEligible = false;
       this.telegramUsed = false;
       this.telegramBusy = false;
