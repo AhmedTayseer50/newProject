@@ -55,7 +55,25 @@ export class EnrollmentGuard implements CanActivate {
     if (adminSnap.exists() && adminSnap.val() === true) return true;
 
     const enrSnap = await get(ref(this.db, `enrollments/${me.uid}/${courseId}`));
-    if (enrSnap.exists()) return true;
+    if (enrSnap.exists()) {
+      const enrollment = enrSnap.val();
+
+      if (enrollment === true) return true;
+
+      if (enrollment?.status === 'suspended') {
+        return this.router.createUrlTree(['/courses', courseId], {
+          queryParams: { access: 'suspended' },
+        });
+      }
+
+      if (enrollment?.expiresAt && Date.now() > Number(enrollment.expiresAt)) {
+        return this.router.createUrlTree(['/courses', courseId], {
+          queryParams: { access: 'expired' },
+        });
+      }
+
+      return true;
+    }
 
     return this.router.parseUrl(`/courses/${courseId}`);
   }

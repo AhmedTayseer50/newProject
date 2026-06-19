@@ -73,7 +73,7 @@
         </ng-template>
 
         <div class="course-hero-actions">
-          <ng-container *ngIf="!canViewLessons">
+          <ng-container *ngIf="!canViewLessons && !accessSuspended">
             <ng-container *ngIf="auth.currentUser; else loginToBuyHero">
               <button class="btn btn-primary" type="button" (click)="buyNow()">
                 {{ purchaseCtaLabel }}
@@ -208,6 +208,35 @@
   </div>
 </section>
 
+<!-- SUSPENDED / EXPIRED ACCESS -->
+<section
+  class="course-suspended-section"
+  [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
+  *ngIf="!loading && !error && course && accessSuspended"
+>
+  <div class="container">
+    <div class="course-suspended-card">
+      <div class="course-suspended-card__icon" aria-hidden="true">⏸</div>
+      <div>
+        <h2 class="course-suspended-card__title">
+          {{ isEnglish ? 'Your course access is currently suspended' : 'تم تعليق الوصول إلى الدروس مؤقتًا' }}
+        </h2>
+        <p class="course-suspended-card__text">
+          {{
+            accessSuspendedReason === 'expired'
+              ? (isEnglish
+                  ? 'Your temporary access period has ended. Please contact support to renew your course access.'
+                  : 'انتهت مدة الوصول المؤقتة للكورس. تواصل مع الدعم الفني لتجديد الاشتراك.')
+              : (isEnglish
+                  ? 'Your access is suspended until you contact support.'
+                  : 'الدرس معلق لحين التواصل مع الدعم الفني.')
+          }}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- PROGRAM GOAL -->
 <section
   class="section program-goal-section"
@@ -232,7 +261,7 @@
         </p>
       </div>
 
-      <div class="program-goal-action" *ngIf="!canViewLessons">
+      <div class="program-goal-action" *ngIf="!canViewLessons && !accessSuspended">
         <ng-container *ngIf="auth.currentUser; else loginToBuyGoal">
           <button class="btn btn-primary" type="button" (click)="buyNow()">
             {{ purchaseCtaLabel }}
@@ -649,7 +678,7 @@
   id="course-pricing"
   class="section section--light"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course && !canViewLessons"
+  *ngIf="!loading && !error && course && !canViewLessons && !accessSuspended"
 >
   <div class="container">
     <div class="section-header">
@@ -859,7 +888,7 @@
 <section
   class="final-push"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && course && !canViewLessons"
+  *ngIf="!loading && !error && course && !canViewLessons && !accessSuspended"
 >
   <div class="container">
     <div class="final-push-box">
@@ -913,7 +942,7 @@
 <section
   class="offer-strip"
   [attr.dir]="isEnglish ? 'ltr' : 'rtl'"
-  *ngIf="!loading && !error && hasActiveOffer && !canViewLessons && course as loadedCourse"
+  *ngIf="!loading && !error && hasActiveOffer && !canViewLessons && !accessSuspended && course as loadedCourse"
 >
   <div class="container">
     <div class="offer-strip__box">
@@ -968,7 +997,7 @@
 
 <div
   class="offer-popup-backdrop"
-  *ngIf="showOfferPopup && hasActiveOffer && !canViewLessons && course as loadedCourse"
+  *ngIf="showOfferPopup && hasActiveOffer && !canViewLessons && !accessSuspended && course as loadedCourse"
   (click)="onOfferBackdropClick($event)"
 >
   <div class="offer-popup" [attr.dir]="isEnglish ? 'ltr' : 'rtl'">

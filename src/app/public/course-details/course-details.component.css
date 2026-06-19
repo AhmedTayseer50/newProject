@@ -1860,3 +1860,53 @@ body.dark-theme .course-access-card--telegram {
     border-radius: 13px;
   }
 }
+
+.course-suspended-section {
+  padding: 1.5rem 0 2.5rem;
+}
+
+.course-suspended-card {
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-radius: 22px;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #fff7ed, #ffffff);
+  box-shadow: 0 16px 36px rgba(146, 64, 14, 0.08);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.course-suspended-card__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: #ffedd5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 1.35rem;
+}
+
+.course-suspended-card__title {
+  font-size: 1.25rem;
+  font-weight: 900;
+  margin: 0 0 0.4rem;
+  color: #7c2d12;
+}
+
+.course-suspended-card__text {
+  margin: 0;
+  color: #7c2d12;
+  line-height: 1.8;
+}
+
+body.dark-theme .course-suspended-card {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.32), rgba(17, 24, 39, 0.96));
+  border-color: rgba(251, 191, 36, 0.22);
+}
+
+body.dark-theme .course-suspended-card__title,
+body.dark-theme .course-suspended-card__text {
+  color: #fde68a;
+}

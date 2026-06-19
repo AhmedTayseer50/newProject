@@ -79,3 +79,82 @@
     text-align: center;
   }
 }
+
+.order-actions,
+.order-course-actions,
+.granted-actions,
+.grant-controls,
+.manual-grant-box {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.order-actions {
+  justify-content: flex-end;
+}
+
+.grant-controls .form-select {
+  min-width: 145px;
+}
+
+.access-days-input {
+  max-width: 105px;
+}
+
+.manual-grant-box {
+  align-items: stretch;
+}
+
+.manual-grant-box > .form-select {
+  min-width: 230px;
+  flex: 1 1 230px;
+}
+
+.access-table td {
+  vertical-align: top;
+}
+
+.granted-course-card {
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 14px;
+  padding: 0.75rem;
+  margin-bottom: 0.6rem;
+  background: #fff;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+body.dark-theme .payment-order-card,
+body.dark-theme .order-course-row,
+body.dark-theme .granted-course-card {
+  background: #151922;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 991.98px) {
+  .granted-course-card {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .granted-actions,
+  .order-actions,
+  .order-course-actions,
+  .grant-controls,
+  .manual-grant-box {
+    width: 100%;
+  }
+
+  .granted-actions .btn,
+  .order-actions .btn,
+  .order-course-actions .btn,
+  .grant-controls .form-select,
+  .grant-controls .access-days-input,
+  .manual-grant-box .btn {
+    flex: 1 1 140px;
+  }
+}

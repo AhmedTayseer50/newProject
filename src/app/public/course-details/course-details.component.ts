@@ -40,6 +40,8 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
   public lectureNames: string[] = [];
   public canViewLessons = false;
+  public accessSuspended = false;
+  public accessSuspendedReason: 'expired' | 'suspended' | null = null;
   public loading = true;
   public error?: string;
   public firstLessonId: string | null = null;
@@ -66,7 +68,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     private wa: WhatsAppService,
     private telegramJoin: TelegramJoinService,
     private cartSvc: CartService,
-    private seo: SeoService
+    private seo: SeoService,
   ) {}
 
   get isEnglish(): boolean {
@@ -216,15 +218,21 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
       : 'برنامج عملي متكامل';
   }
 
-
   get selectedPriceLabel(): string {
     const featuredPlan = this.getFeaturedPlan();
-    return featuredPlan?.priceText || this.course?.displayPriceText || `${this.course?.price || ''}`;
+    return (
+      featuredPlan?.priceText ||
+      this.course?.displayPriceText ||
+      `${this.course?.price || ''}`
+    );
   }
 
   get selectedPlanLabel(): string {
     const featuredPlan = this.getFeaturedPlan();
-    return featuredPlan?.name || (this.isEnglish ? 'Course enrollment' : 'الاشتراك في الكورس');
+    return (
+      featuredPlan?.name ||
+      (this.isEnglish ? 'Course enrollment' : 'الاشتراك في الكورس')
+    );
   }
 
   get heroFallbackTagline(): string {
@@ -255,6 +263,9 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         if (!id) return;
 
         this.courseId = id;
+        this.accessSuspended = false;
+        this.accessSuspendedReason = null;
+        this.syncSuspendedAccessFromQuery();
         this.loading = true;
         this.error = undefined;
         this.course = null;
@@ -281,7 +292,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
             : null;
 
           this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(
-            this.courseId
+            this.courseId,
           );
         } catch (e: any) {
           this.error =
@@ -309,14 +320,24 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
           this.telegramUsed = false;
           this.telegramBusy = false;
           this.telegramMessage = '';
+          this.accessSuspended = false;
+          this.accessSuspendedReason = null;
           return;
         }
 
         try {
-          const myCourses = await this.enrollments.listUserEnrollments(
-            user.uid
+          const enrollmentState = await this.enrollments.getEnrollmentState(
+            user.uid,
+            this.courseId,
           );
-          this.canViewLessons = myCourses.includes(this.courseId);
+
+          this.canViewLessons = enrollmentState === 'active';
+          this.accessSuspended =
+            enrollmentState === 'expired' || enrollmentState === 'suspended';
+          this.accessSuspendedReason =
+            enrollmentState === 'expired' || enrollmentState === 'suspended'
+              ? enrollmentState
+              : null;
 
           if (this.canViewLessons) {
             this.showOfferPopup = false;
@@ -337,9 +358,19 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
           this.telegramUsed = false;
           this.telegramBusy = false;
           this.telegramMessage = '';
+          this.accessSuspended = false;
+          this.accessSuspendedReason = null;
         }
-      }
+      },
     );
+  }
+
+  private syncSuspendedAccessFromQuery(): void {
+    const access = this.route.snapshot.queryParamMap.get('access');
+    if (access === 'expired' || access === 'suspended') {
+      this.accessSuspended = true;
+      this.accessSuspendedReason = access;
+    }
   }
 
   ngOnDestroy(): void {
@@ -352,7 +383,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   public async goToLessons(): Promise<void> {
     if (!this.firstLessonId) {
       this.firstLessonId = await this.resolveFirstLessonIdFromRTDB(
-        this.courseId
+        this.courseId,
       );
     }
 
@@ -386,7 +417,11 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
   getFeaturedPlan(): CoursePricingPlan | null {
     if (this.course?.pricingPlans?.length) {
-      return this.course.pricingPlans.find((plan) => !!plan.highlighted) || this.course.pricingPlans[0] || null;
+      return (
+        this.course.pricingPlans.find((plan) => !!plan.highlighted) ||
+        this.course.pricingPlans[0] ||
+        null
+      );
     }
 
     if (!this.course) return null;
@@ -443,7 +478,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     try {
       const idToken = await user.getIdToken();
       const res = await firstValueFrom(
-        this.telegramJoin.createSession(this.courseId, idToken)
+        this.telegramJoin.createSession(this.courseId, idToken),
       );
 
       this.telegramAvailable = true;
@@ -481,7 +516,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     try {
       const idToken = await user.getIdToken();
       const status = await firstValueFrom(
-        this.telegramJoin.getStatus(this.courseId, idToken)
+        this.telegramJoin.getStatus(this.courseId, idToken),
       );
 
       this.telegramAvailable = !!status.available;
@@ -511,7 +546,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   }
 
   private async resolveFirstLessonIdFromRTDB(
-    courseId: string
+    courseId: string,
   ): Promise<string | null> {
     try {
       let firstId = await this.pickFirstKeyByChild(courseId, 'lessonIndex');
@@ -535,12 +570,12 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
   private async pickFirstKeyByChild(
     courseId: string,
-    child: string
+    child: string,
   ): Promise<string | null> {
     const qy = query(
       ref(this.db, `lessons/${courseId}`),
       orderByChild(child),
-      limitToFirst(1)
+      limitToFirst(1),
     );
 
     const snap = await get(qy);
@@ -558,7 +593,9 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
 
     this.addSelectedPlanToCart(plan);
 
-    alert(this.currentLang === 'en' ? 'Added to cart' : 'تمت الإضافة إلى السلة');
+    alert(
+      this.currentLang === 'en' ? 'Added to cart' : 'تمت الإضافة إلى السلة',
+    );
   }
 
   buyNow(): void {

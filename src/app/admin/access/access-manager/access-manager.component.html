@@ -3,7 +3,7 @@
     <div>
       <h5 class="mb-1">طلبات الدفع عبر واتساب</h5>
       <p class="text-muted mb-0 small">
-        الطلبات التي تم إنشاؤها من السلة، ويمكن البحث عنها بالإيميل ومنح صلاحية كل كورس مباشرة.
+        راجع طلبات السلة، امنح الصلاحية بمدة محددة أو مدى الحياة، وعدّل أو احذف الطلب عند الحاجة.
       </p>
     </div>
 
@@ -15,7 +15,7 @@
   <div class="card-body">
     <div class="row g-3 align-items-end mb-3">
       <div class="col-lg-5">
-        <label class="form-label small text-muted">البحث بإيميل العميل</label>
+        <label class="form-label small text-muted">البحث بإيميل / اسم / رقم الطلب</label>
         <input
           class="form-control"
           type="search"
@@ -36,35 +36,67 @@
                 <span>•</span>
                 <span>{{ order.amount | number:'1.0-0' }} {{ order.currency || 'EGP' }}</span>
                 <span *ngIf="order.createdAt">• {{ order.createdAt | date:'short' }}</span>
+                <span *ngIf="order.userPhone">• {{ order.userPhone }}</span>
               </div>
             </div>
 
-            <span class="badge text-bg-light order-provider-badge">
-              WhatsApp
-            </span>
+            <div class="order-actions">
+              <span class="badge text-bg-light order-provider-badge">WhatsApp</span>
+              <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editOrderStatus(order)">
+                تعديل الحالة
+              </button>
+              <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteOrder(order)">
+                حذف الطلب
+              </button>
+            </div>
           </div>
 
           <div class="order-courses-list mt-3">
             <div class="order-course-row" *ngFor="let courseId of orderCourseIds(order)">
               <div class="order-course-info">
                 <strong>{{ courseTitle(courseId) }}</strong>
-                <span class="small text-muted">
-                  الخطة: {{ orderCoursePlanLabel(order, courseId) }}
-                </span>
+                <span class="small text-muted">الخطة: {{ orderCoursePlanLabel(order, courseId) }}</span>
               </div>
 
-              <button
-                class="btn btn-sm btn-success"
-                type="button"
-                *ngIf="!isOrderCourseGranted(order, courseId); else grantedOrderCourse"
-                (click)="grantOrderCourse(order, courseId)"
-              >
-                منح الصلاحية
-              </button>
+              <div class="grant-controls">
+                <select
+                  class="form-select form-select-sm"
+                  [ngModel]="getOrderAccessMode(order, courseId)"
+                  (ngModelChange)="setOrderAccessMode(order, courseId, $event)"
+                >
+                  <option value="lifetime">بدون حد زمني</option>
+                  <option value="limited">مدة محددة</option>
+                </select>
 
-              <ng-template #grantedOrderCourse>
-                <span class="badge text-bg-success">تم منح الصلاحية</span>
-              </ng-template>
+                <input
+                  class="form-control form-control-sm access-days-input"
+                  type="number"
+                  min="1"
+                  placeholder="الأيام"
+                  [disabled]="getOrderAccessMode(order, courseId) !== 'limited'"
+                  [ngModel]="getOrderAccessDays(order, courseId)"
+                  (ngModelChange)="setOrderAccessDays(order, courseId, $event)"
+                />
+              </div>
+
+              <div class="order-course-actions">
+                <button
+                  class="btn btn-sm btn-success"
+                  type="button"
+                  (click)="grantOrderCourse(order, courseId)"
+                >
+                  {{ isOrderCourseGranted(order, courseId) ? 'تعديل / تجديد الصلاحية' : 'منح الصلاحية' }}
+                </button>
+
+                <button
+                  class="btn btn-sm btn-outline-warning"
+                  type="button"
+                  *ngIf="isOrderCourseGranted(order, courseId)"
+                  (click)="suspendOrderCourse(order, courseId)"
+                >
+                  تعليق الاشتراك
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -72,29 +104,23 @@
     </ng-container>
 
     <ng-template #noWhatsappOrders>
-      <div class="text-center text-muted py-4">
-        لا توجد طلبات واتساب مطابقة حاليًا.
-      </div>
+      <div class="text-center text-muted py-4">لا توجد طلبات واتساب مطابقة حاليًا.</div>
     </ng-template>
   </div>
 </div>
 
 <div class="card shadow-sm border-0">
-  <div
-    class="card-header bg-white d-flex justify-content-between align-items-center"
-  >
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
     <div>
       <h5 class="mb-1">إدارة صلاحيات الكورسات</h5>
       <p class="text-muted mb-0 small">
-        منح أو سحب صلاحيات الكورسات للطلاب.
+        منح صلاحية مدى الحياة أو صلاحية مؤقتة لعدد أيام محدد، مع إمكانية التعليق أو الحذف.
       </p>
     </div>
   </div>
 
   <div class="card-body">
-    <div *ngIf="error" class="alert alert-danger mb-3">
-      {{ error }}
-    </div>
+    <div *ngIf="error" class="alert alert-danger mb-3">{{ error }}</div>
 
     <div *ngIf="loading" class="text-center py-4">
       <div class="spinner-border" role="status"></div>
@@ -103,7 +129,7 @@
     <ng-container *ngIf="!loading">
       <div class="row g-3 mb-3">
         <div class="col-lg-5">
-          <label class="form-label small text-muted">البحث بإيميل المستخدم</label>
+          <label class="form-label small text-muted">البحث بإيميل / اسم / UID المستخدم</label>
           <input
             class="form-control"
             type="search"
@@ -114,69 +140,84 @@
       </div>
 
       <div *ngIf="users.length; else emptyState" class="table-responsive">
-        <table class="table align-middle">
+        <table class="table align-middle access-table">
           <thead>
             <tr>
               <th>العميل</th>
               <th>البريد الإلكتروني</th>
-              <th style="min-width: 360px">منح صلاحية جديدة</th>
-              <th style="min-width: 420px">الكورسات الممنوحة</th>
+              <th style="min-width: 430px">منح صلاحية جديدة</th>
+              <th style="min-width: 480px">الكورسات الممنوحة</th>
             </tr>
           </thead>
 
           <tbody>
             <tr *ngFor="let u of filteredUsers">
-              <td>{{ u.displayName || 'بدون اسم' }}</td>
-              <td>{{ u.email || '—' }}</td>
+              <td>
+                <strong>{{ userLabel(u) }}</strong>
+                <div class="small text-muted" *ngIf="!u.email">UID: {{ u.uid }}</div>
+              </td>
+              <td>{{ u.email || 'لا يوجد بريد محفوظ' }}</td>
 
               <td>
-                <div class="d-flex align-items-center flex-wrap gap-2">
-                  <select
-                    class="form-select form-select-sm"
-                    style="min-width: 280px"
-                    [(ngModel)]="selectedCourse[u.uid]"
-                  >
+                <div class="manual-grant-box">
+                  <select class="form-select form-select-sm" [(ngModel)]="selectedCourse[u.uid]">
                     <option value="">— اختر كورس —</option>
-                    <option *ngFor="let c of courses" [value]="c.id">
-                      {{ c.title || c.id }}
-                    </option>
+                    <option *ngFor="let c of courses" [value]="c.id">{{ c.title || c.id }}</option>
                   </select>
 
+                  <div class="grant-controls">
+                    <select class="form-select form-select-sm" [(ngModel)]="accessMode[u.uid]">
+                      <option value="lifetime">بدون حد زمني</option>
+                      <option value="limited">مدة محددة</option>
+                    </select>
 
-                  <button class="btn btn-sm btn-primary" (click)="grant(u)">
-                    إتاحة
+                    <input
+                      class="form-control form-control-sm access-days-input"
+                      type="number"
+                      min="1"
+                      placeholder="الأيام"
+                      [disabled]="accessMode[u.uid] !== 'limited'"
+                      [(ngModel)]="accessDays[u.uid]"
+                    />
+                  </div>
+
+                  <button class="btn btn-sm btn-primary" type="button" (click)="grant(u)">
+                    منح الصلاحية
                   </button>
                 </div>
               </td>
 
               <td>
-                <div class="mt-3">
-                  <ng-container
-                    *ngIf="(userEnrollments[u.uid]?.length || 0) > 0; else noEnr"
-                  >
-                    <div
-                      class="border rounded p-2 mb-2"
-                      *ngFor="let cid of userEnrollments[u.uid]"
-                    >
-                      <div class="d-flex align-items-center flex-wrap gap-2">
-                        <span class="badge text-bg-secondary">
-                          {{ courseTitle(cid) }}
-                        </span>
-
-                        <button
-                          class="btn btn-sm btn-outline-danger ms-auto"
-                          (click)="revoke(u, cid)"
-                        >
-                          إلغاء الكورس
-                        </button>
-                      </div>
+                <ng-container *ngIf="(userEnrollments[u.uid]?.length || 0) > 0; else noEnr">
+                  <div class="granted-course-card" *ngFor="let cid of userEnrollments[u.uid]">
+                    <div>
+                      <div class="fw-bold">{{ courseTitle(cid) }}</div>
+                      <div class="small text-muted">{{ enrollmentExpiryLabel(u.uid, cid) }}</div>
                     </div>
-                  </ng-container>
 
-                  <ng-template #noEnr>
-                    <span class="text-muted small">لا توجد صلاحيات بعد</span>
-                  </ng-template>
-                </div>
+                    <span
+                      class="badge"
+                      [class.text-bg-success]="enrollmentBadge(u.uid, cid) === 'مدى الحياة' || enrollmentBadge(u.uid, cid) === 'مؤقت'"
+                      [class.text-bg-warning]="enrollmentBadge(u.uid, cid) === 'معلق'"
+                      [class.text-bg-danger]="enrollmentBadge(u.uid, cid) === 'منتهي'"
+                    >
+                      {{ enrollmentBadge(u.uid, cid) }}
+                    </span>
+
+                    <div class="granted-actions">
+                      <button class="btn btn-sm btn-outline-warning" type="button" (click)="suspend(u, cid)">
+                        تعليق
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" type="button" (click)="revoke(u, cid)">
+                        حذف الصلاحية
+                      </button>
+                    </div>
+                  </div>
+                </ng-container>
+
+                <ng-template #noEnr>
+                  <span class="text-muted small">لا توجد صلاحيات بعد</span>
+                </ng-template>
               </td>
             </tr>
           </tbody>
@@ -184,9 +225,7 @@
       </div>
 
       <ng-template #emptyState>
-        <div class="text-center text-muted py-4">
-          لا يوجد مستخدمون لعرضهم حالياً.
-        </div>
+        <div class="text-center text-muted py-4">لا يوجد مستخدمون لعرضهم حالياً.</div>
       </ng-template>
     </ng-container>
   </div>

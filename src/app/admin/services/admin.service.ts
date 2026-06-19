@@ -291,6 +291,21 @@ export class AdminService {
     await update(ref(this.db, `paymentOrders/${orderId}`), payload);
   }
 
+  async updatePaymentOrder(
+    orderId: string,
+    data: Partial<AdminPaymentOrder>,
+  ): Promise<void> {
+    const { merchantOrderId, ...payload } = data;
+    await update(ref(this.db, `paymentOrders/${orderId}`), {
+      ...payload,
+      updatedAt: Date.now(),
+    });
+  }
+
+  async deletePaymentOrder(orderId: string): Promise<void> {
+    await remove(ref(this.db, `paymentOrders/${orderId}`));
+  }
+
   buildLocalizedText(value?: Partial<LocalizedText>): LocalizedText {
     return {
       ar: (value?.ar || '').trim(),
