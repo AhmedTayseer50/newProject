@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Auth, User } from '@angular/fire/auth';
-import { Database, ref, set, update, get, child } from '@angular/fire/database';
+import { Database, ref, update, get, child } from '@angular/fire/database';
 import { UserProfileExtra } from '../models/user-profile.model';
 
 @Injectable({ providedIn: 'root' })
@@ -8,62 +8,57 @@ export class UserService {
   private db = inject(Database);
   private auth = inject(Auth);
 
-  /** إنشاء/تحديث سجلّ المستخدم في /users/{uid} */
+  /** إنشاء/تحديث سجلّ المستخدم في /users/{uid} بدون لمس حقول الصلاحيات الحساسة */
   async syncUser(user: User, extra?: UserProfileExtra): Promise<void> {
     const uid = user.uid;
     const emailLower = (user.email ?? '').toLowerCase();
     const userRef = ref(this.db, `users/${uid}`);
-
     const snap = await get(userRef);
-
-    // تحديد الأدوار تلقائيًا حسب الإيميل
-    const shouldBeAdmin = emailLower === 'admin@gmail.com';
-    const shouldBeStaff = emailLower === 'account@gmail.com';
-
-    // اسم المستخدم: لو اتبعت في extra خده، وإلا خد من Auth
-    const displayName = (extra?.displayName ?? user.displayName ?? null);
-
-    // واتساب: لو اتبعت في extra خزّنه (مفيش whatsapp في Auth أصلاً)
-    const whatsapp = (extra?.whatsapp ?? null);
-
-    if (!snap.exists()) {
-      // أول مرة: خزّن بيانات أساسية
-      await set(userRef, {
-        email: user.email ?? '',
-        displayName,
-        whatsapp,
-        createdAt: Date.now(),
-        isAdmin: shouldBeAdmin,
-        isStaff: shouldBeStaff,
-        isDisabled: false
-      });
-      return;
-    }
-
-    // موجود: حدّث الحقول القابلة للتغيير مع الحفاظ على الحقول الحساسة
-    const data = (snap.val() ?? {}) as {
+    const current = (snap.exists() ? snap.val() : {}) as {
       email?: string;
       displayName?: string | null;
       whatsapp?: string | null;
+      createdAt?: number;
       isAdmin?: boolean;
       isStaff?: boolean;
       isDisabled?: boolean;
     };
 
-    await update(userRef, {
-      // لو user.email موجود استخدمه، وإلا خليك على الموجود
-      email: user.email ?? data.email ?? '',
-      // لو displayName موجود (extra أو auth) حدّثه، وإلا خليك على الموجود
-      displayName: displayName ?? data.displayName ?? null,
-      // لو extra.whatsapp اتبعت (حتى لو فاضي) حدّثه، وإلا خليك على الموجود
-      whatsapp: extra?.whatsapp !== undefined ? whatsapp : (data.whatsapp ?? null),
+    const displayName = extra?.displayName ?? user.displayName ?? current.displayName ?? null;
+    const whatsapp = extra?.whatsapp !== undefined ? extra.whatsapp ?? null : current.whatsapp ?? null;
 
-      // ثبّت الأدوار: لو اتعيّنت قبل كده تبقى كما هي، ولو الإيميل يطابق نفعّلها
-      isAdmin: shouldBeAdmin || !!data.isAdmin,
-      isStaff: shouldBeStaff || !!data.isStaff
+    const basePayload: Record<string, any> = {
+      email: user.email ?? current.email ?? '',
+      displayName,
+      whatsapp,
+      lastLoginAt: Date.now(),
+    };
 
-      // لا نلمس isDisabled هنا — تُدار من شاشة الأدمن فقط
-    });
+    if (!current.createdAt) {
+      basePayload['createdAt'] = Date.now();
+    }
+
+    // مهم: لا نكتب isAdmin / isStaff / isDisabled للمستخدم العادي.
+    // هذه الحقول تظل من شاشة الأدمن/القواعد فقط حتى لا تفشل المزامنة بسبب permission_denied.
+    await update(userRef, basePayload);
+
+    // للحسابات الإدارية القديمة/المحددة بالإيميل: نحاول تثبيت الدور بدون تعطيل تسجيل الدخول لو القواعد رفضت.
+    // لو القواعد لا تسمح للمستخدم بتعديل الأدوار، سيتم تجاهلها بأمان.
+    const rolePayload: Record<string, boolean> = {};
+    if (emailLower === 'admin@gmail.com' && current.isAdmin !== true) {
+      rolePayload['isAdmin'] = true;
+    }
+    if (emailLower === 'account@gmail.com' && current.isStaff !== true) {
+      rolePayload['isStaff'] = true;
+    }
+
+    if (Object.keys(rolePayload).length) {
+      try {
+        await update(userRef, rolePayload);
+      } catch {
+        // الأدوار الحساسة قد تكون ممنوعة بالقواعد، وده طبيعي.
+      }
+    }
   }
 
   /** قراءة علم الأدمن */
@@ -85,17 +80,16 @@ export class UserService {
   }
 
   async getUserProfile(uid: string): Promise<{ displayName?: string | null; whatsapp?: string | null; email?: string } | null> {
-  const userRef = ref(this.db, `users/${uid}`);
-  const snap = await get(userRef);
+    const userRef = ref(this.db, `users/${uid}`);
+    const snap = await get(userRef);
 
-  if (!snap.exists()) return null;
+    if (!snap.exists()) return null;
 
-  const data = snap.val() as { displayName?: string | null; whatsapp?: string | null; email?: string };
-  return {
-    displayName: data.displayName ?? null,
-    whatsapp: data.whatsapp ?? null,
-    email: data.email ?? ''
-  };
-}
-
+    const data = snap.val() as { displayName?: string | null; whatsapp?: string | null; email?: string };
+    return {
+      displayName: data.displayName ?? null,
+      whatsapp: data.whatsapp ?? null,
+      email: data.email ?? ''
+    };
+  }
 }
