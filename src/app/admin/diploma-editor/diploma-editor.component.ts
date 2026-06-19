@@ -94,11 +94,11 @@ export class DiplomaEditorComponent implements OnInit {
   }
 
   get publishReadinessIssues(): string[] {
-    return this.getDiplomaPublishReadinessIssues(this.buildDiplomaPayload());
+    return [];
   }
 
   get canPublishDiploma(): boolean {
-    return this.publishReadinessIssues.length === 0;
+    return true;
   }
 
   async deleteDiplomaItem(id: string): Promise<void> {
@@ -496,16 +496,6 @@ export class DiplomaEditorComponent implements OnInit {
 
       this.syncMetaFromCourses();
       const payload = this.buildDiplomaPayload();
-      const publishIssues = payload.published
-        ? this.getDiplomaPublishReadinessIssues(payload)
-        : [];
-
-      if (publishIssues.length) {
-        throw new Error(
-          `لا يمكن نشر الدبلومة قبل استكمال: ${publishIssues.join('، ')}.`,
-        );
-      }
-
       if (this.diplomaId) {
         await this.diplomasAdmin.updateDiploma(this.diplomaId, payload);
       } else {

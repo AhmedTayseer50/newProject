@@ -277,26 +277,6 @@
             </div>
           </div>
         </div>
-
-        <div
-          class="alert mt-3 mb-0"
-          *ngIf="courseForm.controls.published.value"
-          [class.alert-warning]="!canPublishCourse"
-          [class.alert-success]="canPublishCourse"
-        >
-          <div *ngIf="publishReadinessIssues.length; else courseReadyToPublish">
-            <div class="fw-semibold mb-2">
-              لا يمكن نشر الكورس قبل استكمال العناصر التالية:
-            </div>
-            <ul class="mb-0 ps-3">
-              <li *ngFor="let item of publishReadinessIssues">{{ item }}</li>
-            </ul>
-          </div>
-
-          <ng-template #courseReadyToPublish>
-            الكورس مستوفي الحد الأدنى المطلوب للنشر العام.
-          </ng-template>
-        </div>
       </div>
 
       <!-- 2) HERO META PILLS -->

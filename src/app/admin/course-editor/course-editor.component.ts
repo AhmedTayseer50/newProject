@@ -436,11 +436,11 @@ export class CourseEditorComponent implements OnInit {
   }
 
   get publishReadinessIssues(): string[] {
-    return this.getCoursePublishReadinessIssues(this.buildCoursePayload());
+    return [];
   }
 
   get canPublishCourse(): boolean {
-    return this.publishReadinessIssues.length === 0;
+    return true;
   }
 
   private createLangTextGroup(required = false): LangTextGroup {
@@ -1451,17 +1451,8 @@ export class CourseEditorComponent implements OnInit {
 
     try {
       const payload = this.buildCoursePayload();
-      const publishIssues = payload.published
-        ? this.getCoursePublishReadinessIssues(payload)
-        : [];
       const telegramInviteUrl =
         this.courseForm.controls.telegramInviteUrl.value.trim();
-
-      if (publishIssues.length) {
-        throw new Error(
-          `لا يمكن نشر الكورس قبل استكمال: ${publishIssues.join('، ')}.`,
-        );
-      }
 
       let targetCourseId = this.courseId;
 

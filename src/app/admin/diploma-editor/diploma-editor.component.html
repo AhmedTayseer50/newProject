@@ -189,26 +189,6 @@
         </div>
       </div>
 
-      <div class="col-12" *ngIf="data.published">
-        <div
-          class="alert mb-0"
-          [class.alert-warning]="!canPublishDiploma"
-          [class.alert-success]="canPublishDiploma"
-        >
-          <div *ngIf="publishReadinessIssues.length; else diplomaReadyToPublish">
-            <div class="fw-semibold mb-2">
-              لا يمكن نشر الدبلومة قبل استكمال العناصر التالية:
-            </div>
-            <ul class="mb-0 ps-3">
-              <li *ngFor="let item of publishReadinessIssues">{{ item }}</li>
-            </ul>
-          </div>
-
-          <ng-template #diplomaReadyToPublish>
-            الدبلومة مستوفية الحد الأدنى المطلوب للنشر العام.
-          </ng-template>
-        </div>
-      </div>
     </div>
 
     <hr class="my-4" />
