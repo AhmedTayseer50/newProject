@@ -1,0 +1,50 @@
+<div class="auth-page" [attr.dir]="pageDir">
+  <div class="page-container">
+    <div class="verify-card card-ui">
+      <img class="auth-logo mb-3" src="assets/images/Asset1.svg" alt="Nabdet Haya" />
+
+      <div class="verify-icon" aria-hidden="true">✉️</div>
+      <h2 class="auth-title mb-2">{{ titleText }}</h2>
+      <p class="text-muted verify-text">{{ descriptionText }}</p>
+
+      <div class="verify-email" *ngIf="email">
+        {{ email }}
+      </div>
+
+      <div *ngIf="message" class="alert alert-success auth-alert mt-3">
+        {{ message }}
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger auth-alert mt-3">
+        {{ error }}
+      </div>
+
+      <div class="verify-actions mt-4">
+        <button
+          class="btn btn-primary auth-btn"
+          type="button"
+          [disabled]="loading || resendLoading"
+          (click)="checkVerification()"
+        >
+          {{ checkButtonText }}
+        </button>
+
+        <button
+          class="btn btn-outline-primary auth-btn"
+          type="button"
+          [disabled]="loading || resendLoading"
+          (click)="resend()"
+        >
+          {{ resendButtonText }}
+        </button>
+      </div>
+
+      <div class="auth-inline text-muted mt-4">
+        <span>{{ currentLang === 'en' ? 'Already verified?' : 'فعلت الإيميل بالفعل؟' }}</span>
+        <a routerLink="/login" class="auth-link">
+          {{ currentLang === 'en' ? 'Login' : 'تسجيل الدخول' }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

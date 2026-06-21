@@ -86,7 +86,16 @@ export class LoginComponent implements OnInit {
 
     try {
       const { email, password } = this.form.value;
-      await this.auth.login(email!, password!);
+      const cred = await this.auth.login(email!, password!);
+
+      if (this.auth.needsEmailVerification(cred.user)) {
+        await this.auth.sendVerificationEmail(cred.user);
+        await this.router.navigate(['/verify-email'], {
+          queryParams: { email, redirect: this.redirectUrl },
+        });
+        return;
+      }
+
       await this.router.navigateByUrl(this.redirectUrl);
     } catch (e: any) {
       this.error =

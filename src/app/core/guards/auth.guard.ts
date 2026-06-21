@@ -19,18 +19,27 @@ export class AuthGuard implements CanActivate {
     _route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot,
   ): Observable<boolean | UrlTree> {
-    return this.auth.isLoggedIn$.pipe(
+    return this.auth.user$.pipe(
       take(1),
-      map((isLoggedIn) => {
-        if (isLoggedIn) {
-          return true;
+      map((user) => {
+        if (!user) {
+          return this.router.createUrlTree(['/login'], {
+            queryParams: {
+              redirect: state.url || '/courses',
+            },
+          });
         }
 
-        return this.router.createUrlTree(['/login'], {
-          queryParams: {
-            redirect: state.url || '/courses',
-          },
-        });
+        if (this.auth.needsEmailVerification(user)) {
+          return this.router.createUrlTree(['/verify-email'], {
+            queryParams: {
+              email: user.email || '',
+              redirect: state.url || '/courses',
+            },
+          });
+        }
+
+        return true;
       }),
     );
   }

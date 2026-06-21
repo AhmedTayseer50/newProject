@@ -11,6 +11,7 @@ import { SettingsComponent } from './account/settings/settings.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
 
 import { AuthGuard } from './core/guards/auth.guard';
 import { AdminGuard } from './core/guards/admin.guard';
@@ -276,6 +277,11 @@ const routes: Routes = [
     path: 'forgot-password',
     component: ForgotPasswordComponent,
     data: { title: $localize`:@@title_forgot_password:نسيت كلمة المرور` },
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmailComponent,
+    data: { title: 'تفعيل البريد الإلكتروني' },
   },
   { path: '**', redirectTo: '' },
 ];

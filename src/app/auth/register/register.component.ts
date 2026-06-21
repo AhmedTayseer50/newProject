@@ -129,7 +129,9 @@ export class RegisterComponent implements OnInit {
         displayName: displayName!,
         whatsapp: whatsapp!,
       });
-      await this.router.navigateByUrl('/courses');
+      await this.router.navigate(['/verify-email'], {
+        queryParams: { email },
+      });
     } catch (e: any) {
       this.error =
         e?.message ?? $localize`:@@register_error_default:حدث خطأ أثناء إنشاء الحساب`;

@@ -18,6 +18,7 @@ import { LegalPageComponent } from './public/legal-page/legal-page.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
 import { ProfileComponent } from './account/profile/profile.component';
 import { SettingsComponent } from './account/settings/settings.component';
 
@@ -73,6 +74,7 @@ import { CartComponent } from './billing/cart/cart.component';
     LoginComponent,
     RegisterComponent,
     ForgotPasswordComponent,
+    VerifyEmailComponent,
     ProfileComponent,
     SettingsComponent,
     LessonViewComponent,

@@ -28,6 +28,15 @@ function waitForAuthUser(auth: Auth): Promise<User | null> {
   });
 }
 
+
+function needsEmailVerification(user: User): boolean {
+  const isPasswordUser = user.providerData?.some(
+    (provider) => provider.providerId === 'password',
+  );
+
+  return !!isPasswordUser && user.emailVerified !== true;
+}
+
 @Injectable({ providedIn: 'root' })
 export class EnrollmentGuard implements CanActivate {
   private auth = inject(Auth);
@@ -53,6 +62,15 @@ export class EnrollmentGuard implements CanActivate {
 
     const adminSnap = await get(ref(this.db, `users/${me.uid}/isAdmin`));
     if (adminSnap.exists() && adminSnap.val() === true) return true;
+
+    if (needsEmailVerification(me)) {
+      return this.router.createUrlTree(['/verify-email'], {
+        queryParams: {
+          email: me.email || '',
+          redirect: redirectUrl,
+        },
+      });
+    }
 
     const enrSnap = await get(ref(this.db, `enrollments/${me.uid}/${courseId}`));
     if (enrSnap.exists()) {
