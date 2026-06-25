@@ -74,6 +74,12 @@ type ParsedLocalizedLandingPage = {
   prerequisitesTitle?: string;
   prerequisitesDescription?: string;
   sectionCards: { title: string; description: string }[];
+  pricingPlans: {
+    name: string;
+    badge: string;
+    note: string;
+    features: string[];
+  }[];
   communityPerks: string[];
   bottomCtaText?: string;
   bottomCtaButtonText?: string;
@@ -980,7 +986,9 @@ export class CourseEditorComponent implements OnInit {
       parsed.ar.curriculum.length ||
       parsed.en.curriculum.length ||
       parsed.ar.sectionCards.length ||
-      parsed.en.sectionCards.length
+      parsed.en.sectionCards.length ||
+      parsed.ar.pricingPlans.length ||
+      parsed.en.pricingPlans.length
     );
 
     if (!hasAnyData) {
@@ -1003,6 +1011,7 @@ export class CourseEditorComponent implements OnInit {
       curriculum: [],
       audienceItems: [],
       sectionCards: [],
+      pricingPlans: [],
       communityPerks: [],
     };
   }
@@ -1033,6 +1042,12 @@ export class CourseEditorComponent implements OnInit {
       ...data.curriculum.flatMap((item) => [item.title, ...item.points]),
       ...data.audienceItems,
       ...data.sectionCards.flatMap((item) => [item.title, item.description]),
+      ...data.pricingPlans.flatMap((item) => [
+        item.name,
+        item.badge,
+        item.note,
+        ...item.features,
+      ]),
       ...data.communityPerks,
     ].filter((item) => `${item || ''}`.trim()).length;
   }
@@ -1114,8 +1129,14 @@ export class CourseEditorComponent implements OnInit {
       );
     data.prerequisitesDescription = this.cleanBulkValue(this.valueAfter(audienceBlock, 'وصف المتطلبات السابقة:', ''));
 
-    const transformationBlock = this.sectionBetween(text, '9.', '12.');
+    const pricingStartIndex = text.indexOf('11.');
+    const transformationBlock = pricingStartIndex >= 0
+      ? this.sectionBetween(text, '9.', '11.')
+      : this.sectionBetween(text, '9.', '12.');
     data.sectionCards = this.parseTitleDescriptionBlocks(transformationBlock, 'التحول المتوقع');
+
+    const pricingBlock = this.sectionBetween(text, '11.', '12.');
+    data.pricingPlans = this.parsePricingPlanItems(pricingBlock);
 
     const communityBlock = this.sectionBetween(text, '12.', '14.');
     data.communityPerks = this.parseCommunityItems(communityBlock);
@@ -1175,6 +1196,7 @@ export class CourseEditorComponent implements OnInit {
     this.replaceCurriculumItems(parsed.ar.curriculum, parsed.en.curriculum);
     this.replaceLocalizedTextArray(this.audienceItems, parsed.ar.audienceItems, parsed.en.audienceItems, (item) => this.addAudienceItem(item));
     this.replaceSectionCards(parsed.ar.sectionCards, parsed.en.sectionCards);
+    this.replacePricingPlanItems(parsed.ar.pricingPlans, parsed.en.pricingPlans);
     this.replaceLocalizedTextArray(this.communityPerks, parsed.ar.communityPerks, parsed.en.communityPerks, (item) => this.addCommunityPerk(item));
   }
 
@@ -1268,6 +1290,38 @@ export class CourseEditorComponent implements OnInit {
     }
   }
 
+  private replacePricingPlanItems(
+    arItems: { name: string; badge: string; note: string; features: string[] }[],
+    enItems: { name: string; badge: string; note: string; features: string[] }[],
+  ): void {
+    const max = Math.max(arItems.length, enItems.length);
+    if (!max) return;
+
+    this.clearFormArray(this.pricingPlans);
+    for (let index = 0; index < max; index += 1) {
+      this.addPricingPlan({
+        name: {
+          ar: arItems[index]?.name || '',
+          en: enItems[index]?.name || '',
+        },
+        badge: {
+          ar: arItems[index]?.badge || '',
+          en: enItems[index]?.badge || '',
+        },
+        priceBeforeOfferText: { ar: '', en: '' },
+        priceText: { ar: '', en: '' },
+        note: {
+          ar: arItems[index]?.note || '',
+          en: enItems[index]?.note || '',
+        },
+        features: {
+          ar: arItems[index]?.features || [],
+          en: enItems[index]?.features || [],
+        },
+      });
+    }
+  }
+
   private normalizeBulkText(value: string): string {
     return (value || '')
       .replace(/\r/g, '')
@@ -1319,6 +1373,7 @@ export class CourseEditorComponent implements OnInit {
         line
           .replace(/^[-–—•]+\s*/, '')
           .replace(/^\d+[.)-]\s*/, '')
+          .replace(/^[:：]\s*/, '')
           .trim(),
       )
       .filter(
@@ -1425,6 +1480,37 @@ export class CourseEditorComponent implements OnInit {
         description: this.cleanBulkValue(this.valueAfter(part, 'الوصف:', '')),
       }))
       .filter((item) => item.title || item.description);
+  }
+
+  private parsePricingPlanItems(
+    block: string,
+  ): { name: string; badge: string; note: string; features: string[] }[] {
+    const normalizedBlock = (block || '').trim();
+    if (!normalizedBlock) return [];
+
+    return normalizedBlock
+      .split(/\n\s*اسم\s+الخطة\s*:/g)
+      .map((part, index) => (index === 0 ? '' : `اسم الخطة:${part}`).trim())
+      .filter((part) => part.includes('اسم الخطة'))
+      .map((part) => {
+        const name = this.cleanBulkValue(this.valueAfter(part, 'اسم الخطة', 'Badge'));
+        const badge = this.cleanBulkValue(this.valueAfter(part, 'Badge', 'ملاحظة إضافية'));
+        const note = this.cleanBulkValue(
+          this.valueAfter(part, 'ملاحظة إضافية', 'مميزات الخطة'),
+        );
+        const features = this.cleanBulkValue(
+          this.valueAfter(part, 'مميزات الخطة (كل سطر = ميزة)', ''),
+        )
+          .split('\n')
+          .map((line) => this.cleanBulkValue(line))
+          .filter(Boolean);
+
+        return { name, badge, note, features };
+      })
+      .filter(
+        (item) =>
+          item.name || item.badge || item.note || item.features.length,
+      );
   }
 
   private parseCommunityItems(block: string): string[] {

@@ -129,7 +129,7 @@
             <h6 class="editor-section__title mb-1">ملء الخانات تلقائيًا من نموذج صفحة البيع</h6>
             <p class="text-muted small mb-0">
               انسخ بيانات الـ Landing Page بنفس ترتيب الفورم داخل المربع، ثم اضغط على زر ملء الخانات.
-              سيتم إنشاء العناصر المتكررة تلقائيًا مثل Meta pills، عناصر التعلم، محتوى البرنامج، التحولات، وما بعد الاشتراك.
+              سيتم إنشاء العناصر المتكررة تلقائيًا مثل Meta pills، عناصر التعلم، محتوى البرنامج، التحولات، الخطط السعرية، وما بعد الاشتراك.
             </p>
           </div>
 
@@ -146,7 +146,7 @@
           rows="10"
           class="form-control bulk-import-textarea"
           [formControl]="bulkLandingPageControl"
-          placeholder="الصق هنا بيانات صفحة البيع العربية والإنجليزية بنفس شكل الفورم..."
+          placeholder="الصق هنا بيانات صفحة البيع بنفس شكل الفورم، بما فيها قسم الخطط السعرية رقم 11 إن وجد..."
         ></textarea>
 
         <div *ngIf="bulkImportMessage" class="alert alert-success small py-2 mt-3 mb-0">
