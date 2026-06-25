@@ -138,7 +138,8 @@
             <button
               class="btn btn-primary"
               type="button"
-              (click)="joinNow(c)"
+              [routerLink]="['/courses', c.id]"
+              fragment="course-pricing"
               i18n="@@home_course_join"
             >
               اشترك الآن

@@ -71,7 +71,12 @@
             {{ detailsText }}
           </button>
 
-          <button class="btn btn-primary" type="button" (click)="joinNow(c)">
+          <button
+            class="btn btn-primary"
+            type="button"
+            [routerLink]="['/courses', c.id]"
+            fragment="course-pricing"
+          >
             {{ enrollNowText }}
           </button>
         </ng-template>

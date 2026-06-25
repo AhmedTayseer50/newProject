@@ -302,6 +302,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
               : 'حدث خطأ أثناء تحميل الكورس');
         } finally {
           this.loading = false;
+          this.scrollToRequestedSection();
         }
 
         window.removeEventListener('scroll', this.onWindowScroll);
@@ -371,6 +372,18 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
       this.accessSuspended = true;
       this.accessSuspendedReason = access;
     }
+  }
+
+  private scrollToRequestedSection(): void {
+    const fragment = this.route.snapshot.fragment;
+    if (!fragment) return;
+
+    setTimeout(() => {
+      const target = document.getElementById(fragment);
+      if (!target) return;
+
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
   }
 
   ngOnDestroy(): void {
