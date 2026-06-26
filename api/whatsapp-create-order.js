@@ -1,6 +1,6 @@
 const { getFirebaseAdmin } = require('./_lib/firebaseAdmin');
 
-const WHATSAPP_NUMBER = '201555614096';
+const WHATSAPP_NUMBER = '201027997536';
 
 function send(res, status, payload) {
   res.status(status).json(payload);
