@@ -1054,7 +1054,7 @@ export class CourseEditorComponent implements OnInit {
 
   private parseLandingPageText(rawText: string): ParsedLandingPage {
     const normalizedText = this.normalizeBulkText(rawText);
-    const englishMarker = /(?:بيانات\s+Landing\s+Page\s*[—-]\s*النسخة\s+الإنجليزية|النسخة\s+الإنجليزية|English\s+Version)/i;
+    const englishMarker = /(?:بيانات\s+Landing\s+Page\s*[—-]\s*النسخة\s+الإنجليزية|النسخة\s+الإنجليزية|القسم\s+الإنجليزي|الجزء\s+الإنجليزي|English\s+Version|English\s+Section|\bEnglish\b|\bEN\b)/i;
     const markerMatch = englishMarker.exec(normalizedText);
 
     const arText = markerMatch
@@ -1075,59 +1075,113 @@ export class CourseEditorComponent implements OnInit {
     if (!text.trim()) return data;
 
     const heroBlock = this.sectionBetween(text, '1.', '2.');
-    data.title = this.cleanBulkValue(this.valueAfter(heroBlock, 'عنوان الكورس:', 'الوصف المختصر:'));
-    data.description = this.cleanBulkValue(this.valueAfter(heroBlock, 'الوصف المختصر:', 'Eyebrow'));
-    data.heroEyebrow = this.cleanBulkValue(this.valueAfter(heroBlock, 'Eyebrow / عنوان صغير أعلى الهيرو:', 'Tagline / سطر تعريفي قصير:'));
-    data.heroTagline = this.cleanBulkValue(this.valueAfter(heroBlock, 'Tagline / سطر تعريفي قصير:', 'Highlighted title / الجزء المميز من العنوان:'));
-    data.heroTitleHighlight = this.cleanBulkValue(this.valueAfter(heroBlock, 'Highlighted title / الجزء المميز من العنوان:', 'التصنيف:'));
-    data.categoryId = this.cleanBulkValue(this.valueAfter(heroBlock, 'التصنيف:', 'رابط الصورة المصغرة:'));
-    data.thumbnail = this.cleanUrlValue(this.cleanBulkValue(this.valueAfter(heroBlock, 'رابط الصورة المصغرة:', 'السعر الأساسي')));
-    data.price = this.parseNumberValue(this.valueAfter(heroBlock, 'السعر الأساسي', ''));
+    data.title = this.cleanBulkValue(
+      this.valueAfterLabel(heroBlock, /عنوان\s+الكورس(?:\s*\((?:Arabic|English|العربية|الإنجليزية)\))?\s*[:：]/i, [
+        /الوصف\s+المختصر\s*[:：]/i,
+      ]),
+    );
+    data.description = this.cleanBulkValue(
+      this.valueAfterLabel(heroBlock, /الوصف\s+المختصر\s*[:：]/i, [
+        /Eyebrow\s*\/\s*عنوان\s+صغير\s+أعلى\s+الهيرو\s*[:：]/i,
+      ]),
+    );
+    data.heroEyebrow = this.cleanBulkValue(
+      this.valueAfterLabel(heroBlock, /Eyebrow\s*\/\s*عنوان\s+صغير\s+أعلى\s+الهيرو\s*[:：]/i, [
+        /Tagline\s*\/\s*سطر\s+تعريفي\s+قصير\s*[:：]/i,
+      ]),
+    );
+    data.heroTagline = this.cleanBulkValue(
+      this.valueAfterLabel(heroBlock, /Tagline\s*\/\s*سطر\s+تعريفي\s+قصير\s*[:：]/i, [
+        /Highlighted\s+title\s*\/\s*الجزء\s+المميز\s+من\s+العنوان\s*[:：]/i,
+      ]),
+    );
+    data.heroTitleHighlight = this.cleanBulkValue(
+      this.valueAfterLabel(heroBlock, /Highlighted\s+title\s*\/\s*الجزء\s+المميز\s+من\s+العنوان\s*[:：]/i, [
+        /التصنيف\s*[:：]/i,
+        /رابط\s+الصورة\s+المصغرة\s*[:：]/i,
+        /السعر\s+الأساسي/i,
+      ]),
+    );
+    data.categoryId = this.cleanBulkValue(
+      this.valueAfterLabel(heroBlock, /التصنيف\s*[:：]/i, [
+        /رابط\s+الصورة\s+المصغرة\s*[:：]/i,
+        /السعر\s+الأساسي/i,
+      ]),
+    );
+    data.thumbnail = this.cleanUrlValue(
+      this.cleanBulkValue(
+        this.valueAfterLabel(heroBlock, /رابط\s+الصورة\s+المصغرة\s*[:：]/i, [
+          /السعر\s+الأساسي/i,
+        ]),
+      ),
+    );
+    data.price = this.parseNumberValue(
+      this.valueAfterLabel(heroBlock, /السعر\s+الأساسي(?:\s*\/\s*fallback\s+price)?\s*[:：]?/i, []),
+    );
 
     const metaBlock = this.sectionBetween(text, '2.', '3.');
     data.meta = this.parseMetaItems(metaBlock);
 
     const goalBlock = this.sectionBetween(text, '3.', '4.');
-    data.goalTitle = this.cleanBulkValue(this.valueAfter(goalBlock, 'عنوان الهدف:', 'وصف الهدف:'));
-    data.goalDescription = this.cleanBulkValue(this.valueAfter(goalBlock, 'وصف الهدف:', ''));
+    data.goalTitle = this.cleanBulkValue(
+      this.valueAfterLabel(goalBlock, /عنوان\s+الهدف\s*[:：]/i, [/وصف\s+الهدف\s*[:：]/i]),
+    );
+    data.goalDescription = this.cleanBulkValue(
+      this.valueAfterLabel(goalBlock, /وصف\s+الهدف\s*[:：]/i, []),
+    );
 
     const outcomesBlock = this.sectionBetween(text, '4.', '6.');
-    data.outcomes = this.parseNumberedItems(this.valueAfter(outcomesBlock, 'عناصر التعلم:', ''));
+    data.outcomes = this.parseNumberedItems(
+      this.valueAfterLabel(outcomesBlock, /عناصر\s+التعلم\s*[:：]/i, []),
+    );
+    if (!data.outcomes.length) {
+      data.outcomes = this.parseNumberedItems(outcomesBlock);
+    }
 
     const curriculumBlock = this.sectionBetween(text, '6.', '7.');
     data.curriculum = this.parseCurriculumItems(curriculumBlock);
 
     const studyBlock = this.sectionBetween(text, '7.', '8.');
-    data.programDuration = this.cleanBulkValue(this.valueAfter(studyBlock, 'مدة البرنامج:', 'لمن هذا البرنامج؟'));
-    data.targetAudience = this.cleanBulkValue(this.valueAfter(studyBlock, 'لمن هذا البرنامج؟ / وصف مختصر للجمهور:', 'المدة المتوقعة للدراسة:'));
-    data.expectedStudyTimeTitle = this.cleanBulkValue(this.valueAfter(studyBlock, 'المدة المتوقعة للدراسة:', 'وصف المدة أو نمط الدراسة:'));
-    data.expectedStudyTimeDescription = this.cleanBulkValue(this.valueAfter(studyBlock, 'وصف المدة أو نمط الدراسة:', ''));
+    data.programDuration = this.cleanBulkValue(
+      this.valueAfterLabel(studyBlock, /مدة\s+البرنامج\s*[:：]/i, [
+        /لمن\s+هذا\s+البرنامج\؟\s*\/\s*وصف\s+مختصر\s+للجمهور\s*[:：]/i,
+        /المدة\s+المتوقعة\s+للدراسة\s*[:：]/i,
+      ]),
+    );
+    data.targetAudience = this.cleanBulkValue(
+      this.valueAfterLabel(studyBlock, /لمن\s+هذا\s+البرنامج\؟\s*\/\s*وصف\s+مختصر\s+للجمهور\s*[:：]/i, [
+        /المدة\s+المتوقعة\s+للدراسة\s*[:：]/i,
+      ]),
+    );
+    data.expectedStudyTimeTitle = this.cleanBulkValue(
+      this.valueAfterLabel(studyBlock, /المدة\s+المتوقعة\s+للدراسة\s*[:：]/i, [
+        /وصف\s+المدة\s+أو\s+نمط\s+الدراسة\s*[:：]/i,
+        /وصف\s+المدة\s+أو\s+النمط\s*[:：]?/i,
+      ]),
+    );
+    data.expectedStudyTimeDescription = this.cleanBulkValue(
+      this.valueAfterLabel(studyBlock, /وصف\s+المدة\s+أو\s+(?:نمط\s+الدراسة|النمط)\s*[:：]?/i, []),
+    );
 
     const audienceBlock = this.sectionBetween(text, '8.', '9.');
     const prereqStart = this.indexOfAny(audienceBlock, ['المتطلبات السابقة']);
     const audienceOnlyBlock = prereqStart >= 0 ? audienceBlock.slice(0, prereqStart) : audienceBlock;
     data.audienceItems = this.parseNumberedItems(
-      this.valueAfter(audienceOnlyBlock, 'مراحل التحسين المناسبة لك', ''),
+      this.valueAfterLabel(audienceOnlyBlock, /مراحل\s+التحسين\s+المناسبة\s+لك\s*[:：]?/i, []),
     );
-    data.prerequisitesTitle =
-      this.cleanBulkValue(
-        this.valueAfter(
-          audienceBlock,
-          'المتطلبات السابقة / عنوان يظهر في الكارت:',
-          'وصف المتطلبات السابقة:',
-        ),
-      ) ||
-      this.cleanBulkValue(
-        this.valueAfter(
-          audienceBlock,
-          'المتطلبات السابقة ( عنوان يظهر في الكارت) :',
-          'وصف المتطلبات السابقة:',
-        ),
-      ) ||
-      this.cleanBulkValue(
-        this.valueAfter(audienceBlock, 'المتطلبات السابقة', 'وصف المتطلبات السابقة:'),
-      );
-    data.prerequisitesDescription = this.cleanBulkValue(this.valueAfter(audienceBlock, 'وصف المتطلبات السابقة:', ''));
+    if (!data.audienceItems.length) {
+      data.audienceItems = this.parseNumberedItems(audienceOnlyBlock);
+    }
+    const prerequisitesBlock = prereqStart >= 0 ? audienceBlock.slice(prereqStart) : audienceBlock;
+    data.prerequisitesTitle = this.cleanBulkValue(
+      this.valueAfterLabel(prerequisitesBlock, /(?:المتطلبات\s+السابقة(?:\s*\/\s*عنوان\s+يظهر\s+في\s+الكارت)?|عنوان\s+يظهر\s+في\s+الكارت(?:\s*\([^)]*\))?)\s*[:：]?/i, [
+        /وصف\s+المتطلبات\s+السابقة\s*[:：]/i,
+        /وصف\s+المدة\s+أو\s+النمط\s*[:：]?/i,
+      ]),
+    );
+    data.prerequisitesDescription = this.cleanBulkValue(
+      this.valueAfterLabel(prerequisitesBlock, /(?:وصف\s+المتطلبات\s+السابقة|وصف\s+المدة\s+أو\s+النمط)\s*[:：]?/i, []),
+    );
 
     const pricingStartIndex = text.indexOf('11.');
     const transformationBlock = pricingStartIndex >= 0
@@ -1142,14 +1196,26 @@ export class CourseEditorComponent implements OnInit {
     data.communityPerks = this.parseCommunityItems(communityBlock);
 
     const bottomCtaBlock = this.sectionBetween(text, '14.', '15.');
-    data.bottomCtaText = this.cleanBulkValue(this.valueAfter(bottomCtaBlock, 'النص:', 'نص الزر:'));
-    data.bottomCtaButtonText = this.cleanBulkValue(this.valueAfter(bottomCtaBlock, 'نص الزر:', ''));
+    data.bottomCtaText = this.cleanBulkValue(
+      this.valueAfterLabel(bottomCtaBlock, /النص\s*[:：]/i, [/نص\s+الزر\s*[:：]/i]),
+    );
+    data.bottomCtaButtonText = this.cleanBulkValue(
+      this.valueAfterLabel(bottomCtaBlock, /نص\s+الزر\s*[:：]/i, []),
+    );
 
     const offerBlock = this.sectionAfter(text, '15.');
-    data.offerPercent = this.parseNumberValue(this.valueAfter(offerBlock, 'النسبة %:', 'عنوان العرض:'));
-    data.offerHeading = this.cleanBulkValue(this.valueAfter(offerBlock, 'عنوان العرض:', 'نص العرض:'));
-    data.offerText = this.cleanBulkValue(this.valueAfter(offerBlock, 'نص العرض:', 'نص الزر:'));
-    data.offerCtaText = this.cleanBulkValue(this.valueAfter(offerBlock, 'نص الزر:', ''));
+    data.offerPercent = this.parseNumberValue(
+      this.valueAfterLabel(offerBlock, /النسبة\s*%\s*[:：]?/i, [/عنوان\s+العرض\s*[:：]/i]),
+    );
+    data.offerHeading = this.cleanBulkValue(
+      this.valueAfterLabel(offerBlock, /عنوان\s+العرض\s*[:：]/i, [/نص\s+العرض\s*[:：]/i]),
+    );
+    data.offerText = this.cleanBulkValue(
+      this.valueAfterLabel(offerBlock, /نص\s+العرض\s*[:：]/i, [/نص\s+الزر\s*[:：]/i]),
+    );
+    data.offerCtaText = this.cleanBulkValue(
+      this.valueAfterLabel(offerBlock, /نص\s+الزر\s*[:：]/i, []),
+    );
 
     return data;
   }
@@ -1358,6 +1424,28 @@ export class CourseEditorComponent implements OnInit {
     return (endIndex >= 0 ? text.slice(from, endIndex) : text.slice(from)).trim();
   }
 
+  private valueAfterLabel(
+    text: string,
+    labelPattern: RegExp,
+    endPatterns: RegExp[],
+  ): string {
+    if (!text) return '';
+
+    const labelMatch = labelPattern.exec(text);
+    if (!labelMatch || labelMatch.index < 0) return '';
+
+    const from = labelMatch.index + labelMatch[0].length;
+    const nextIndexes = endPatterns
+      .map((pattern) => {
+        const match = pattern.exec(text.slice(from));
+        return match && match.index >= 0 ? from + match.index : -1;
+      })
+      .filter((index) => index >= 0);
+
+    const to = nextIndexes.length ? Math.min(...nextIndexes) : text.length;
+    return text.slice(from, to).trim();
+  }
+
   private indexOfAny(text: string, markers: string[]): number {
     const indexes = markers
       .map((marker) => text.indexOf(marker))
@@ -1374,14 +1462,25 @@ export class CourseEditorComponent implements OnInit {
           .replace(/^[-–—•]+\s*/, '')
           .replace(/^\d+[.)-]\s*/, '')
           .replace(/^[:：]\s*/, '')
+          .replace(/^عنوان\s+يظهر\s+في\s+الكارت\s*\([^)]*\)\s*[:：]?\s*/i, '')
+          .replace(/^وصف\s+المدة\s+أو\s+النمط\s*\([^)]*\)\s*[:：]?\s*/i, '')
           .trim(),
       )
-      .filter(
-        (line) =>
-          !!line &&
-          !/^[_\sـ-]{5,}$/.test(line) &&
-          !/^\/?\s*[\u0600-\u06FFa-zA-Z0-9\s؟?()/%-]+:$/.test(line),
-      )
+      .filter((line) => {
+        if (!line) return false;
+        if (/^[_\sـ-]{5,}$/.test(line)) return false;
+        if (/^[.…\s]+$/.test(line)) return false;
+        if (/^الخ\.?$/i.test(line)) return false;
+        if (/^هنا\s+ممكن/i.test(line)) return false;
+        if (/^هذا\s+الجزء\s+يغذي/i.test(line)) return false;
+        if (/^يظهر\s+بعد\s+الهيرو/i.test(line)) return false;
+        if (/^نفس\s+ترتيب\s+قسم/i.test(line)) return false;
+        if (/^كل\s+نقطة\s+في\s+سطر/i.test(line)) return false;
+        if (/^عنوان\s+يظهر\s+في\s+الكارت\s*\(/i.test(line)) return false;
+        if (/^وصف\s+المدة\s+أو\s+النمط\s*\(/i.test(line)) return false;
+        if (/^\/?\s*[\u0600-\u06FFa-zA-Z0-9\s؟?()/%-]+:$/.test(line)) return false;
+        return true;
+      })
       .join('\n')
       .trim();
   }
@@ -1409,13 +1508,14 @@ export class CourseEditorComponent implements OnInit {
   }
 
   private parseNumberedItems(block: string): string[] {
+    const sectionHeadingPattern = /^\d+\.\s*(?:Hero|Meta|Bottom|Offer|الهدف|ماذا|محتوى|نظرة|هل|التحول|الخطط)/i;
     const lines = (block || '')
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean);
 
     return lines
-      .filter((line) => /^\d+[.)-]\s+/.test(line))
+      .filter((line) => /^\d+\s*[.)-]\s*/.test(line) && !sectionHeadingPattern.test(line))
       .map((line) => this.cleanBulkValue(line))
       .filter(Boolean);
   }
@@ -1428,20 +1528,21 @@ export class CourseEditorComponent implements OnInit {
     const items: { label: string; value: string }[] = [];
 
     for (let index = 0; index < lines.length; index += 1) {
-      if (!/^Label\s*\//i.test(lines[index])) continue;
+      if (!/^Label(?:\s*\/\s*اسم\s+البيان)?\s*[:：]/i.test(lines[index])) continue;
 
       const label = this.cleanBulkValue(
-        lines[index].replace(/^Label\s*\/\s*اسم البيان\s*:?/i, ''),
+        lines[index].replace(/^Label(?:\s*\/\s*اسم\s+البيان)?\s*[:：]?/i, ''),
       ) || this.cleanBulkValue(lines[index + 1] || '');
 
       let value = '';
       const valueLineIndex = lines.findIndex(
-        (line, lineIndex) => lineIndex > index && /^Value\s*\//i.test(line),
+        (line, lineIndex) =>
+          lineIndex > index && /^Value(?:\s*\/\s*القيمة)?\s*[:：]/i.test(line),
       );
 
       if (valueLineIndex >= 0) {
         value = this.cleanBulkValue(
-          lines[valueLineIndex].replace(/^Value\s*\/\s*القيمة\s*:?/i, ''),
+          lines[valueLineIndex].replace(/^Value(?:\s*\/\s*القيمة)?\s*[:：]?/i, ''),
         ) || this.cleanBulkValue(lines[valueLineIndex + 1] || '');
         index = valueLineIndex;
       }
@@ -1453,16 +1554,24 @@ export class CourseEditorComponent implements OnInit {
   }
 
   private parseCurriculumItems(block: string): { title: string; points: string[] }[] {
-    return (block || '')
-      .split(/\n\s*عنصر من محتوى البرنامج\s*\n/g)
+    const normalizedBlock = (block || '').trim();
+    if (!normalizedBlock) return [];
+
+    const parts = normalizedBlock
+      .split(/\n\s*(?=عنوان\s+المحور\s*[:：])/g)
       .map((part) => part.trim())
-      .filter((part) => part.includes('عنوان المحور:'))
+      .filter((part) => /عنوان\s+المحور\s*[:：]/i.test(part));
+
+    return parts
       .map((part) => ({
-        title: this.cleanBulkValue(this.valueAfter(part, 'عنوان المحور:', 'نقاط المحور:')),
-        points: this.cleanBulkValue(this.valueAfter(part, 'نقاط المحور:', ''))
-          .split('\n')
-          .map((line) => this.cleanBulkValue(line))
-          .filter(Boolean),
+        title: this.cleanBulkValue(
+          this.valueAfterLabel(part, /عنوان\s+المحور\s*[:：]/i, [
+            /نقاط\s+المحور(?:\s*\([^)]*\))?\s*[:：]/i,
+          ]),
+        ),
+        points: this.parseNumberedItems(
+          this.valueAfterLabel(part, /نقاط\s+المحور(?:\s*\([^)]*\))?\s*[:：]/i, []),
+        ),
       }))
       .filter((item) => item.title || item.points.length);
   }
@@ -1471,13 +1580,22 @@ export class CourseEditorComponent implements OnInit {
     block: string,
     splitMarker: string,
   ): { title: string; description: string }[] {
-    return (block || '')
-      .split(new RegExp(`\\n\\s*${splitMarker}\\s*\\n`, 'g'))
+    const normalizedBlock = (block || '').trim();
+    if (!normalizedBlock) return [];
+
+    const parts = normalizedBlock
+      .split(/\n\s*(?=العنوان\s*[:：])/g)
       .map((part) => part.trim())
-      .filter((part) => part.includes('العنوان:'))
+      .filter((part) => /العنوان\s*[:：]/i.test(part));
+
+    return parts
       .map((part) => ({
-        title: this.cleanBulkValue(this.valueAfter(part, 'العنوان:', 'الوصف:')),
-        description: this.cleanBulkValue(this.valueAfter(part, 'الوصف:', '')),
+        title: this.cleanBulkValue(
+          this.valueAfterLabel(part, /العنوان\s*[:：]/i, [/الوصف\s*[:：]/i]),
+        ),
+        description: this.cleanBulkValue(
+          this.valueAfterLabel(part, /الوصف\s*[:：]/i, []),
+        ),
       }))
       .filter((item) => item.title || item.description);
   }
@@ -1489,21 +1607,25 @@ export class CourseEditorComponent implements OnInit {
     if (!normalizedBlock) return [];
 
     return normalizedBlock
-      .split(/\n\s*اسم\s+الخطة\s*:/g)
-      .map((part, index) => (index === 0 ? '' : `اسم الخطة:${part}`).trim())
-      .filter((part) => part.includes('اسم الخطة'))
+      .split(/\n\s*(?=اسم\s+الخطة\s*[:：])/g)
+      .map((part) => part.trim())
+      .filter((part) => /اسم\s+الخطة\s*[:：]/i.test(part))
       .map((part) => {
-        const name = this.cleanBulkValue(this.valueAfter(part, 'اسم الخطة', 'Badge'));
-        const badge = this.cleanBulkValue(this.valueAfter(part, 'Badge', 'ملاحظة إضافية'));
-        const note = this.cleanBulkValue(
-          this.valueAfter(part, 'ملاحظة إضافية', 'مميزات الخطة'),
+        const name = this.cleanBulkValue(
+          this.valueAfterLabel(part, /اسم\s+الخطة\s*[:：]/i, [/Badge\s*[:：]/i]),
         );
-        const features = this.cleanBulkValue(
-          this.valueAfter(part, 'مميزات الخطة (كل سطر = ميزة)', ''),
-        )
-          .split('\n')
-          .map((line) => this.cleanBulkValue(line))
-          .filter(Boolean);
+        const badge = this.cleanBulkValue(
+          this.valueAfterLabel(part, /Badge\s*[:：]/i, [/ملاحظة\s+إضافية\s*[:：]/i]),
+        );
+        const note = this.cleanBulkValue(
+          this.valueAfterLabel(part, /ملاحظة\s+إضافية\s*[:：]/i, [/مميزات\s+الخطة/i]),
+        );
+        const featuresBlock = this.valueAfterLabel(
+          part,
+          /مميزات\s+الخطة(?:\s*\([^)]*\))?\s*[:：]/i,
+          [],
+        );
+        const features = this.parseNumberedItems(featuresBlock);
 
         return { name, badge, note, features };
       })
@@ -1514,16 +1636,32 @@ export class CourseEditorComponent implements OnInit {
   }
 
   private parseCommunityItems(block: string): string[] {
-    const items: string[] = [];
-    const regex = /بعد الاشتراك:?\s*([\s\S]*?)(?=\n\s*بعد الاشتراك:?|$)/g;
+    const normalizedBlock = (block || '').trim();
+    if (!normalizedBlock) return [];
+
+    // في الفورم الجديد قسم المجتمع بييجي غالبًا كقائمة مباشرة:
+    // 1 - عنصر
+    // 2 - عنصر
+    // لذلك نقرأ العناصر المرقمة أولًا حتى لا تتحول القائمة كلها إلى خانة واحدة.
+    const numberedItems = this.parseNumberedItems(normalizedBlock);
+    if (numberedItems.length) return numberedItems;
+
+    const explicitItems: string[] = [];
+    const regex = /بعد\s+الاشتراك:?\s*([\s\S]*?)(?=\n\s*بعد\s+الاشتراك:?|$)/g;
     let match: RegExpExecArray | null;
 
-    while ((match = regex.exec(block || ''))) {
+    while ((match = regex.exec(normalizedBlock))) {
       const value = this.cleanBulkValue(match[1] || '');
-      if (value) items.push(value);
+      if (value) explicitItems.push(value);
     }
 
-    return items;
+    if (explicitItems.length) return explicitItems;
+
+    // fallback بسيط لو المستخدم كتب العناصر كسطور عادية أو bullets بدون ترقيم.
+    return normalizedBlock
+      .split('\n')
+      .map((line) => this.cleanBulkValue(line))
+      .filter(Boolean);
   }
 
   async saveCourse(): Promise<void> {
