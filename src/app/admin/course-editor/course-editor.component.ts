@@ -1509,13 +1509,14 @@ export class CourseEditorComponent implements OnInit {
 
   private parseNumberedItems(block: string): string[] {
     const sectionHeadingPattern = /^\d+\.\s*(?:Hero|Meta|Bottom|Offer|الهدف|ماذا|محتوى|نظرة|هل|التحول|الخطط)/i;
+    const itemMarkerPattern = /^(?:\d+\s*[.)-]|[-–—•*])\s+/;
     const lines = (block || '')
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean);
 
     return lines
-      .filter((line) => /^\d+\s*[.)-]\s*/.test(line) && !sectionHeadingPattern.test(line))
+      .filter((line) => itemMarkerPattern.test(line) && !sectionHeadingPattern.test(line))
       .map((line) => this.cleanBulkValue(line))
       .filter(Boolean);
   }
